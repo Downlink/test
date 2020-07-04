@@ -6,26 +6,43 @@ The module's API is a FaaS (Function as a Service) also called "serverless" with
 
 Each user can create multiple client applications accessing multiple remote devices through its user assigned device/server *id's*. Communications between client and device applications are encrypted using TLS protocol.  Access to remote devices/servers is restricted to authenticated and authorized users only.
 
-[](https://raw.githubusercontent.com/EdoLabs/src/master/m2mSystem2.svg?sanitize=true)
-
-
-
-Note:
-
 To use the m2m client module, user must create an account and register their devices with [node-m2m](https://www.node-m2m.com) server.
 
-#### Works with the following devices:
+[](https://raw.githubusercontent.com/EdoLabs/src/master/m2mSystem2.svg?sanitize=true)
 
-* Raspberry Pi Models: B+, 2, 3, Zero & Zero W, Compute Module 3, 3B+, 3A+ (40-pin models only)
+# Table of contents
+1. [Supported Devices](#supported-devices)
+2. [Node.js version requirement](#node-version)
+3. [Installation](#installation)
+4. [Quick Tour](#quicktour)
+5. [Examples](#examples)
+   - [Example 1](#example1)
+   - [Example 2](#example2)
+   - [Example 3](#example3)
+   - [Example 4](#example4)
+6. [Http REST API Simulation](#http-rest-api-simulation)
+7. [Browser Interaction](#browser-interaction)
+   - [Application Online Code Editing](#online-code-editing)
+   - [Restarting Application or Auto Restart Setup](#auto-restart-setup)
+8. [Other FaaS functions](#other-faas-functions)
+   - [Client request to get all available remote devices](#get-all-devices)
+   - [Client request to get each device resources setup](#device-setup)
+
+
+
+
+## Supported Devices <a name="supported-devices"></a>
+
+* Raspberry Pi Models: B+, 2, 3, Zero & Zero W, Compute Module 3, 3B+, 3A+ (generally all 40-pin models only)
 * Linux Computer
 * Windows PC
 * Mac Computer
 
-## Compatibility
+## Node.js version requirement <a name="node-version"></a>
 
 * Node.js Versions: 8.x, 9.x, 10.x, 11.x, 12.x
 
-## Installation
+## Installation <a name="installation"></a>
 ```js
 $ npm install m2m
 ```
@@ -37,7 +54,7 @@ You need to install it as a separate module for Raspberry Pi devices.
 $ npm install array-gpio
 ```
 
-## Quick Tour
+## Quick Tour <a name="quicktour"></a>
 
 For this quick tour, we will use two computers communicating with each other using the internet.
 
@@ -185,7 +202,8 @@ watch random value 115
 ...
 ```
 
-## Example 1
+<a name="examples"></a>
+## Example 1 <a name="example1"></a>
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
 [](example1.svg)
@@ -280,7 +298,7 @@ client.connect(function(err, result){
 });
 ```
 
-## Example 2
+## Example 2 <a name="example2"></a>
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
@@ -388,7 +406,7 @@ client.connect(function(err, result){
 });
 ```
 
-## Example 3
+## Example 3 <a name="example3"></a>
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
 [](example3.svg)
@@ -466,7 +484,7 @@ function machineControl(devices){
   });
 }
 ```
-## Example 4
+## Example 4 <a name="example4"></a>
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
 ### Sending Data To Remote Device or Server
@@ -549,7 +567,7 @@ server.connect(function(err, result){
 ```
 
 
-### Http REST API Simulation
+### Http REST API Simulation <a name="http-rest-api-simulation"></a>
 
 #### GET and POST method client request
 ```js
@@ -616,9 +634,11 @@ server.connect((err, result) => {
 });
 ```
 
-## Browser Interaction
+## Browser Interaction <a name="browser-interaction"></a>
 
-Using the browser, you can download, edit and upload your client/device application code from or into your remote devices anywhere.
+### Application Online Code Editing <a name="online-code-editing"></a>
+
+Using the browser, you can download, edit and upload your client/device application code from or into your remote devices from anywhere.
 
 To allow the browser to communicate with your application, you need to set a *code* permission option as shown below.
 ```js
@@ -626,7 +646,7 @@ To allow the browser to communicate with your application, you need to set a *co
 ```
 You need to set the property *allow* to true and provide the *filename* of your application.
 
-Also for client application, you can set a *name*, *location* and *description* property option 
+Also for client application, you can set a *name*, *location* and *description* property option
 especially if you have multiple clients to monitor as shown below. For device application, you do not need to set these properties.
 ```js
 {code:{allow:true, filename:'myAppFilename.js'}, name:'myAppName', location:'myAppLocation', description:'myAppDescription'}}
@@ -665,8 +685,7 @@ device.connect(function (err, result) {
   // device application logic ...
 });
 ```
-
-### Restarting Application or Auto Restart Setup
+### Restarting Application or Auto Restart Setup <a name="auto-restart-setup"></a>
 
 During browser interaction, your client/device application process will need to be restarted after a module update, application code update, remote command restart etc.
 
@@ -686,18 +705,16 @@ Node-m2m uses nodemon to restart your application process. You can add the follo
   "ext": "js,json"
 }
 ```
-From the configuration section above, the name of your application is *device.js*. Replace it with the actual name of your application.
+From the configuration section above, the filename of your application is *device.js*. Replace it with the actual filename of your application.
  Start your application using npm start.
 ```js
 $ npm start
 ```
 For other custom nodemon configuration, please read nodemon documentation.
 
+## Other FaaS functions <a name="other-faas-functions"></a>
 
-
-## Other FaaS functions
-
-#### Client request to get all available remote devices and resources setup for each device
+### Client request to get all available remote devices <a name="get-all-devices"></a>
 ```js
 const m2m = require('m2m');
 
@@ -705,27 +722,41 @@ const client = new m2m.Client();
 
 client.connect((err, result) => {
   if(err) return console.error('Connect error:', err);
-
   console.log('result:', result);
 
   // user request to get all registered devices
   client.getDevices((err, devices) => {
-	if(err) return console.error('getDevices err:', err.message);
-	console.log('devices', devices);
+    if(err) return console.error('getDevices err:', err.message);
+    console.log('devices', devices);
+    // devices output
     /*[
       { id: 100, name: 'Machine1', location: 'Seoul, South Korea' },
       { id: 200, name: 'Machine2', location: 'New York, US' },
       { id: 300, name: 'Machine3', location: 'London, UK' }
     ]*/
   });
+});
+```
 
-  // user request to get device 300 resources
+### Client request to get each device resources setup <a name="device-setup"></a>
+```js
+const m2m = require('m2m');
+
+const client = new m2m.Client();
+
+client.connect((err, result) => {
+  if(err) return console.error('Connect error:', err);
+  console.log('result:', result);
+
   client.accessDevice(300, (err, device) => {
     if(err) return console.error('accessDevice 300 error:', err.message);
+
+    // client request to get device 300 resources
     // e.g. gpio input/output pins, available channels, system information
     device.setupInfo(function(err, data){
       if(err) return console.log('device1 setup error:', err.message);
       console.log('device1 setup data', data);
+      // data output
       /*{
         id: 300,
         systemInfo: {
