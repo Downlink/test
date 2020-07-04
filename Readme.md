@@ -8,6 +8,8 @@ Each user can create multiple client applications accessing multiple remote devi
 
 [](https://raw.githubusercontent.com/EdoLabs/src/master/m2mSystem2.svg?sanitize=true)
 
+
+
 Note:
 
 To use the m2m client module, user must create an account and register their devices with [node-m2m](https://www.node-m2m.com) server.
@@ -34,7 +36,6 @@ You need to install it as a separate module for Raspberry Pi devices.
 ```js
 $ npm install array-gpio
 ```
-
 
 ## Quick Tour
 
@@ -231,7 +232,7 @@ device.connect(function(err, result){
 $ npm install m2m
 ```
 ```js
-cconst m2m = require('m2m');
+const m2m = require('m2m');
 
 let client = new m2m.Client();
 
@@ -472,7 +473,7 @@ function machineControl(devices){
 
 #### Client Application
 ```js
-cconst m2m = require('m2m');
+const m2m = require('m2m');
 
 let client = new m2m.Client();
 
@@ -584,7 +585,7 @@ client.connect((err, result) => {
 ```js
 const m2m = require('m2m');
 
-const server = new m2m.Server();
+const server = new m2m.Server(300);
 
 server.connect((err, result) => {
   if(err) return console.error('Connect error:', err);
