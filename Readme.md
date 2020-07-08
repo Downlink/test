@@ -16,10 +16,10 @@ To use the m2m client module, user must create an account and register their dev
 3. [Installation](#installation)
 4. [Quick Tour](#quicktour)
 5. [Examples](#examples)
-   - [Example 1](#example1)
-   - [Example 2](#example2)
-   - [Example 3](#example3)
-   - [Example 4](#example4)
+   - [Example 1 - Using MCP 9808 Temperature Sensor](#example1)
+   - [Example 2 - GPIO Input/Output Control](#example2)
+   - [Example 3 - Remote Machine Control](#example3)
+   - [Example 4 - Sending Data to Remote Device/Server](#example4)
 6. [Http REST API Simulation](#http-rest-api-simulation)
 7. [Browser Interaction](#browser-interaction)
    - [Application Online Code Editing](#online-code-editing)
@@ -81,18 +81,17 @@ const m2m = require('m2m');
 // this id must must be registered with node-m2m server
 let device = new m2m.Device(100);
 
-// your device must be authenticated with m2m server before it starts providing services to clients
+// authenticate and connect with node-m2m server
 device.connect(function(err, result){
     if(err) return console.error('connect error:', err);
 
     console.log('result:', result);
 
-    // if your credentials are valid, channel 'random' data
-    // and simulated gpio output data will be setup
-
     device.setChannel('random', function(err, data){
       if(err) return console.error('setData random error:', err.message);
 
+      data.value =   Math.floor(( Math.random() * 100) + 25);
+      // or
       data.result =   Math.floor(( Math.random() * 100) + 25);
       console.log('random value', data.result);
     });
@@ -107,14 +106,14 @@ device.connect(function(err, result){
 
 Start your device application.
 ```js
-$ node device.js or node device.js -r
+$ node device.js
 ```
 
 The first time you start your application, you will be prompted to provide your credentials.
 ```js
-$ prompt: Enter userid (email):
-$ prompt: Enter password:
-$ prompt: Enter security code:
+? Enter your userid (email):
+? Enter your password:
+? Enter your security code:
 
 ```
 Enter your credentials.
@@ -127,7 +126,7 @@ $ node device.js -r
 ```
 It will ask you to enter your credentials again. Enter your credentials and your token will be renewed.
 
-### Client Application Computer Setup
+### Client Application Setup
 Similar with the remote device setup, create a client project directory and install m2m module.
 ```js
 $ npm install m2m
@@ -139,7 +138,6 @@ const m2m = require('m2m');
 // create a client application object
 let client = new m2m.Client();
 
-// enter your credentials for server authentication
 client.connect(function(err, result){
     if(err) return console.error('connect error:', err);
 
@@ -221,16 +219,14 @@ const i2c = require('./node_modules/m2m/examples/i2c/9808.js');
 
 let device = new m2m.Device(110);
 
-// connect to m2m server for authentication
-
-// explicitly connecting to default m2m server
+// explicitly connecting to default node-m2m server
 device.connect('https://www.node-m2m.com', function(err, result){
   // device application logic
 });
 
 // or
 
-// implicitly connecting to default m2m server
+// implicitly connecting to default node-m2m server
 device.connect(function(err, result){
   if(err) return console.error('connect error:', err);
 
@@ -321,14 +317,15 @@ device.connect(function(err, result){
   // set pin 11 and 13 as GPIO inputs
   device.setGpio({mode:'input', pin:[11,13]});
 
-  // or using a callback to execute any custom logic
+  // or
 
-  // callback will be executed if gpio state changes
+  // set GPIO inputs with a callback to execute any custom logic
+  // callback will be executed if input gpio.pin state changes
   device.setGpio({mode:'input', pin:[11,13]}, function(err, gpio){
     if(err) return console.error('input setGpio error:', err.message);
 
     console.log('input pin', gpio.pin, 'state', gpio.state);
-    // process custom logic if callback is executed
+    // add custom logic here
   });
 });
 ```
@@ -347,10 +344,18 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
+  device.setGpio({mode:'output', pin:[33,35]});
+
+  // or
+
+  // with a callback to execute any custom logic
+  // callback will be executed if output gpio.pin state changes
+  // as controlled by client applications
   device.setGpio({mode:'output', pin:[33,35]}, function(err, gpio){
     if(err) return console.error('output setGpio error:', err.message);
 
     console.log('output pin', gpio.pin, 'state', gpio.state);
+    // add custom logic here
   });
 });
 ```
@@ -489,7 +494,7 @@ function machineControl(devices){
 [](example1.svg)
 ### Sending Data To Remote Device or Server
 
-#### Client Application
+#### Client
 ```js
 const m2m = require('m2m');
 
@@ -525,7 +530,7 @@ client.connect(function(err, result){
 ```
 
 
-#### Device/Server Application
+#### Device/Server
 ```js
 const m2m = require('m2m');
 
@@ -569,7 +574,7 @@ server.connect(function(err, result){
 
 ### Http REST API Simulation <a name="http-rest-api-simulation"></a>
 
-#### GET and POST method client request
+#### Client GET and POST method request
 ```js
 const m2m = require('m2m');
 
@@ -585,7 +590,7 @@ client.connect((err, result) => {
 
     // GET method api request
     server.api('/random').getData((err, result) => {
-      if(err) return console.error('getData random error:', err.message);
+      if(err) return console.error('/random error:', err.message);
       console.log('/random value', result); // 24
     });
 
@@ -599,7 +604,7 @@ client.connect((err, result) => {
 });
 ```
 
-#### GET and POST method server setup
+#### Server GET and POST method setup
 ```js
 const m2m = require('m2m');
 
@@ -642,7 +647,7 @@ Using the browser, you can download, edit and upload your client/device applicat
 
 To allow the browser to communicate with your application, you need to set a *code* permission option as shown below.
 ```js
-{code:{allow:true, filename:'myApplication.js'}}
+{code:{allow:true, filename:'myAppFileName.js'}}
 ```
 You need to set the property *allow* to true and provide the *filename* of your application.
 
@@ -654,7 +659,10 @@ especially if you have multiple clients to monitor as shown below. For device ap
 #### Example
 
 ##### Client Application
+
 ```js
+// client.js
+
 const m2m = require('m2m');
 
 const client = new m2m.Client();
@@ -670,6 +678,8 @@ client.connect(function (err, result) {
 ```
 ##### Device Application
 ```js
+// device.js
+
 const m2m = require('m2m');
 
 const device = new m2m.Device(1000);
@@ -721,12 +731,12 @@ const m2m = require('m2m');
 const client = new m2m.Client();
 
 client.connect((err, result) => {
-  if(err) return console.error('Connect error:', err);
+  if(err) return console.error('Connect error:', err.message);
   console.log('result:', result);
 
   // user request to get all registered devices
   client.getDevices((err, devices) => {
-    if(err) return console.error('getDevices err:', err.message);
+    if(err) return console.error('getDevices err:', err);
     console.log('devices', devices);
     // devices output
     /*[
