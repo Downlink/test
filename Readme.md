@@ -625,9 +625,14 @@ server.connect((err, result) => {
 
 ### Naming Your Client Application For Tracking Purposes<a name="client-name-tracking"></a>
 
-Unlike *device/server* applications, you can create *client* applications without registering it with **node-m2m** server. Node-m2m tracks client applications using a dynamic string *client id*. If you have multiple client applications, it may be difficult to track all your clients by just referring to its *client id* using the browser interface.
+Unlike *device/server* applications, users can create *client* applications without registering it with **node-m2m** server.
 
-Similar with device/server applications, you can assign a *name*, *location* and a *description* properties to your clients as shown below.
+Node-m2m tracks all client applications through a dynamic string *client id*.
+If you have multiple client applications, it may be difficult to track all your clients by just referring to its *client id* from the browser interface.
+
+You can assign a **name**, **location** and a **description** properties to your clients as shown below.
+
+This will make it easy to track your clients using the browser interface by referring to  its name, location and description.
 ```js
 const m2m = require('m2m');
 
@@ -640,7 +645,6 @@ client.connect((err, result) => {
 });
 ```
 
-After which, tracking your clients is easier using the browser interface by referring to their names, locations and descriptions.
 
 ### Remote Application Code Editing <a name="online-code-editing"></a>
 
@@ -660,11 +664,16 @@ as shown below.
 ```
 You need to set the property *allow* to true and provide the *filename* of your application.
 
+From the example above, the filename of the application is *device.js*. Replace it with the actual filename of your application.
+
+
 ### Auto Restart Setup <a name="auto-restart-setup"></a>
 
 Using the browser interface, you may need to restart your application after a module update, application code edit/update, remote restart command etc.
 
-Node-m2m uses the **nodemon** npm module to restart your application process. You can add the following *nodemonConfig* and *scripts* properties in your project's npm package.json as a basic auto restart configuration.
+Node-m2m uses the **nodemon** module to restart your application process.
+
+You can add the following *nodemonConfig* and *scripts* properties in your project's npm package.json as a basic auto restart configuration.
 ```js
 "nodemonConfig": {
   "delay":"2000",
@@ -680,27 +689,25 @@ Node-m2m uses the **nodemon** npm module to restart your application process. Yo
   "start": "nodemon device.js"
 },
 ```
-From the example above, the filename of the application is *device.js*. Replace it with the actual filename of your application when adding the scripts property. Then re-start your node process using npm start as shown below.
+From the example above, the filename of the application is *device.js*. Replace it with the actual filename of your application when adding the scripts property. Then re-start your node process using *npm start* as shown below.
 ```js
 $ npm start
 ```
-For other custom nodemon configuration, please read nodemon documentation.
+For other custom nodemon configuration, please read the nodemon documentation.
 
 ## Auto configuration for Code Edit and Auto Restart <a name="auto-config"></a>
 To automatically configure your package.json for code editing and auto restart, start your node process with -config flag.
 
 **m2m** will attempt to configure your package.json by adding/creating the *m2mConfig*, *nodemonConfig*, and *scripts* properties to your existing project's package.json. If your m2m project does not have an existing package.json, it will create a new one.  
 
-#### Example
-
 Assuming your application filename is *device.js*, start your node application as shown below.
 ```js
 $ node device -config
 ```
 
-Stop your node process using *ctrl c*. Check and verify your package.json if it was properly configured.
+Stop your node process using *ctrl-c*. Check and verify your package.json if it was properly configured.
 
-If the configuration is correct, you can now run your node process using npm start.
+If the configuration is correct, you can now run your node process using *npm start*.
 ```js
 $ npm start
 ```
