@@ -59,17 +59,17 @@ $ npm install array-gpio
 ![]()
 ## Quick Tour <a name="quicktour"></a>
 
-For this quick tour, we will let two computers communicating with each other using the internet.
+For this quick tour, we will let two computers communicate with each other using the internet.
 
-We will create a micro server (*remote device*) that will just generate random numbers as its service.
+We will create a micro server (*remote device*) that will generate random numbers as its sole service.
 
 And a client application (*remote client*) that will access the random numbers from the remote device.
 
-We will access the random numbers using two methods.
+The remote client will access the random numbers using two methods.
 
-The first one called a pull-method, we will capture the random numbers using a one time function call.
+The first one called a pull-method, the client will capture the random numbers using a one time function call.
 
-And the second one using a push-method, we will watch the random numbers for value changes every 5 seconds. <br> If the value changes, it will be sent to the remote client from remote device.   
+And the second one using a push-method, the client will watch the random numbers for any changes to its value <br> every 5 seconds. If the value changes, only then the remote device will send the new random value to the remote client.   
 
 
 
