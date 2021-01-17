@@ -232,7 +232,7 @@ client.connect(function(err, result){
     console.log('temperature value', value); // 23.51, 23.49, 23.11
   });
 
-  // or
+  // or use accessDevice() method w/ a callback
 
   client.accessDevice(110, function (err, device){
     if(err) return console.error('accessDevice 110 error:', err.message);
@@ -242,7 +242,6 @@ client.connect(function(err, result){
       console.log('temperature value', value); // 23.51, 23.49, 23.11
     });
   });
-
 });
 ```
 #### Client application in London
@@ -280,8 +279,8 @@ client.connect(function(err, result){
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
-### Configure device1 for GPIO input monitoring
-Install array-gpio both on device1 and device2 for GPIO monitoring and control
+### Configure device1 for gpio input monitoring
+Install array-gpio both on device1 and device2
 ```js
 $ npm install m2m array-gpio
 ```
@@ -296,9 +295,6 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
-  // set GPIO inputs with a callback to execute any custom logic
-  // optional callback will be executed if any of the input pin state changes
-  // as triggered by any sensor/switch connected to pin 11 and 13
   device.setGpio({mode:'input', pin:[11, 13]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
@@ -308,7 +304,7 @@ device.connect(function(err, result){
 });
 ```
 
-### Configure device2 for GPIO output control
+### Configure device2 for gpio output control
 ```js
 $ npm install m2m array-gpio
 ```
@@ -322,8 +318,6 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
-  // set gpio with an optional callback, it will be executed
-  // if any of the output pin state changes as controlled by the client
   device.setGpio({mode:'output', pin:[33, 35]}, function(err, gpio){
     if(err) return console.error('setGpio output error:', err.message);
 
@@ -333,7 +327,7 @@ device.connect(function(err, result){
 });
 ```
 
-### Client application to control device1 and device2
+### Client to monitor device1 gpio inputs and control device2 gpio outputs
 ```js
 $ npm install m2m
 ```
@@ -689,7 +683,7 @@ You can add the following *nodemonConfig* and *scripts* properties in your proje
   "start": "nodemon device.js"
 },
 ```
-From the example above, the filename of the application is *device.js*. Replace it with the actual filename of your application when adding the scripts property. Then re-start your node process using *npm start* as shown below.
+From the example above, the filename of the application is *device.js*. Replace it with the actual filename of your application when adding the scripts property. Then restart your node process using *npm start* command as shown below.
 ```js
 $ npm start
 ```
@@ -707,7 +701,7 @@ $ node device -config
 
 Stop your node process using *ctrl-c*. Check and verify your package.json if it was properly configured.
 
-If the configuration is correct, you can now run your node process using *npm start*.
+If the configuration is correct, you can now run your node process using *npm start* command.
 ```js
 $ npm start
 ```
