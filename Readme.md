@@ -42,7 +42,7 @@ To use this module, users must create an account and register their devices with
 
 ## Node.js version requirement <a name="node-version"></a>
 
-* Node.js Versions: 8.x, 9.x, 10.x, 11.x, 12.x, 14.x
+* Node.js versions: 8.x, 9.x, 10.x, 11.x, 12.x, 14.x
 
 ## Installation <a name="installation"></a>
 ```js
@@ -51,9 +51,7 @@ $ npm install m2m
 
 ![]()
 ###  Raspberry Pi peripheral access (GPIO, I2C, SPI and PWM). <a name="rpi-peripheral-access"></a>
-This module is also using *array-gpio* for Raspberry Pi peripheral access (GPIO, I2C, SPI and PWM).
-
-You may need to install it as a separate module for Raspberry Pi devices.
+For projects requiring raspberry pi peripheral access such as GPIO, I2C, SPI and PWM, you will need to install *array-gpio* as a separate module.
 ```js
 $ npm install array-gpio
 ```
@@ -63,9 +61,18 @@ $ npm install array-gpio
 
 For this quick tour, we will use two computers communicating with each other using the internet.
 
-One computer will act as the *remote device* that will generate random numbers and simulate a GPIO output using pin 33.
+We will create a micro server (*remote device*) that will just generate random numbers as its service.
 
-The other computer will host a *client application* that will access the random numbers and control the GPIO output using a console.
+And a client application (*remote client*) that will access the random numbers from the remote device.
+
+There are two ways we can access the random numbers from the remote device.
+
+We can access it using a pull-method using a one time function call.
+
+And using an event function also called a push-method where the random numbers will be sent <br>
+to the remote client every 5 seconds if the random value changes from the remote device.   
+
+
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/quicktour.svg?sanitize=true)
 [](quicktour.svg)
@@ -121,7 +128,7 @@ $ node device.js -r
 ```
 It will ask you to enter your credentials again. Enter your credentials to renew your token.
 
-### Client Application Setup
+### Remote Client Setup
 Similar with the remote device setup, create a client project directory and install m2m.
 ```js
 $ npm install m2m
@@ -383,7 +390,7 @@ client.connect(function(err, result){
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
 [](example3.svg)
 
-#### Configure each remote machine's embedded rpi microcontroller with a unique device *id* and set pin 40 for GPIO output control
+#### Configure each remote machine's embedded rpi microcontroller with a unique device *id* <br> and set pin 40 for GPIO output control
 
 Install array-gpio on all remote machines for GPIO output control
 ```js
@@ -622,7 +629,7 @@ server.connect((err, result) => {
 Unlike *device/server* applications, users can create *client* applications without registering it with **node-m2m** server.
 
 Node-m2m tracks all client applications through a dynamic string *client id*.
-If you have multiple client applications, it may be difficult to track all your clients by just referring to its *client id* from the browser interface.
+If you have multiple client applications, <br> it may be difficult to track all your clients by just referring to its *client id* from the browser interface.
 
 You can assign a **name**, **location** and a **description** properties to your clients as shown below.
 
