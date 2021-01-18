@@ -67,7 +67,7 @@ And a client application (*remote client*) that will access the random numbers f
 
 The remote client will access the random numbers using two methods.
 
-The first one called a pull-method, the client will capture the random numbers using a one time function call.
+The first one using a pull-method, the client will capture the random numbers using a one time function call.
 
 And the second one using a push-method, the client will watch the random numbers for any changes to its value <br> every 5 seconds. If the value changes, only then the remote device will send the new random value to the remote client.   
 
