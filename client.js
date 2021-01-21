@@ -1030,9 +1030,9 @@ const client = exports.client = (() => {
         throw new Error('callback argument is required');
       }
       let args = Object.assign({}, spl);
-	    args.id = this.id;
-	    args.event = false;
-	    args.watch = false;
+      args.id = this.id;
+      args.event = false;
+      args.watch = false;
       if(typeof o === 'string'){
         args.name = o;
       }
@@ -1042,8 +1042,8 @@ const client = exports.client = (() => {
       else{
         throw new Error('invalid arguments');
       } 
-	    args.rcvd = true;
-	    args.getData = true;
+      args.rcvd = true;
+      args.getData = true;
 
       validateDevice(args, () => {
         getChannelData(args, cb);
@@ -1084,7 +1084,7 @@ const client = exports.client = (() => {
         args.name = o;
       }
       else if(typeof o === 'object' && o.name && typeof o.name === 'string'){
-		    args.name = o.name; 
+        args.name = o.name; 
         if(o.interval && Number.isInteger(o.interval)){
           args.interval = o.interval;
         }
@@ -1608,7 +1608,7 @@ const device = exports.device = (() => {
       return;
     }
 
-		if(rxd.b){
+    if(rxd.b){
       return; 
     }  
 
@@ -1701,7 +1701,7 @@ const device = exports.device = (() => {
       process.nextTick(deviceUnwatchChannelData, rxd);
     }
     if(watchDeviceInputData.length > 0){
- 			process.nextTick(deviceUnwatchGpioInputState, rxd);
+      process.nextTick(deviceUnwatchGpioInputState, rxd);
     }
     if(watchDeviceOutputData.length > 0){
       process.nextTick(deviceUnwatchGpioOutputState, rxd);
@@ -1775,9 +1775,9 @@ const device = exports.device = (() => {
         deviceSetup.id = data.id;
         if(cb){
           process.nextTick(function(){ 
-          	cb(deviceSetup);
-          	exports.deviceSetup = deviceSetup;
-					});
+            cb(deviceSetup);
+            exports.deviceSetup = deviceSetup;
+          });
         }
       });	 
     }
@@ -1916,14 +1916,14 @@ const device = exports.device = (() => {
               if(data.event && data.state === data.initValue ){
                 return;
               }
-	            if(cb){
-	              process.nextTick(() => {
-								  if(data.error){
-								    return cb(new Error(data.error), null);
-								  }
-								  cb(null, data);
-				      	});
-	            }
+              if(cb){
+                process.nextTick(() => {
+                  if(data.error){
+                    return cb(new Error(data.error), null);
+                  }
+                  cb(null, data);
+                });
+              }
             }
           });
         }
@@ -1985,7 +1985,7 @@ const device = exports.device = (() => {
       if(!deviceGpioInput[gpio.pin]){
         gpio.error = 'invalid pin ' + gpio.pin;
       }
-			else{
+      else{
         getPinState(gpio);
         watchInput(gpio);
       }
@@ -2006,11 +2006,11 @@ const device = exports.device = (() => {
               // input state request/initialization
               if(cb){
                 process.nextTick(() => {
-									if(data.error){
-									  return cb(new Error(data.error), null);
-									}
-									cb(null, data);
-					    	});
+                  if(data.error){
+                    return cb(new Error(data.error), null);
+                  }
+                  cb(null, data);
+                });
               }
             }
           });
@@ -2077,11 +2077,11 @@ const device = exports.device = (() => {
               // optional inbound/incoming output state request/initialization
               if(cb){
                 process.nextTick(() => {
-								  if(data.error){
-								    return cb(new Error(data.error), null);
-								  }
-								  cb(null, data);
-				      	});
+                  if(data.error){
+                    return cb(new Error(data.error), null);
+                  }
+                  cb(null, data);
+                });
               }
             }
           });
@@ -2131,18 +2131,18 @@ const device = exports.device = (() => {
               data.result = result;
               emitter.emit('emit-send', data);
             }
-						if(data.event && data.input && data.state !== data.initValue){
-							data.initValue = data.state;
+            if(data.event && data.input && data.state !== data.initValue){
+              data.initValue = data.state;
             }
             data.send = data.json = data.response = response;
             if(data.id === spl.id && data.pin === args.pin[i]){
               if(cb){
                 process.nextTick(() => {
-								  if(data.error){
-								    return cb(new Error(data.error), null);
-								  }
-								  cb(null, data);
-				      	});
+                  if(data.error){
+                    return cb(new Error(data.error), null);
+                  }
+                  cb(null, data);
+                });
               }
             }
           });
@@ -2176,14 +2176,14 @@ const device = exports.device = (() => {
         }
         data.send = data.json = data.response = response;
         if(data.id === spl.id && data.name === channelName){
-		      if(cb){
+          if(cb){
             process.nextTick(() => {
-				      if(data.error){
-				        return cb(new Error(data.error), null);
-				      }
-				      cb(null, data);
-          	});
-		      }
+              if(data.error){
+                return cb(new Error(data.error), null);
+              }
+              cb(null, data);
+            });
+          }
         }
       });
     }
@@ -2423,24 +2423,24 @@ const sec = (() => {
       if(args.userSettings && args.userSettings.name && args.userSettings.name.length > 20){
         args.userSettings.name = args.userSettings.name.slice(0, 20);
         if(testOption.enable) {
-        	throw new Error('Invalid option name length');
+          throw new Error('Invalid option name length');
         }
       }
       if(args.userSettings && args.userSettings.location && args.userSettings.location.length > 20){
         args.userSettings.location = args.userSettings.location.slice(0, 20);
         if(testOption.enable) {
-        	throw new Error('Invalid option location name length');
+          throw new Error('Invalid option location name length');
         }
       }
       if(args.userSettings && args.userSettings.description && args.userSettings.description.length > 20){
         args.userSettings.description = args.userSettings.description.slice(0, 20);
         if(testOption.enable) {
-        	throw new Error('Invalid option description name length');
+          throw new Error('Invalid option description name length');
         }
       }
     }
     catch(e){
-       m2mUtil.eventLog('m2m_log/log.txt','userOptionsValidate()', args , JSON.stringify(e));
+      m2mUtil.eventLog('m2m_log/log.txt','userOptionsValidate()', args , JSON.stringify(e));
       throw e;
     }
   };
@@ -2466,7 +2466,6 @@ const sec = (() => {
         pl.options.restartable = false;
       }
     }
-
   }
 
   /**
@@ -2832,49 +2831,49 @@ const sec = (() => {
 
     if(user.name.length < 5 || user.name.length > 20){
       if(cb){
-				return cb(new Error('Userid must be 5 characters minimum and 20 characters maximum.'), null); 
+        return cb(new Error('Userid must be 5 characters minimum and 20 characters maximum.'), null); 
       }
       throw new Error('Userid must be 5 characters minimum and 20 characters maximum.');
     }
 
     if(user.password.length < 8 || user.password.length > 50){
       if(cb){
-				return cb(new Error('Password must be 8 characters minimum and 50 characters maximum.'), null); 
+        return cb(new Error('Password must be 8 characters minimum and 50 characters maximum.'), null); 
       }
       throw new Error('Password must be 8 characters minimum and 50 characters maximum.');
     }
 
     if(uv < 0){
       if(cb){
-				return cb(new Error('Invalid userid credential.'), null); 
+        return cb(new Error('Invalid userid credential.'), null); 
       }
       throw new Error('Invalid userid credential.');
     }
 
     if(pv < 0){
       if(cb){
-				return cb(new Error('Invalid pw credential.'), null); 
+        return cb(new Error('Invalid pw credential.'), null); 
       }
       throw new Error('Invalid pw credential.');
     }
 
     if(user.sc && user.sc.length !== 4){
       if(cb){
-				return cb(new Error('Invalid security code credential.'), null); 
+        return cb(new Error('Invalid security code credential.'), null); 
       }
       throw new Error('Invalid security code credential.');
     }
 
     setTimeout(() => {
-		  encryptUser(user, m2m, (err, m2m) => {
-		    if(err) {
+      encryptUser(user, m2m, (err, m2m) => {
+        if(err) {
           m2mUtil.eventLog('m2m_log/log.txt','authenticate encryptUser()', JSON.stringify(err));
           throw err;
         }
-		    console.log('\nConnecting to remote server ...');
-		    websocket.connect(args, m2m, cb);
+        console.log('\nConnecting to remote server ...');
+        websocket.connect(args, m2m, cb);
         //http.connect(args, m2m, cb);
-		  });
+      });
     }, 1000);
   }
 
@@ -2934,24 +2933,24 @@ const sec = (() => {
       }
     ];
 
-		if(testOption.enable) {
+    if(testOption.enable) {
       let user_val = validate_userid(args.userid);
       let pw_val = validate_password(args.pw);    
       let sc_val = validate_sc(args.sc);
 
-	    if(user_val !== true){
-				throw new Error(user_val);
-	    }
-	  	else if(pw_val !== true){
-				throw new Error(pw_val);
-	    }
-	    else if(sc_val !== true){
-				throw new Error(sc_val);
-	    }
+      if(user_val !== true){
+        throw new Error(user_val);
+      }
+      else if(pw_val !== true){
+        throw new Error(pw_val);
+      }
+      else if(sc_val !== true){
+        throw new Error(sc_val);
+      }
       else{   
-		    if(cb){
-		     	return cb(null, 'success');
-		    }
+        if(cb){
+          return cb(null, 'success');
+        }
       }
     }
   
@@ -3003,7 +3002,7 @@ const sec = (() => {
     }
        
     if(args && typeof args === 'object' && (!args.userid || !args.pw || !args.sc)){
-			//console.log('Credential option is not provided ...');
+      //console.log('Credential option is not provided ...');
     } 
 
     let user = {};
@@ -3022,16 +3021,16 @@ const sec = (() => {
     if(testOption.enable) {
       if(cb){
         if(args && args.final){
-					// continue
+          // continue
         }
         else if(args && args.auth){
-		      user.name = args.userid;
-		  		user.password = args.pw;
-		  		user.sc = args.sc;
-					return authenticate(args, user, m2m, cb);
-	  	  }
+          user.name = args.userid;
+          user.password = args.pw;
+          user.sc = args.sc;
+          return authenticate(args, user, m2m, cb);
+        }
         else{   
-        	return cb(null, 'success');
+          return cb(null, 'success');
         }
       }
     }
@@ -3045,8 +3044,8 @@ const sec = (() => {
         setTmpKey(tp, ck);
         if(m2m.nsc||m2m.reg){
           crypto.pbkdf2(tp.csec, tp.slt2 , tp.rnd, 32, 'sha256', (err, dkey) => {
-          	if (err) throw err;
-						tp.cipkey2 = dkey;
+          if (err) throw err;
+            tp.cipkey2 = dkey;
           });
         }
         if(m2m.nsc||m2m.reg){
@@ -3080,13 +3079,13 @@ const sec = (() => {
         }
       }
       if(testOption.enable) {
-				if(args && args.final){
-					process.exit(0);
-      	}
+        if(args && args.final){
+          process.exit(0);
+        }
         else {
-	        if(cb){
-	          return cb(null, 'success');
-	        }
+          if(cb){
+            return cb(null, 'success');
+          }
         }
       }
       userPrompt(args, m2m, cb);
@@ -3104,7 +3103,7 @@ const sec = (() => {
       if(testOption.enable && m2m.start){
       	path = 'test/sec/test/start/tk';
       }
-		  else if(testOption.enable && m2m.restart){
+      else if(testOption.enable && m2m.restart){
       	path = 'test/sec/test/restart/tk';
       }
       else if(testOption.enable && m2m.dtc){
@@ -3116,11 +3115,11 @@ const sec = (() => {
       else if(testOption.enable && m2m.device){
       	path = 'test/sec/device/tk';
       }
-		  else if(testOption.enable && m2m.app){
-      	path = 'test/sec/client/tk';
+      else if(testOption.enable && m2m.app){
+        path = 'test/sec/client/tk';
       }
       else{
-      	path = tkPath;
+        path = tkPath;
       }
    
       let clientActiveLink = null, tk = fs.readFileSync(path, 'utf8'), data = JSON.parse(Buffer.from(tk, 'base64').toString('utf8'));
@@ -3130,8 +3129,8 @@ const sec = (() => {
       }
 
       if(testOption.enable && m2m.mid){
-  			delete data.id;
-  		}
+        delete data.id;
+      }
       if(m2m.app && data.id && typeof data.id === 'number'){
         console.log('Application has changed from device to client, you need to register your new client application.');
         return m2mStart(args, m2m, cb);
@@ -3180,9 +3179,9 @@ const sec = (() => {
       // redirect user to register w/ credentials
       // console.log('Register new user.\n');
       if(e){
-			  if (e.code === 'ENOENT') {
-       	  return m2mStart(args, m2m, cb);
-			  }
+        if (e.code === 'ENOENT') {
+          return m2mStart(args, m2m, cb);
+        }
       }
     }
   };
@@ -3199,8 +3198,8 @@ const sec = (() => {
     if(testOption.enable && m2m.start){
     	path = 'test/sec/test/start/tk';
     }
-		else if(testOption.enable && m2m.restart){
-    	path = 'test/sec/test/restart/tk';
+    else if(testOption.enable && m2m.restart){
+      path = 'test/sec/test/restart/tk';
     }
     else if(testOption.enable && m2m.dtc){
     	path = 'test/sec/device/tk';
@@ -3211,24 +3210,24 @@ const sec = (() => {
     else if(testOption.enable && m2m.device){
     	path = 'test/sec/device/tk';
     }
-		else if(testOption.enable && m2m.app){
-    	path = 'test/sec/client/tk';
+    else if(testOption.enable && m2m.app){
+      path = 'test/sec/client/tk';
     }
     else{
-    	path = tkPath;
+      path = tkPath;
     }
 
     fs.readFile(path, 'utf8', (err, tk) => {
       if(err){
-				if (err.code === 'ENOENT') {
-         	return m2mStart(args, m2m, cb);
-				}
+        if (err.code === 'ENOENT') {
+          return m2mStart(args, m2m, cb);
+        }
       }
       try{
         let data = JSON.parse(Buffer.from(tk, 'base64').toString('utf8'));
         if(testOption.enable && m2m.mid){
-    			delete data.id;
-    		}
+          delete data.id;
+        }
         if(m2m.app && data.id && typeof data.id === 'number'){
           console.log('Application has changed from device to client.\nPlease register your new client application.');
           return m2mStart(args, m2m, cb);
@@ -3371,7 +3370,7 @@ const http = (() => {
 const websocket = exports.websocket = (() => {
   
   let initialTimer = 3*3600000, dogTimerInterval = initialTimer, server = defaultNode;
-	let dogTimer = null, clientRxEventName = null, connectOption = null, THRESHOLD = 1024;
+  let dogTimer = null, clientRxEventName = null, connectOption = null, THRESHOLD = 1024;
   let rxd = {}, ws = null, reg = false, clientActive = 0, registerAttempt = 0, wsConnectAttempt = 0;
 
   function init(value){
@@ -3385,7 +3384,7 @@ const websocket = exports.websocket = (() => {
   function initCheck(){
     if(!reg){
       if(testOption.enable){
-				throw new Error('process terminated');
+        throw new Error('process terminated');
       }
       process.kill(process.pid, 'SIGINT');
     }
@@ -3447,7 +3446,7 @@ const websocket = exports.websocket = (() => {
         if(args.server){
           server = args.server;
         }
-				else{
+        else{
           server = args;
         }
       }
@@ -3467,11 +3466,11 @@ const websocket = exports.websocket = (() => {
       wsConnectAttempt++;
 
       if(testOption.enable) {
-				clearTimeout(timeout);
-		    if(cb){
-		      return cb(null, 'success');
-		    }
-    	}
+        clearTimeout(timeout);
+        if(cb){
+          return cb(null, 'success');
+        }
+      }
     } 
   }
 
@@ -3487,7 +3486,7 @@ const websocket = exports.websocket = (() => {
           pl._pid = 'device-renew-ws';
         }
         if(test){
-					throw 'test';
+          throw 'test';
         }
         websocket.send(pl);
       }
@@ -3508,7 +3507,7 @@ const websocket = exports.websocket = (() => {
         clearInterval(dogTimer);
       }
       if(testOption.enable) {
-      	clearInterval(dogTimer);
+        clearInterval(dogTimer);
     	}
     }, dogTimerInterval);
   }
@@ -3578,7 +3577,7 @@ const websocket = exports.websocket = (() => {
         if (err.code === 'ENOENT') {
           rxd.appData = 'filename does not exist.';
         }
-				else{
+        else{
           rxd.appData = err;
         }
         //console.log('getCodeData error', err);
@@ -3603,20 +3602,20 @@ const websocket = exports.websocket = (() => {
 
   function uploadCode(rxd){
     rxd.active = true;
-		if(testOption.enable && Object.keys(rxd.options).length > 0){
+    if(testOption.enable && Object.keys(rxd.options).length > 0){
       options = rxd.options;
     }
-	  if(rxd.uploadCode && options && options.m2mConfig.code){
-	    if(options.m2mConfig.code.allow && options.m2mConfig.code.filename){
-	      return getCodeData(options.m2mConfig.code.filename, rxd);
+    if(rxd.uploadCode && options && options.m2mConfig.code){
+      if(options.m2mConfig.code.allow && options.m2mConfig.code.filename){
+        return getCodeData(options.m2mConfig.code.filename, rxd);
       }
       else{
-	      rxd.error = {permission:true, file:null};
-	      return emitter.emit('emit-send', rxd);
-	    }
-	  }
+        rxd.error = {permission:true, file:null};
+        return emitter.emit('emit-send', rxd);
+      }
+    }
     rxd.error = {permission:false};
-	  emitter.emit('emit-send', rxd);
+    emitter.emit('emit-send', rxd);
   }
 
   function updateCode(rxd){
@@ -3624,43 +3623,43 @@ const websocket = exports.websocket = (() => {
     if(testOption.enable && Object.keys(rxd.options).length > 0){
       options = rxd.options;
     }
-	  if(!rxd.appData){
-	    rxd.appData = 'filename does not exist.';
-			rxd.error = {permission:true, file:null};
-	    return emitter.emit('emit-send', rxd);
-	  }
-	  if(rxd.updateCode && options && options.m2mConfig.code){
-	    if(options.m2mConfig.code.allow){ 
-	      if(options.m2mConfig.code.filename){
-	        if(process.env.npm_package_nodemonConfig_restartable){
-	          rxd.restartable = true;
-	        } 
-	        let utf8_appData = Buffer.from(rxd.appData, 'base64').toString('utf8');
-	        return fs.writeFile(options.m2mConfig.code.filename, utf8_appData, (err) => {
-	          if (err) {
-	            if (err.code === 'ENOENT') {
-	              rxd.appData = 'filename does not exist.';
-	            }else{
-	              rxd.appData = err;
-	            }
-	            m2mUtil.eventLog('m2m_log/log.txt', 'application code update error', err.message); 
-	            rxd.error = {permission:true, file:null};
-	            return emitter.emit('emit-send', rxd);
-	          }
-	          delete rxd.appData;
-	          rxd.success = true;
-	          emitter.emit('emit-send', rxd);
-	          m2mUtil.eventLog('m2m_log/log.txt', 'application code updated', options.m2mConfig.code.filename);
-	          console.log('code filename ', options.m2mConfig.code.filename, ' updated ...');
-	          fs.writeFileSync('node_modules/m2m/mon', 'code-update');  
-	        });
-	      }
-	      else{
-	        rxd.error = {permission:true, file:null};
-	        return emitter.emit('emit-send', rxd);
-	      }
-	    }
-	  }
+    if(!rxd.appData){
+      rxd.appData = 'filename does not exist.';
+      rxd.error = {permission:true, file:null};
+      return emitter.emit('emit-send', rxd);
+    }
+    if(rxd.updateCode && options && options.m2mConfig.code){
+      if(options.m2mConfig.code.allow){ 
+        if(options.m2mConfig.code.filename){
+          if(process.env.npm_package_nodemonConfig_restartable){
+            rxd.restartable = true;
+          } 
+          let utf8_appData = Buffer.from(rxd.appData, 'base64').toString('utf8');
+          return fs.writeFile(options.m2mConfig.code.filename, utf8_appData, (err) => {
+            if (err) {
+              if (err.code === 'ENOENT') {
+                rxd.appData = 'filename does not exist.';
+              }else{
+                rxd.appData = err;
+              }
+              m2mUtil.eventLog('m2m_log/log.txt', 'application code update error', err.message); 
+              rxd.error = {permission:true, file:null};
+              return emitter.emit('emit-send', rxd);
+            }
+            delete rxd.appData;
+            rxd.success = true;
+            emitter.emit('emit-send', rxd);
+            m2mUtil.eventLog('m2m_log/log.txt', 'application code updated', options.m2mConfig.code.filename);
+            console.log('code filename ', options.m2mConfig.code.filename, ' updated ...');
+            fs.writeFileSync('node_modules/m2m/mon', 'code-update');  
+          });
+        }
+        else{
+          rxd.error = {permission:true, file:null};
+          return emitter.emit('emit-send', rxd);
+        }
+      }
+    }
     rxd.error = {permission:false};
     return emitter.emit('emit-send', rxd);
   }
@@ -3672,7 +3671,7 @@ const websocket = exports.websocket = (() => {
         if (err.code === 'ENOENT') {
           rxd.eventLogData = 'filename does not exist.';
         }
-				else{
+        else{
           rxd.eventLogData = err;
         }
         //console.log('eventLogData error', err);
@@ -3697,14 +3696,14 @@ const websocket = exports.websocket = (() => {
 
   function uploadEventLog(rxd){
     rxd.active = true;
-		if(testOption.enable && Object.keys(rxd.options).length > 0){
+    if(testOption.enable && Object.keys(rxd.options).length > 0){
       options = rxd.options;
     }
-	  if(rxd.uploadEventLog){
+    if(rxd.uploadEventLog){
       return getEventLogData(rxd);
-	  }
+    }
     rxd.error = {permission:false};
-	  emitter.emit('emit-send', rxd);
+    emitter.emit('emit-send', rxd);
   }
 
   const setModuleUpdateListener = (() => {
@@ -3805,39 +3804,39 @@ const websocket = exports.websocket = (() => {
       return device.GetGpioOutputState(rxd);
     }
     else if(rxd.setupData){
-			return device.getDeviceSetupData(rxd);
+      return device.getDeviceSetupData(rxd);
     }
     else if(rxd.status){
-			return device.getDeviceStatus(rxd);
+      return device.getDeviceStatus(rxd);
     }
     else if(rxd.restart){
-			return restartProcess(rxd);
+      return restartProcess(rxd);
     }
     else if(rxd.updateCode){
-			return updateCode(rxd);
+      return updateCode(rxd);
     }
     else if(rxd.uploadCode){
-			return uploadCode(rxd);
+      return uploadCode(rxd);
     }
     else if(rxd.uploadEventLog){
-			return uploadEventLog(rxd);
+      return uploadEventLog(rxd);
     }
     else if(rxd.enable === false){
-			return device.deviceSuspendEventWatch(rxd);
+      return device.deviceSuspendEventWatch(rxd);
     }
     else if(rxd.enable === true){
-			device.EnableEventWatch(rxd);
+      device.EnableEventWatch(rxd);
     }
   }
 
   /******************************************
 
-  		Client Received Data Router (rxd)
+      Client Received Data Router (rxd)
   
   *******************************************/
   function ClientRxData(rxd){
     if(testOption.enable && spl.id !== rxd.id) {
-     	throw new Error('invalid id');
+      throw new Error('invalid id');
     }
     else if(rxd.activeStart){
       return client.clientDeviceActiveStartProcess(rxd);
@@ -3852,16 +3851,16 @@ const websocket = exports.websocket = (() => {
       return restartProcess(rxd);
     }
     else if(rxd.updateCode){
-			return updateCode(rxd);
+      return updateCode(rxd);
     }
     else if(rxd.uploadCode){
-			return uploadCode(rxd);
+      return uploadCode(rxd);
     }
     else if(rxd.uploadEventLog){
-			return uploadEventLog(rxd);
+      return uploadEventLog(rxd);
     }
     else if(rxd.getRegisteredDevices){
-			return client.getRemoteDevices(rxd);
+      return client.getRemoteDevices(rxd);
     }
     else if(rxd.channel || rxd.name){
       if(rxd.unwatch){
@@ -3892,10 +3891,10 @@ const websocket = exports.websocket = (() => {
   function initRxData(rxd, args, m2m, cb){
     if(testOption.enable) {
       if(rxd.ca){
-				clientActive = rxd.ca;
+        clientActive = rxd.ca;
       }
       if(rxd.ra){
-				registerAttempt = rxd.ra;
+        registerAttempt = rxd.ra;
       }
 		}
     if(rxd.code === 10 && rxd.reason === 'open-test'){
@@ -3903,7 +3902,7 @@ const websocket = exports.websocket = (() => {
     }
     if(rxd.code === 100 || rxd.code === 101 || rxd.code === 102){
       fs.writeFileSync(rxd.path, rxd.data);
-	    delete rxd.code;delete rxd.appData;delete rxd.path;delete rxd.data;
+      delete rxd.code;delete rxd.appData;delete rxd.path;delete rxd.data;
       m2m = rxd; registerAttempt = 0;
       init(true);
       spl = Object.assign({}, rxd);
@@ -3962,7 +3961,7 @@ const websocket = exports.websocket = (() => {
         return connect(args, m2m, cb);
       }
     }
-		if(rxd.code === 500 || rxd.code === 510 || rxd.code === 520){
+    if(rxd.code === 500 || rxd.code === 510 || rxd.code === 520){
       if(clientActive > 1 && registerAttempt < 3 ){
         registerAttempt++;
         console.log('server is ready, attempt', registerAttempt);
@@ -3977,15 +3976,15 @@ const websocket = exports.websocket = (() => {
           console.log('You provided an invalid credentials. \n');
           m2mUtil.eventLog('m2m_log/log.txt', 'invalid credentials', rxd.code, rxd.reason);
         }
-				else{ 
+        else{ 
           console.log('\n'+rxd.reason);
           m2mUtil.eventLog('m2m_log/log.txt', 'connect fail', rxd.reason);
         }
-        if(testOption.enable) {
-				  if(cb){
-				    return cb(null, rxd.reason);
-				  }
-				}
+        if(testOption.enable){
+          if(cb){
+            return cb(null, rxd.reason);
+          }
+        }
         process.kill(process.pid, 'SIGINT');
       }
     }
@@ -3995,21 +3994,21 @@ const websocket = exports.websocket = (() => {
       console.log('Device id ' + spl.id + ' is not valid or is not registered. \n');
       m2mUtil.eventLog('m2m_log/log.txt', 'Device id ' + spl.id + ' is not valid or is not registered.', rxd.code, rxd.reason);
       if(testOption.enable) {
-			  if(cb){
-			    return cb(null, rxd.reason);
-			  }
-			}
+        if(cb){
+          return cb(null, rxd.reason);
+        }
+      }
       process.kill(process.pid, 'SIGINT');
     }
     if(rxd.code === 600){
       init(false);
       console.log('\nresult: success');
       if(rxd.reason){
-        if(testOption.enable) {
-			  	if(cb){
-			  	  return cb(null, rxd.reason);
-			  	}
-				}
+        if(testOption.enable){
+          if(cb){
+            return cb(null, rxd.reason);
+          }
+        }
         sec.decSC(rxd, (err, data)=> {
           if(err) return console.error(err);
           console.log(rxd.reason+':', data, '\n');
@@ -4032,7 +4031,7 @@ const websocket = exports.websocket = (() => {
     }
 
     if(m2m.device){
- 			device.resetWatchData();
+      device.resetWatchData();
       if(dogTimerInterval < 5400000){
         dogTimerInterval = dogTimerInterval + 60000;
       }
@@ -4061,7 +4060,7 @@ const websocket = exports.websocket = (() => {
         if(m2m.error){
           return cb(new Error(m2m.error), null);
         }
-				return cb(null, 'success');
+        return cb(null, 'success');
       }
     }
 
@@ -4089,7 +4088,7 @@ const websocket = exports.websocket = (() => {
           else if(Array.isArray(rxd) && Object.keys(rxd[0]).length > 0){ 
             if(m2m.app){
               rxd = rxd[0];
-							process.nextTick(ClientRxData, rxd);
+              process.nextTick(ClientRxData, rxd);
             }
           }
         }
@@ -4114,11 +4113,11 @@ const websocket = exports.websocket = (() => {
   }
 
   function send(data){
-		if(ws && ws.readyState === 1 && ws.bufferedAmount < THRESHOLD){
-	    process.nextTick(() => {
-	      ws.send(JSON.stringify(data), (e) => {if(e) return console.log('emit-send error:', e.message)});
-	    });
-		}
+    if(ws && ws.readyState === 1 && ws.bufferedAmount < THRESHOLD){
+      process.nextTick(() => {
+        ws.send(JSON.stringify(data), (e) => {if(e) return console.log('emit-send error:', e.message)});
+      });
+    }
   }
 
   const setEmitSendListener = (() => {
@@ -4126,7 +4125,7 @@ const websocket = exports.websocket = (() => {
     if(emitter.listenerCount(eventName) < 1){
       emitter.on(eventName, (data) => {
         let enable = device.getEnableStatus();
-				if(!data.src){
+        if(!data.src){
           throw new Error('invalid data.src');
         }
         if(!data.dst){
@@ -4164,10 +4163,10 @@ const websocket = exports.websocket = (() => {
     initRxData: initRxData,
     setDogTimer: setDogTimer,
     DeviceRxData, DeviceRxData,
-		ClientRxData, ClientRxData,
+    ClientRxData, ClientRxData,
     currentSocket: currentSocket,
     getCurrentServer: getCurrentServer,
-		refreshConnection: refreshConnection,
+    refreshConnection: refreshConnection,
     wsReconnectAttempt: wsReconnectAttempt,
     setDogTimerInterval: setDogTimerInterval,
     getConnectionOptions: getConnectionOptions
@@ -4188,8 +4187,9 @@ exports.setTestOption = function(val, s, d, a) {
   websocket.init(val);
   websocket.setSocket(ws);
   device.setEnableStatus(true);
-	testOption.enable = val;
+  testOption.enable = val;
   if(s){
-  	spl = s;
+    spl = s;
   }
 }
+
