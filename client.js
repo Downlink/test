@@ -304,7 +304,7 @@ const client = exports.client = (() => {
 
   function getClientStatus(rxd){
     if(testOption.enable && rxd.options){
-			options = rxd.options
+      options = rxd.options
     }
     let appIds = fs.readFileSync('m2m_log/client_active_link', 'utf8');
     rxd.active = true;
@@ -322,8 +322,8 @@ const client = exports.client = (() => {
   }
 
   function testFunction(pl,eventName){
-		if(testOption.enable){
-	    if(pl.name === 'watch-fail' || pl.name === 'fail' || pl.name === 'test-fail'|| pl.name === 'error'){
+    if(testOption.enable){
+      if(pl.name === 'watch-fail' || pl.name === 'fail' || pl.name === 'test-fail'|| pl.name === 'error'){
         if(pl.unwatch){
           emitter.emit(eventName, { id:pl.id, unwatch:true, name:pl.name, error:'fail'});
         }
