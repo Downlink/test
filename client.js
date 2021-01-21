@@ -340,7 +340,7 @@ const client = exports.client = (() => {
       else{
         emitter.emit(eventName, { id:pl.id, name:pl.name, result:{test:'passed'}});
       }
-		}
+    }
   }
 
   /*******************************************
@@ -364,16 +364,16 @@ const client = exports.client = (() => {
       if(!data.unwatch && data.id === pl.id && data.name === pl.name){
         if(cb){
           process.nextTick(() => {
-		        if(data.error){
-		          return cb(new Error(data.error), null);
-		        }
-		        if(data.result){
-		          return cb(null, data.result);
-		        }
-		        if(data.value){
-		          return cb(null, data.value);
-		        }
-					});
+            if(data.error){
+              return cb(new Error(data.error), null);
+            }
+            if(data.result){
+              return cb(null, data.result);
+            }
+            if(data.value){
+              return cb(null, data.value);
+            }
+          });
         }
       }
     };
@@ -423,7 +423,7 @@ const client = exports.client = (() => {
               return cb(new Error(data.error), null);
             }
             // valid unwatch channel, successfully unwatch channel name, returns true
-			      cb(null, data.unwatch);
+            cb(null, data.unwatch);
             if(data.unwatch){
               removeActiveSyncDataEvent(data, activeSyncChannelData, (err, status) => {
                 if(err){ return cb(err, null);}
@@ -503,7 +503,7 @@ const client = exports.client = (() => {
 
   const get = function(cb){
     websocket.initCheck();
-	  let args = Object.assign({}, spl);
+    let args = Object.assign({}, spl);
     args.id = this.id;
     args.event = false;
     args.watch = false;
@@ -586,7 +586,7 @@ const client = exports.client = (() => {
             args.interval = o.interval;
           }
           else if(o.poll && Number.isInteger(o.poll)){
-        	args.interval = o.poll;
+            args.interval = o.poll;
           }
         }
         else{
@@ -612,10 +612,10 @@ const client = exports.client = (() => {
       if(data.id === pl.id && data.pin === pl.pin && data._pid === pl._pid){
         if(cb){
           process.nextTick(() => {
-		        if(data.error){
-		          return cb(new Error(data.error), null);
-		        }
-		        cb(null, data.state);
+            if(data.error){
+              return cb(new Error(data.error), null);
+            }
+            cb(null, data.state);
           });
         }
       }
@@ -800,11 +800,11 @@ const client = exports.client = (() => {
         if(data.id === pl.id && data.pin === pl.pin && data._pid === pl._pid){
           if(cb){
             process.nextTick(() => {
-		          if(data.error){
-		            return cb(new Error(data.error), null);
-		          }
-		          cb(null, data.state);
-						});
+              if(data.error){
+                return cb(new Error(data.error), null);
+              }
+              cb(null, data.state);
+            });
           }
         }
       });
@@ -935,7 +935,7 @@ const client = exports.client = (() => {
   function setupInfo(cb){
     websocket.initCheck();
     if(!cb){
-		  throw new Error('callback is required');
+      throw new Error('callback is required');
     }
     let pl = Object.assign({}, spl); 
     pl.id = this.id;
@@ -950,11 +950,11 @@ const client = exports.client = (() => {
           if(data.id === pl.id && data.setupData){ 
             if(cb){   
               process.nextTick(() => {
-	            if(data.error){
-	              return cb(new Error(data.error), null);
-	            }
-	            cb(null, data.setupData);
-        	  });
+                if(data.error){
+                  return cb(new Error(data.error), null);
+                }
+                cb(null, data.setupData);
+              });
             }
           }
         });
@@ -1027,20 +1027,20 @@ const client = exports.client = (() => {
     getData: function(o, cb){
       websocket.initCheck();
       if(typeof cb !== 'function'){
-	      throw new Error('callback argument is required');
+        throw new Error('callback argument is required');
       }
-	    let args = Object.assign({}, spl);
+      let args = Object.assign({}, spl);
 	    args.id = this.id;
 	    args.event = false;
 	    args.watch = false;
       if(typeof o === 'string'){
-	  	  args.name = o;
+        args.name = o;
       }
-	    else if(typeof o === 'object' && o.name && typeof o.name === 'string'){
-		    args.name = o.name;
+      else if(typeof o === 'object' && o.name && typeof o.name === 'string'){
+        args.name = o.name;
       }
       else{
-		    throw new Error('invalid arguments');
+        throw new Error('invalid arguments');
       } 
 	    args.rcvd = true;
 	    args.getData = true;
@@ -1048,7 +1048,7 @@ const client = exports.client = (() => {
       validateDevice(args, () => {
         getChannelData(args, cb);
       });
-  	},
+    },
 
     // e.g. device.unwatch 
     unwatch: function(args, cb){
@@ -1072,7 +1072,7 @@ const client = exports.client = (() => {
     watch: function(o, cb){
       websocket.initCheck();
       if(typeof cb !== 'function'){
-		    throw new Error('callback argument is required');
+        throw new Error('callback argument is required');
       }
       
       let args = Object.assign({}, spl);
@@ -1081,19 +1081,19 @@ const client = exports.client = (() => {
       args.id = this.id;
       args.interval = 5000;
       if(typeof o === 'string'){
-		    args.name = o;
+        args.name = o;
       }
-	    else if(typeof o === 'object' && o.name && typeof o.name === 'string'){
+      else if(typeof o === 'object' && o.name && typeof o.name === 'string'){
 		    args.name = o.name; 
         if(o.interval && Number.isInteger(o.interval)){
           args.interval = o.interval;
         }
         if(o.poll && Number.isInteger(o.poll)){
-        	args.interval = o.poll;
+          args.interval = o.poll;
         }
       } 
       else{
-	      throw new Error('invalid arguments');
+        throw new Error('invalid arguments');
       }
 
       validateDevice(args, () => {
@@ -1119,15 +1119,15 @@ const client = exports.client = (() => {
         });  
       });
       setImmediate(() => {
-          clientDeviceId.forEach((id) => {
-            if(!validServerID[id]){
-              invalidDevices.push(id);
-              console.log( '* device id',id,'is invalid, device is not registered!');
-            }
-            else{
-              console.log('Accessing device',id,'...');
-            }
-          });
+        clientDeviceId.forEach((id) => {
+          if(!validServerID[id]){
+            invalidDevices.push(id);
+            console.log( '* device id',id,'is invalid, device is not registered!');
+          }
+          else{
+            console.log('Accessing device',id,'...');
+          }
+        });
       });
     }
   }
@@ -1164,9 +1164,9 @@ const client = exports.client = (() => {
   const getDevices = exports.getDevices = function (cb){
     websocket.initCheck();
     if(userDevices && userDevices.length > 0){
-	    cb(null, userDevices);
-	  }
-	  let pl = Object.assign({}, spl);
+      cb(null, userDevices);
+    }
+    let pl = Object.assign({}, spl);
     if(testOption.enable && pl.error){
       userDevices = []; 
     }
@@ -1180,13 +1180,13 @@ const client = exports.client = (() => {
       emitter.once(eventName, (data) => {
         if(data.id === pl.id && data._pid === pl._pid){
           if(cb){
-						process.nextTick(() => {
-	            if(data.error){
-	              return cb(new Error(data.error), null);
-	            }
-	            userDevices =  data.devices;
-	            cb(null, data.devices);
-						});
+            process.nextTick(() => {
+              if(data.error){
+                return cb(new Error(data.error), null);
+              }
+              userDevices =  data.devices;
+              cb(null, data.devices);
+            });
           }
         }
       });
