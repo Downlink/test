@@ -19,9 +19,9 @@ To use this module, users must create an account and register their devices with
 4. [Quick Tour](#quick-tour)
 5. [Examples](#examples)
    - [Example 1 Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
-   - [Example 2 GPIO Input/Output Control](#example-2-gpio-input/output-control)
-   - [Example 3 Remote Machine Control](#example-3)
-   - [Example 4 Sending Data to Remote Device/Server](#example-4)
+   - [Example 2 GPIO Input/Output Control](#example-2-gpio-input-output-control)
+   - [Example 3 Remote Machine Control](#example-3-remote-machine-control)
+   - [Example 4 Sending Data to Remote Device/Server](#example-4-sending-data-to-remote-device-server)
 6. [Http REST API Simulation](#http-rest-api-simulation)
 7. [Browser Interaction](#browser-interaction)
    - [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
@@ -178,8 +178,9 @@ watch random value 115
 ...
 ```
 
+## Examples
 
-## Example 1 Using MCP 9808 Temperature Sensor
+### Example 1 Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
 [](example1.svg)
@@ -281,7 +282,7 @@ client.connect(function(err, result){
 });
 ```
 
-## Example 2 GPIO Input/Output Control
+### Example 2 GPIO Input/Output Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
@@ -384,7 +385,7 @@ client.connect(function(err, result){
 });
 ```
 
-## Example 3 Remote Machine Control
+### Example 3 Remote Machine Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
 [](example3.svg)
@@ -464,7 +465,7 @@ function machineControl(devices){
   });
 }
 ```
-## Example 4 Sending Data to Remote Device/Server
+### Example 4 Sending Data to Remote Device/Server
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
 ### Sending Data To Remote Server
