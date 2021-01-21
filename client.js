@@ -55,9 +55,10 @@ const m2mUtil = exports.m2mUtil = (() => {
     }
   }
 
-  const rid = exports.rid = (n) => {
+  function rid(n){
+  //const rid = exports.rid = (n) => {
     return crypto.randomBytes(n).toString('hex');
-  };
+  }
 
   fs.stat('m2m_log', (err, stats) => {
     if (err) {
@@ -170,7 +171,8 @@ const m2mUtil = exports.m2mUtil = (() => {
     return false;
   }
 
-  const startConnect = exports.startConnect = (cb) => {
+  function startConnect(cb){
+  //const startConnect = exports.startConnect = (cb) => {
     let eventName = 'connect';
     if(emitter.listenerCount(eventName) < 1){
       emitter.on(eventName, (data) => {
@@ -182,7 +184,7 @@ const m2mUtil = exports.m2mUtil = (() => {
         }
       });	 
     }
-  };
+  }
 
   return {
     st: st,
@@ -348,10 +350,11 @@ const client = exports.client = (() => {
           Device Access Constructor
 
   ********************************************/
-  const deviceAccess = exports.deviceAccess = function (i, id) { 
+  function deviceAccess(i, id){
+  //const deviceAccess = exports.deviceAccess = function (i, id) { 
     this.id = id;
     this._index = i;
-  };
+  }
 
   /***************************************************
   
@@ -1148,7 +1151,8 @@ const client = exports.client = (() => {
     }
   })();
 
-  const getRegisteredDevices = exports.getRegisteredDevices = function (){
+  function getRegisteredDevices(){ 
+  //const getRegisteredDevices = exports.getRegisteredDevices = function (){
     websocket.initCheck();
  	  if(userDevices){
       if(userDevices.length > 0){
@@ -1159,9 +1163,10 @@ const client = exports.client = (() => {
     pl._pid = 'getRegisteredDevices';
     pl.getRegisteredDevices = true;
     websocket.send(pl);
-  };
+  }
   
-  const getDevices = exports.getDevices = function (cb){
+  function getDevices(cb){
+  //const getDevices = exports.getDevices = function (cb){
     websocket.initCheck();
     if(userDevices && userDevices.length > 0){
       cb(null, userDevices);
@@ -1192,7 +1197,7 @@ const client = exports.client = (() => {
       });
     }
     websocket.send(pl);
-  };
+  }
 
 
   /**
@@ -2198,7 +2203,8 @@ const device = exports.device = (() => {
         Device Application Setup Property Methods
 
   ****************************************************/
-  const setData = exports.setData = function(args, cb){
+  function setData(args, cb){
+  //const setData = exports.setData = function(args, cb){
     websocket.initCheck();
     let eventName = null;
 
@@ -2222,9 +2228,10 @@ const device = exports.device = (() => {
       throw new Error('invalid arguments');
     }
     setChannelData(args, eventName, cb);
-  };
+  }
 
-  const setApi = exports.setApi = function(args, cb){
+  function setApi(args, cb){
+  //const setApi = exports.setApi = function(args, cb){
     websocket.initCheck();
     let o = {};let eventName = null;
     if((typeof args === 'string' || args instanceof String) && typeof cb === 'function'){
@@ -2242,9 +2249,10 @@ const device = exports.device = (() => {
     else{
       throw new Error('1st parameter must be a string or object');
     }
-  };
+  }
 
-  const setGpio = exports.setGpio = function(args, cb){
+  function setGpio(args, cb){
+  //const setGpio = exports.setGpio = function(args, cb){
     websocket.initCheck();
     // system arch  
     let sa = null;
@@ -2320,7 +2328,7 @@ const device = exports.device = (() => {
     else{ // invalid args.mode
       throw new Error('invalid arguments');
     }
-  };
+  }
 
   setDeviceResourcesListener((deviceSetup) => {
     deviceSetup.gpio.input.pin = removeDuplicateInArray(deviceSetup.gpio.input.pin);
@@ -2383,14 +2391,16 @@ const sec = (() => {
   const pwVldn = { regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*()\\[\]{}\-_+=~|:;<>,./? ])(?=.{6,})/, 
   msg: 'Password must be 8 characters minimum\nwith at least one number, one lowercase letter,\none uppercase letter, and one special character.'};
 
-  const getCurrentProcess = exports.getCurrentProcess = () => {
+  function getCurrentProcess(){
+  //const getCurrentProcess = exports.getCurrentProcess = () => {
     let mfn = require.main.filename, st =  mfn.lastIndexOf('/');
     processFilename = mfn.slice(st+1,st+25);
     return processFilename;
   }
   getCurrentProcess();
 
-  const readTknPl = exports.readTknPl = function(){
+  function readTknPl(){
+  //const readTknPl = exports.readTknPl = function(){
     let data = null;
     try{
       let tk = fs.readFileSync(tkPath, 'utf8');
@@ -2403,9 +2413,10 @@ const sec = (() => {
     finally{
       return data;
     }
-  };
+  }
 
-  const userOptionsValidate = exports.userOptionsValidate = (args) => {
+  function userOptionsValidate(args){
+  //const userOptionsValidate = exports.userOptionsValidate = (args) => {
     try{
       if(args && ((typeof args !== 'object') || !(args instanceof Object))){
          throw new Error('invalid arguments');
@@ -2443,7 +2454,7 @@ const sec = (() => {
       m2mUtil.eventLog('m2m_log/log.txt','userOptionsValidate()', args , JSON.stringify(e));
       throw e;
     }
-  };
+  }
 
   // additional options setup
   function UserProcessSetup(pl){
@@ -2471,7 +2482,8 @@ const sec = (() => {
   /**
    * set m2m package.json configuration (auto config)
    */
-  const setPkgConfig = exports.setPkgConfig = (pl) => {
+  function setPkgConfig(pl){
+  //const setPkgConfig = exports.setPkgConfig = (pl) => {
     let pkgjsn = {}, startScript = {}, startScriptDelay = 2000, filename = processFilename, m2mConfig = false, nodemonConfig = false, pkgScript = false;
     if(pl && !pl.options){
       pl.options = {};
@@ -2532,7 +2544,8 @@ const sec = (() => {
   /**
    * get m2m package.json current configuration
    */
-  const getPkgConfig = exports.getPkgConfig = (pl) => {
+  function getPkgConfig(pl){
+  //const getPkgConfig = exports.getPkgConfig = (pl) => {
     /*if(processArgs[0] === '-config'){
       return;
     }*/
@@ -2995,8 +3008,8 @@ const sec = (() => {
     }
   }
 
-  const m2mStart = exports.m2mStart = function(args, m2m, cb){
-
+  function m2mStart(args, m2m, cb){
+  //const m2mStart = exports.m2mStart = function(args, m2m, cb){
     if(m2m.options){
       options = m2m.options;
     }
@@ -3090,9 +3103,10 @@ const sec = (() => {
       }
       userPrompt(args, m2m, cb);
     });
-  };
+  }
 
-  const m2mRestart = exports.m2mRestart = function(args, m2m, cb){
+  function m2mRestart(args, m2m, cb){
+  //const m2mRestart = exports.m2mRestart = function(args, m2m, cb){
     try{
       let path = null;
       // set options for new m2m 
@@ -3184,10 +3198,10 @@ const sec = (() => {
         }
       }
     }
-  };
+  }
   
-  const m2mRestartAsync = exports.m2mRestartAsync = function(args, m2m, cb){
-
+  function m2mRestartAsync(args, m2m, cb){
+  //const m2mRestartAsync = exports.m2mRestartAsync = function(args, m2m, cb){
     let path = null;
 
     // set options for new m2m 
@@ -3260,7 +3274,7 @@ const sec = (() => {
         m2mStart(args, m2m, cb); 
       }
     });
-  };
+  }
 
   return  {
     decSC: decSC,
@@ -4174,7 +4188,7 @@ const websocket = exports.websocket = (() => {
 
 })(); // websocket
 
-exports.websocket = websocket;
+//exports.websocket = websocket;
 
 /* test environment setup */
 /* istanbul ignore next */

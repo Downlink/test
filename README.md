@@ -33,18 +33,18 @@ To use this module, users must create an account and register their devices with
    - [Client request to get each device resources setup](#device-setup)
 
 
-## Supported Devices <a name="supported-devices"></a>
+## Supported Devices
 
 * Raspberry Pi Models: B+, 2, 3, Zero & Zero W, Compute Module 3, 3B+, 3A+ (generally all 40-pin models)
 * Linux Computer
 * Windows PC
 * Mac Computer
 
-## Node.js version requirement <a name="node-version"></a>
+## Node.js version requirement
 
 * Node.js versions: 8.x, 9.x, 10.x, 11.x, 12.x, 14.x
 
-## Installation <a name="installation"></a>
+## Installation
 ```js
 $ npm install m2m
 ```
@@ -57,7 +57,7 @@ $ npm install array-gpio
 ```
 
 ![]()
-## Quick Tour <a name="quicktour"></a>
+## Quick Tour
 
 For this quick tour, we will let two computers communicate with each other using the internet.
 
@@ -178,8 +178,8 @@ watch random value 115
 ...
 ```
 
-<a name="examples"></a>
-## Example 1 <a name="example1"></a>
+
+## Example 1
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
 [](example1.svg)
@@ -384,7 +384,7 @@ client.connect(function(err, result){
 });
 ```
 
-## Example 3 <a name="example3"></a>
+## Example 3
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
 [](example3.svg)
@@ -464,7 +464,7 @@ function machineControl(devices){
   });
 }
 ```
-## Example 4 <a name="example4"></a>
+## Example 4
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
 ### Sending Data To Remote Server
@@ -559,7 +559,7 @@ server.connect(function(err, result){
 ```
 
 
-### Http REST API Simulation <a name="http-rest-api-simulation"></a>
+### Http REST API Simulation
 
 #### Client GET and POST method request
 ```js
@@ -623,7 +623,7 @@ server.connect((err, result) => {
 
 ## Browser Interaction
 
-### Naming Your Client Application For Tracking Purposes<a name="client-name-tracking"></a>
+### Naming Your Client Application For Tracking Purposes
 
 Unlike *device/server* applications, users can create *client* applications without registering it with **node-m2m** server.
 
@@ -646,7 +646,7 @@ client.connect((err, result) => {
 ```
 
 
-### Remote Application Code Editing <a name="online-code-editing"></a>
+### Remote Application Code Editing
 
 Using the browser interface, you can download, edit and upload your application code from or into your remote clients and devices from anywhere.
 
@@ -667,7 +667,7 @@ You need to set the property *allow* to true and provide the *filename* of your 
 From the example above, the filename of the application is *device.js*. Replace it with the actual filename of your application.
 
 
-### Auto Restart Setup <a name="auto-restart-setup"></a>
+### Auto Restart Setup
 
 Using the browser interface, you may need to restart your application after a module update, application code edit/update, remote restart command etc.
 
@@ -715,9 +715,9 @@ $ npm start
 Your node process or application will automatically restart after a remote code update, an npm module update, a remote restart command etc. using the browser interface.
 
 
-## Other FaaS functions <a name="other-faas-functions"></a>
+## Other FaaS functions
 
-### Client request to get all available remote devices <a name="get-all-devices"></a>
+### Client request to get all available remote devices
 ```js
 const m2m = require('m2m');
 
@@ -741,7 +741,7 @@ client.connect((err, result) => {
 });
 ```
 
-### Client request to get each device resources setup <a name="device-setup"></a>
+### Client request to get each device resources setup
 ```js
 const m2m = require('m2m');
 
