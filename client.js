@@ -199,7 +199,7 @@ const m2mUtil = exports.m2mUtil = (() => {
 
 /********************************************
 
-          APPLICATION CLIENT OBJECT
+                CLIENT OBJECT
 
  ********************************************/
 const client = exports.client = (() => {
@@ -1267,7 +1267,7 @@ const client = exports.client = (() => {
 
 /********************************************
  
-          APPLICATION DEVICE OBJECT
+                DEVICE OBJECT
 
  ********************************************/
 const device = exports.device = (() => {
@@ -2372,7 +2372,7 @@ const device = exports.device = (() => {
 
 /*****************************************
 
-        APPLICATION SECURITY OBJECT
+              SECURITY OBJECT
 
  *****************************************/
 /* istanbul ignore next */
@@ -3196,19 +3196,19 @@ const sec = (() => {
     }
 
     if(testOption.enable && m2m.start){
-    	path = 'test/sec/test/start/tk';
+      path = 'test/sec/test/start/tk';
     }
     else if(testOption.enable && m2m.restart){
       path = 'test/sec/test/restart/tk';
     }
     else if(testOption.enable && m2m.dtc){
-    	path = 'test/sec/device/tk';
+      path = 'test/sec/device/tk';
     }
     else if(testOption.enable && m2m.ctd){
-    	path = 'test/sec/client/tk';
+      path = 'test/sec/client/tk';
     }
     else if(testOption.enable && m2m.device){
-    	path = 'test/sec/device/tk';
+      path = 'test/sec/device/tk';
     }
     else if(testOption.enable && m2m.app){
       path = 'test/sec/client/tk';
@@ -3279,7 +3279,7 @@ exports.sec = sec;
 
 /*****************************************
 
-        APPLICATION HTTP OBJECT
+              HTTP OBJECT
 
  *****************************************/
 /* istanbul ignore next */
@@ -3359,11 +3359,11 @@ const http = (() => {
     connect: connect,
   }
 
-})();
+})(); // http
 
 /************************************************
 
-       APPLICATION WEBSOCKET CLIENT OBJECT
+            WEBSOCKET CLIENT OBJECT
 
  ************************************************/
 /* istanbul ignore next */
