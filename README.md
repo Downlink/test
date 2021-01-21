@@ -179,7 +179,7 @@ watch random value 115
 ```
 
 
-## Example 1
+## Example 1 - Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
 [](example1.svg)
@@ -281,7 +281,7 @@ client.connect(function(err, result){
 });
 ```
 
-## Example 2 <a name="example2"></a>
+## Example 2 - GPIO Input/Output Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
@@ -384,7 +384,7 @@ client.connect(function(err, result){
 });
 ```
 
-## Example 3
+## Example 3 - Remote Machine Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
 [](example3.svg)
@@ -464,7 +464,7 @@ function machineControl(devices){
   });
 }
 ```
-## Example 4
+## Example 4 - Sending Data to Remote Device/Server
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
 ### Sending Data To Remote Server
@@ -623,7 +623,7 @@ server.connect((err, result) => {
 
 ## Browser Interaction
 
-### Naming Your Client Application For Tracking Purposes
+### Naming Your Client Application for Tracking Purposes
 
 Unlike *device/server* applications, users can create *client* applications without registering it with **node-m2m** server.
 
@@ -695,7 +695,7 @@ $ npm start
 ```
 For other custom nodemon configuration, please read the nodemon documentation.
 
-## Auto configuration for Code Edit and Auto Restart <a name="auto-config"></a>
+## Auto Configuration for Code Edit and Auto Restart
 To automatically configure your package.json for code editing and auto restart, start your node process with -config flag.
 
 **m2m** will attempt to configure your package.json by adding/creating the *m2mConfig*, *nodemonConfig*, and *scripts* properties to your existing project's package.json. If your m2m project does not have an existing package.json, it will create a new one.  
