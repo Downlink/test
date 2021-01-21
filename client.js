@@ -328,18 +328,18 @@ const client = exports.client = (() => {
           emitter.emit(eventName, { id:pl.id, unwatch:true, name:pl.name, error:'fail'});
         }
         else{
-				  emitter.emit(eventName, { id:pl.id, name:pl.name, error:'fail'});
+          emitter.emit(eventName, { id:pl.id, name:pl.name, error:'fail'});
         }
-		  }
-		  else if(pl.name === 'test-value'){
-				emitter.emit(eventName, { id:pl.id, name:pl.name, value:{test:'passed'}});
-		  }
-		  else if(pl.unwatch){
-				emitter.emit(eventName, { id:pl.id, name:pl.name, unwatch:true, result:{test:'passed'}});
-		  }
-			else{
-				emitter.emit(eventName, { id:pl.id, name:pl.name, result:{test:'passed'}});
-		  }
+      }
+      else if(pl.name === 'test-value'){
+        emitter.emit(eventName, { id:pl.id, name:pl.name, value:{test:'passed'}});
+      }
+      else if(pl.unwatch){
+        emitter.emit(eventName, { id:pl.id, name:pl.name, unwatch:true, result:{test:'passed'}});
+      }
+      else{
+        emitter.emit(eventName, { id:pl.id, name:pl.name, result:{test:'passed'}});
+      }
 		}
   }
 
