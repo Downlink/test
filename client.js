@@ -15,19 +15,12 @@ const colors = require('colors');
 const inquirer = require('inquirer');
 const EventEmitter = require('events');
 class StateEmitter extends EventEmitter {}
-const emitter = exports.emitter = new StateEmitter();
+const emitter = new StateEmitter();
 const m2mv = require('../package.json');
-emitter.setMaxListeners(2);
 const processArgs = process.argv.slice(2);
-const defaultNode = exports.defaultNode = "https://www.node-m2m.com";
-var spl = {}, options = {}, testOption = {};
-const systemInfo = { 
-  type: os.arch(),
-  mem: {total: (os.totalmem()/1000000).toFixed(0) + ' ' + 'MB' , free: (os.freemem()/1000000).toFixed(0) + ' ' + 'MB'},
-  m2mv: 'v' + m2mv.version,
-  os: os.platform()
-};
+var spl = {}, options = {};
 
+emitter.setMaxListeners(2);
 
 /****************************************
 
@@ -36,8 +29,16 @@ const systemInfo = {
 
  ****************************************/
 /* istanbul ignore next */
-const m2mUtil = exports.m2mUtil = (() => {
-  let d1 = null, d2 = null;
+var m2mUtil = exports.m2mUtil = (() => {
+  let d1 = null, d2 = null, testOption = {};
+  const defaultNode = "https://www.node-m2m.com", testEmitter = emitter; 
+
+  const systemInfo = { 
+    type: os.arch(),
+    mem: {total: (os.totalmem()/1000000).toFixed(0) + ' ' + 'MB' , free: (os.freemem()/1000000).toFixed(0) + ' ' + 'MB'},
+    m2mv: 'v' + m2mv.version,
+    os: os.platform()
+  };
 
   function st(){
     d1 = new Date();
@@ -56,7 +57,6 @@ const m2mUtil = exports.m2mUtil = (() => {
   }
 
   function rid(n){
-  //const rid = exports.rid = (n) => {
     return crypto.randomBytes(n).toString('hex');
   }
 
@@ -172,7 +172,6 @@ const m2mUtil = exports.m2mUtil = (() => {
   }
 
   function startConnect(cb){
-  //const startConnect = exports.startConnect = (cb) => {
     let eventName = 'connect';
     if(emitter.listenerCount(eventName) < 1){
       emitter.on(eventName, (data) => {
@@ -185,19 +184,32 @@ const m2mUtil = exports.m2mUtil = (() => {
       });	 
     }
   }
+  
+  function setTestOption(val, s) {
+    testOption.enable = val;
+    if(s){
+      spl = s;
+    }
+  }
 
   return {
     st: st,
     et: et,
     rid: rid,
     eventLog: eventLog,
+    systemInfo: systemInfo,
+    testOption: testOption,
+    defaultNode: defaultNode,
+    testEmitter: testEmitter,
     startConnect: startConnect,
     setDataEvent: setDataEvent,
     trackClientId: trackClientId,
+    setTestOption: setTestOption,
     getClientActiveLinkData: getClientActiveLinkData
   }
 
 })(); // m2mUtil
+
 
 /********************************************
 
@@ -211,7 +223,7 @@ const client = exports.client = (() => {
   // validate remote device/server
   function validateDevice(args, next){
     td = td + 50;
-    if(testOption.enable){
+    if(m2mUtil.testOption.enable){
       next();
     }  
     else{
@@ -305,15 +317,16 @@ const client = exports.client = (() => {
   }
 
   function getClientStatus(rxd){
-    if(testOption.enable && rxd.options){
+    if(m2mUtil.testOption.enable && rxd.options){
       options = rxd.options
     }
     let appIds = fs.readFileSync('m2m_log/client_active_link', 'utf8');
     rxd.active = true;
     rxd.appId = rxd.id;
     rxd.appIds = JSON.parse(appIds);
-    rxd.systemInfo = systemInfo;
+    rxd.systemInfo = m2mUtil.systemInfo;
     rxd.clientDeviceId = clientDeviceId;
+    rxd.ctk = sec.getCtk();
     if(process.env.npm_package_nodemonConfig_restartable){
       rxd.restartable = true;
     }
@@ -324,7 +337,7 @@ const client = exports.client = (() => {
   }
 
   function testFunction(pl,eventName){
-    if(testOption.enable){
+    if(m2mUtil.testOption.enable){
       if(pl.name === 'watch-fail' || pl.name === 'fail' || pl.name === 'test-fail'|| pl.name === 'error'){
         if(pl.unwatch){
           emitter.emit(eventName, { id:pl.id, unwatch:true, name:pl.name, error:'fail'});
@@ -351,7 +364,6 @@ const client = exports.client = (() => {
 
   ********************************************/
   function deviceAccess(i, id){
-  //const deviceAccess = exports.deviceAccess = function (i, id) { 
     this.id = id;
     this._index = i;
   }
@@ -392,7 +404,7 @@ const client = exports.client = (() => {
       emitter.on(eventName, clientChannelDataListener);
     }
 
-    if(testOption.enable){
+    if(m2mUtil.testOption.enable){
       testFunction(pl,eventName);
     }
   }
@@ -439,7 +451,7 @@ const client = exports.client = (() => {
       });
     }
 
-    if(testOption.enable){
+    if(m2mUtil.testOption.enable){
       testFunction(pl,eventName);
     }
   }  
@@ -1105,12 +1117,11 @@ const client = exports.client = (() => {
     },
   };
 
-  /**********************************************************
+  /*********************************************************
   
       Accesss Remote Devices/Resources Support Functions
 
-  ***********************************************************/
-
+  **********************************************************/
   function getRemoteDevices(rxd){
     if(clientDeviceId.length > 0 && rxd && rxd.devices && rxd.devices.length > 0){ 
       let validServerID = [];
@@ -1151,8 +1162,7 @@ const client = exports.client = (() => {
     }
   })();
 
-  function getRegisteredDevices(){ 
-  //const getRegisteredDevices = exports.getRegisteredDevices = function (){
+  function getRegisteredDevices(cb){ 
     websocket.initCheck();
  	  if(userDevices){
       if(userDevices.length > 0){
@@ -1163,21 +1173,17 @@ const client = exports.client = (() => {
     pl._pid = 'getRegisteredDevices';
     pl.getRegisteredDevices = true;
     websocket.send(pl);
+    if(cb){
+      cb(userDevices);
+    }
   }
   
   function getDevices(cb){
-  //const getDevices = exports.getDevices = function (cb){
     websocket.initCheck();
     if(userDevices && userDevices.length > 0){
       cb(null, userDevices);
     }
     let pl = Object.assign({}, spl);
-    if(testOption.enable && pl.error){
-      userDevices = []; 
-    }
-    if(testOption.enable && pl.userDevices){
-      userDevices = pl.userDevices;
-    }
     pl._pid = 'getDevices';
     pl.getDevices = true;
     let eventName = pl.id + pl._pid;
@@ -1199,10 +1205,11 @@ const client = exports.client = (() => {
     websocket.send(pl);
   }
 
+  /************************************
 
-  /**
- *  client's device access method 
- */
+      client device access method 
+
+  *************************************/
   function accessDevice(){
     let cb = null, clientServer = [];
 
@@ -1270,6 +1277,7 @@ const client = exports.client = (() => {
 
 })(); // client
 
+
 /********************************************
  
                 DEVICE OBJECT
@@ -1279,8 +1287,7 @@ const device = exports.device = (() => {
   let deviceInputEventnameHeader = 'gpio-Input', deviceOutputEventnameHeader ='gpio-Output', dataEventName = null,  outputGpioInterval = null;
   let gpioData = [], deviceGpioInput = [], deviceGpioOutput = [], watchDeviceInputData = [], watchDeviceOutputData = [], watchDeviceChannelData = [];
   let r = null, enable = true, scanInterval = 5000, inputPin = 0, outputPin = 0, extInputPin = 0, extOutputPin = 0, simInputPin = 0, simOutputPin = 0;
-  let deviceSetup = {id: spl.id , systemInfo: {cpu: os.arch(), os: os.platform(), m2mv: m2mv.version, totalmem: ((os.totalmem()/1000000)).toFixed(0) + ' '
-      + 'MB', freemem: ((os.freemem()/1000000)).toFixed(0) + ' ' + 'MB'}, gpio:{ input:{pin:[],type:null}, output:{pin:[],type:null}}, channel:{name:[]}, watchChannel:{name:[]}};
+  let deviceSetup = {id: spl.id , systemInfo: m2mUtil.systemInfo, gpio:{ input:{pin:[],type:null}, output:{pin:[],type:null}}, channel:{name:[]}, watchChannel:{name:[]}};
 
   function getEnableStatus(){
     return enable;
@@ -1302,6 +1309,7 @@ const device = exports.device = (() => {
     });
   }
 
+  /* istanbul ignore next */
   function gpioExitProces(){
     if(deviceGpioInput.length > 0){
       for(let x in deviceGpioInput){
@@ -1358,18 +1366,20 @@ const device = exports.device = (() => {
       }
     });
   }
-
-  function startWatch(arrayData){
-    if(arrayData.length > 0){
+ 
+  function startWatch(rxd, arrayData){
+    if(arrayData && arrayData.length > 0){
       for (let i = 0; i < arrayData.length; i++ ) {
         if(arrayData[i]){
-          clearTimeout(arrayData[i].watchTimeout);
-          arrayData[i].watchTimeout = setTimeout(function tick() {
-            if(arrayData[i]){
-              iterateDataEvent(arrayData[i].watchEventData); 
-              arrayData[i].watchTimeout = setTimeout(tick,  arrayData[i].interval);
-            }
-          }, arrayData[i].interval);
+          if(arrayData[i].appId === rxd.appId){
+            clearTimeout(arrayData[i].watchTimeout);
+            arrayData[i].watchTimeout = setTimeout(function tick() {
+              if(arrayData[i]){
+                iterateDataEvent(arrayData[i].watchEventData); 
+                arrayData[i].watchTimeout = setTimeout(tick,  arrayData[i].interval);
+              }
+            }, arrayData[i].interval);
+          }
         }
       }
     }
@@ -1379,53 +1389,53 @@ const device = exports.device = (() => {
     if(rxd.unwatch && (rxd.pin || rxd.name)){
       if(arrayData.length > 0){
         for (let i = 0; i < arrayData.length; i++ ) {
-          // unwatch/remove a gpio input/output pin event as requested by a specific client  
-          if(arrayData[i] && rxd.pin && rxd.unwatch && arrayData[i].pin === rxd.pin && arrayData[i].id === rxd.id && arrayData[i].appId === rxd.appId ){
-            m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'unwatch/stop event', rxd.appId, 'pin ' + rxd.pin);
-            clearTimeout(arrayData[i].watchTimeout);
-            arrayData.splice(i,1);
-            // send confirmation signal back to client 
-            emitter.emit('emit-send', rxd);
-            if(cb){
-              return process.nextTick(cb, true);
+          if(arrayData[i]){
+            // unwatch/remove a gpio input/output pin event per client request  
+            if(arrayData[i] && rxd.pin && rxd.unwatch && arrayData[i].pin === rxd.pin && arrayData[i].id === rxd.id && arrayData[i].appId === rxd.appId ){
+              m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'unwatch/stop event', rxd.appId, 'pin ' + rxd.pin);
+              clearTimeout(arrayData[i].watchTimeout);
+              //arrayData.splice(i,1);
+              // send confirmation result back to client 
+              emitter.emit('emit-send', rxd);
+              if(cb){
+                return process.nextTick(cb, true);
+              }
             }
-          }
-          // unwatch/remove a channel event as requested by a specific client 
-          else if(arrayData[i] && rxd.name && rxd.unwatch && arrayData[i].name === rxd.name && arrayData[i].id === rxd.id && arrayData[i].appId === rxd.appId ){
-            m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'unwatch/stop event', rxd.appId, 'channel ' + rxd.name);
-            clearTimeout(arrayData[i].watchTimeout);
-            arrayData.splice(i,1);
-            // send confirmation signal back to client 
-            emitter.emit('emit-send', rxd);
-            if(cb){
-              return process.nextTick(cb, true);
+            // unwatch/remove a channel event per client request 
+            else if(arrayData[i] && rxd.name && rxd.unwatch && arrayData[i].name === rxd.name && arrayData[i].id === rxd.id && arrayData[i].appId === rxd.appId ){
+              m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'unwatch/stop event', rxd.appId, 'channel ' + rxd.name);
+              clearTimeout(arrayData[i].watchTimeout);
+              //arrayData.splice(i,1);
+              // send confirmation result back to client 
+              emitter.emit('emit-send', rxd);
+              if(cb){
+                return process.nextTick(cb, true);
+              }
             }
           }
         }
       }
     }
     if(rxd.exit && rxd.stopEvent){
-      let event = null;
-      //remove all channel & gpio events as requested by a specific client 
+      //remove all channel & gpio events per client exit process 
       if(arrayData.length > 0){
         for (let i = 0; i < arrayData.length; i++ ) {
           if(arrayData[i] && arrayData[i].appId === rxd.appId){
-            if(arrayData[i].name){
-              event = 'channel ' + arrayData[i].name;
-            }
-            if(arrayData[i].pin){
-              event = 'pin ' + arrayData[i].pin;
-            }
-            m2mUtil.eventLog('m2m_log/log.txt', 'remote client','exit stop event', rxd.appId, event);
+            console.log('arrayData[i].appId', arrayData[i].appId);
             clearTimeout(arrayData[i].watchTimeout);
             //arrayData.splice(i,1);
+            //delete arrayData[i];
+            if(cb){
+              //cb(rxd.appId);
+              process.nextTick(cb, true);
+            }
           }
         }
-        return;
       }
-      /*return process.nextTick(() => {
-        arrayData = arrayData.filter(function(e){return e});
-      });*/
+      m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'unwatch/stop all events', rxd.appId);
+      arrayData = arrayData.filter(function(e){return e});
+      //console.log('arrayData.length', arrayData.length) 
+      return;
     }
     // no event, invalid watch event, nothing to unwatch
     if(rxd.channel){
@@ -1439,33 +1449,14 @@ const device = exports.device = (() => {
     }
     emitter.emit('emit-send', rxd);
   }
-
-  function resetDeviceWatchData(arrayData, rxd){
-    if(arrayData.length > 0){
-      for (let i = 0; i < arrayData.length; i++ ) {
-        if(arrayData[i] && arrayData[i].name && rxd.name){
-          if(arrayData[i] && arrayData[i].name === rxd.name && arrayData[i].appId === rxd.appId){
-            //console.log('** channelData match **');
-            m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'reset watch event', rxd.appId, rxd.name);
-            clearTimeout(arrayData[i].watchTimeout);
-            arrayData.splice(i,1);
-            return false;
-          }
-        }
-        if(arrayData[i] && arrayData[i].pin === rxd.pin){
-          if(arrayData[i] && arrayData[i].pin === rxd.pin && arrayData[i].appId === rxd.appId ){
-            //console.log('** gpioInput match **');
-            m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'reset watch event', rxd.appId , rxd.pin);
-            clearTimeout(arrayData[i].watchTimeout);
-            arrayData.splice(i,1);
-            return false;
-          }
-        } 
-      }
-      //arrayData = arrayData.filter(function(e){return e});
-      return false;
+ 
+  setTimeout(function(){
+    if(m2mUtil.testOption.enable){
+      exports.startWatch = startWatch;
+      exports.removeDataEvent = removeDataEvent;
     }
-  }
+  }, 100); 
+  
 
   /***************************************
    
@@ -1486,31 +1477,54 @@ const device = exports.device = (() => {
       if(rxd.api){
         rxd.error = 'invalid api';
       }
-      return emitter.emit('emit-send', rxd);
+      setImmediate(() => {
+        emitter.emit('emit-send', rxd);
+      });
     }
+    return v;
   }
+  
+  setTimeout(function(){
+    if(m2mUtil.testOption.enable){
+      exports.getChannelDataEvent = getChannelDataEvent;
+    }
+  }, 100); 
 
   function deviceWatchChannelData(rxd){
     if(!rxd.event){
       return;
     }
+
     if(rxd.b){
       return;
     }
 
-    // don't add existing data during client refresh
-    if(resetDeviceWatchData(watchDeviceChannelData, rxd)){
+    if(!getChannelDataEvent(rxd)){
       return;
     }
 
-    getChannelDataEvent(rxd);
+    watchDeviceChannelData = watchDeviceChannelData.filter(function(e){return e}); 
+    
+    // don't add existing data during client refresh
+    if(watchDeviceChannelData.length > 0){
+      for (let i = 0; i < watchDeviceChannelData.length; i++ ) {
+        if(watchDeviceChannelData[i] && watchDeviceChannelData[i].name === rxd.name && watchDeviceChannelData[i].appId === rxd.appId){
+          //console.log('** channelData match **');
+          clearTimeout(watchDeviceChannelData[i].watchTimeout);
+          //watchDeviceChannelData.splice(i,1);
+          //delete watchDeviceChannelData[i];
+          m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'reset watch channel event', rxd.appId, rxd.name);
+          return setImmediate(startWatch, rxd, watchDeviceChannelData);
+        }
+      }
+    }
     
     if(!rxd.interval){
       rxd.interval = scanInterval;
     }
-
-    let dataObject = { id:rxd.id, appId:rxd.appId, watchEventData:[], watchTimeout:null, interval:rxd.interval };
-    dataObject.name = rxd.name;
+   
+    let dataObject = { id:rxd.id, name:rxd.name, appId:rxd.appId, watchEventData:[], watchTimeout:null, interval:rxd.interval };
+    //dataObject.name = rxd.name;
 
     if(rxd.result){
       rxd.initValue = rxd.result;
@@ -1518,15 +1532,16 @@ const device = exports.device = (() => {
     else if(rxd.value){
       rxd.initValue = rxd.value;
     }
-   
-    // capture watch channel data for browser monitoring 
-    setDeviceResourcesWatchData(rxd.name);
 
     // m2mUtil.setDataEvent(rxd, dataObject.watchEventData);
-    dataObject.watchEventData.push(rxd);
-    watchDeviceChannelData.push(dataObject);
-    m2mUtil.eventLog('m2m_log/log.txt', 'remote client' , 'start watch event', rxd.appId, rxd.name);
-    process.nextTick(startWatch, watchDeviceChannelData);
+    setImmediate(function(){
+      dataObject.watchEventData.push(rxd);
+      watchDeviceChannelData.push(dataObject);
+      setImmediate(startWatch, rxd, watchDeviceChannelData);
+    });
+     
+    m2mUtil.eventLog('m2m_log/log.txt', 'remote client' , 'start watch channel event', rxd.appId, rxd.name);
+    
   }
 
   function deviceUnwatchChannelData(rxd){
@@ -1550,6 +1565,7 @@ const device = exports.device = (() => {
     process.nextTick(() => {
       emitter.emit('emit-send', rxd);
     });
+    return v;  
   }
 
   function deviceWatchGpioInputState(rxd){
@@ -1561,27 +1577,44 @@ const device = exports.device = (() => {
       return;
     }
 
-    // don't add existing data during client refresh
-    if(resetDeviceWatchData(watchDeviceInputData, rxd)){
+    if(!GetGpioInputState(rxd)){
       return;
     }
-    
-    GetGpioInputState(rxd);
 
+    watchDeviceInputData = watchDeviceInputData.filter(function(e){return e});
+    
+    // don't add existing data during client refresh
+    if(watchDeviceInputData.length > 0){
+      for (let i = 0; i < watchDeviceInputData.length; i++ ) {
+        if(watchDeviceInputData[i] && watchDeviceInputData[i].pin === rxd.pin && watchDeviceInputData[i].appId === rxd.appId){
+          //console.log('** gpioInput match **');
+          clearTimeout(watchDeviceInputData[i].watchTimeout);
+          //watchDeviceInputData.splice(i,1);
+          //delete watchDeviceInputData[i];
+          m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'reset watch gpio input event', rxd.appId , rxd.pin);
+          return setImmediate(startWatch, rxd, watchDeviceInputData);
+        }
+      }
+    }
+    
     if(!rxd.interval){
       rxd.interval = scanInterval;
     }
 
-    let dataObject = { id:rxd.id, event:rxd.event, appId:rxd.appId, watchEventData:[], watchTimeout:null, interval:rxd.interval };
-    dataObject.pin = rxd.pin;
+    let dataObject = { id:rxd.id, pin:rxd.pin, event:rxd.event, appId:rxd.appId, watchEventData:[], watchTimeout:null, interval:rxd.interval };
+    //dataObject.pin = rxd.pin;
 
     rxd.initValue = rxd.state;
 
     // m2mUtil.setDataEvent(rxd, dataObject.watchEventData);
-    dataObject.watchEventData.push(rxd);
-    watchDeviceInputData.push(dataObject);
-    m2mUtil.eventLog('m2m_log/log.txt', 'remote client' ,'start watch event' , rxd.appId, rxd.pin);
-    process.nextTick(startWatch, watchDeviceInputData);
+    setImmediate(function(){
+      dataObject.watchEventData.push(rxd);
+      watchDeviceInputData.push(dataObject);
+      setImmediate(startWatch, rxd, watchDeviceInputData);
+    });
+
+    m2mUtil.eventLog('m2m_log/log.txt', 'remote client' ,'start watch gpio input event' , rxd.appId, rxd.pin);
+    
   }
 
   function deviceUnwatchGpioInputState(rxd){
@@ -1605,6 +1638,7 @@ const device = exports.device = (() => {
     process.nextTick(() => {
       emitter.emit('emit-send', rxd);
     });
+    return v;
   }
 
   /* istanbul ignore next */
@@ -1615,29 +1649,45 @@ const device = exports.device = (() => {
 
     if(rxd.b){
       return; 
-    }  
-
-    // don't add existing data during client refresh
-    if(resetDeviceWatchData(watchDeviceOutputData, rxd)){
-      return;
     }
 
-    GetGpioOutputState(rxd);
+    if(!GetGpioOutputState(rxd)){
+      return;
+    }  
 
+    watchDeviceOutputData = watchDeviceOutputData.filter(function(e){return e});
+    
+    // don't add existing data during client refresh
+    if(watchDeviceOutputData.length > 0){
+      for (let i = 0; i < watchDeviceOutputData.length; i++ ) {
+        if(watchDeviceOutputData[i] && watchDeviceOutputData[i].pin === rxd.pin && watchDeviceOutputData[i].appId === rxd.appId){
+          //console.log('** gpioInput match **');
+          clearTimeout(watchDeviceOutputData[i].watchTimeout);
+          //watchDeviceOutputData.splice(i,1);
+          //delete watchDeviceOutputData[i];
+          m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'reset watch gpio output event', rxd.appId , rxd.pin);
+          return setImmediate(startWatch, rxd, watchDeviceOutputData);
+        }
+      }
+    }
+   
     if(!rxd.interval){
       rxd.interval = scanInterval;
     }
 
-    let dataObject = { id:rxd.id, event:rxd.event, appId:rxd.appId, watchEventData:[], watchTimeout:null, interval:rxd.interval };
-    dataObject.pin = rxd.pin;
+    let dataObject = { id:rxd.id, pin:rxd.pin, event:rxd.event, appId:rxd.appId, watchEventData:[], watchTimeout:null, interval:rxd.interval };
+    //dataObject.pin = rxd.pin;
 
     rxd.initValue = rxd.state;
 
     // m2mUtil.setDataEvent(rxd, dataObject.watchEventData);
-    dataObject.watchEventData.push(rxd);
-    watchDeviceOutputData.push(dataObject);
-    m2mUtil.eventLog('m2m_log/log.txt', 'remote client', 'start watch event', rxd.appId, rxd.pin);
-    process.nextTick(startWatch, watchDeviceOutputData);
+    setImmediate(function(){
+      dataObject.watchEventData.push(rxd);
+      watchDeviceOutputData.push(dataObject);
+      setImmediate(startWatch, rxd, watchDeviceOutputData);
+    });
+
+    m2mUtil.eventLog('m2m_log/log.txt', 'remote client' ,'start watch gpio output event' , rxd.appId, rxd.pin);
   }
  
   /* istanbul ignore next */
@@ -1716,7 +1766,8 @@ const device = exports.device = (() => {
 
   function getDeviceStatus(rxd){
     rxd.active = true;
-    rxd.systemInfo = systemInfo;
+    rxd.systemInfo = m2mUtil.systemInfo;
+    rxd.ctk = sec.getCtk();
     if(options && Object.keys(options).length > 0){
       rxd.options = options;
     }
@@ -1876,8 +1927,7 @@ const device = exports.device = (() => {
         return state;
       }
     }
-
-    /* istanbul ignore next */
+    
     function GpioInputState(gpio){
       if(gpio.input){
         let rn = Math.floor(( Math.random() * 20) + 5); 
@@ -1942,7 +1992,7 @@ const device = exports.device = (() => {
 
   // gpio input monitoring using array-gpio for raspberry pi
   function setRpiGpioInput(args, eventName, cb){
-		if(testOption.enable){
+		if(m2mUtil.testOption.enable){
       inputPin = 0;
       if(args.pin[0] === 41){
         inputPin = 1;
@@ -2030,7 +2080,7 @@ const device = exports.device = (() => {
   
   // gpio output control using array-gpio for raspberry pi
   function setRpiGpioOutput(args, eventName, cb){
-    if(testOption.enable){
+    if(m2mUtil.testOption.enable){
       if(args.pin[0] === 43){
       	outputPin = 0;r = null;
       }
@@ -2178,6 +2228,7 @@ const device = exports.device = (() => {
         }
         if(data.event && data.name && data.result && data.result !== data.initValue){
 					data.initValue = data.result;
+          setDeviceResourcesWatchData(args);
         }
         data.send = data.json = data.response = response;
         if(data.id === spl.id && data.name === channelName){
@@ -2204,7 +2255,6 @@ const device = exports.device = (() => {
 
   ****************************************************/
   function setData(args, cb){
-  //const setData = exports.setData = function(args, cb){
     websocket.initCheck();
     let eventName = null;
 
@@ -2231,7 +2281,6 @@ const device = exports.device = (() => {
   }
 
   function setApi(args, cb){
-  //const setApi = exports.setApi = function(args, cb){
     websocket.initCheck();
     let o = {};let eventName = null;
     if((typeof args === 'string' || args instanceof String) && typeof cb === 'function'){
@@ -2252,12 +2301,11 @@ const device = exports.device = (() => {
   }
 
   function setGpio(args, cb){
-  //const setGpio = exports.setGpio = function(args, cb){
     websocket.initCheck();
     // system arch  
     let sa = null;
 
-    if(testOption.enable && args.pin === 55){
+    if(m2mUtil.testOption.enable && args.pin === 55){
        sa = 'x64';
     }
     else{
@@ -2330,6 +2378,7 @@ const device = exports.device = (() => {
     }
   }
 
+  // invoking setDeviceResourcesListener() to setup listener
   setDeviceResourcesListener((deviceSetup) => {
     deviceSetup.gpio.input.pin = removeDuplicateInArray(deviceSetup.gpio.input.pin);
     deviceSetup.gpio.output.pin = removeDuplicateInArray(deviceSetup.gpio.output.pin);
@@ -2351,32 +2400,53 @@ const device = exports.device = (() => {
     });
   });
 
-  return {
+  let resources = {
     setApi: setApi,
     setData: setData,
     setGpio: setGpio,
+  };
+
+  let input = {
+    getGpioInputSetup: getGpioInputSetup,
+    GetGpioInputState: GetGpioInputState,
+    deviceWatchGpioInputState: deviceWatchGpioInputState,
+  };
+
+  let output = {
+    GetGpioOutputState: GetGpioOutputState,
+    getGpioOutputSetup: getGpioOutputSetup,
+    deviceWatchGpioOutputState: deviceWatchGpioOutputState,
+  };
+
+  let channel = {
+    getChannelDataEvent: getChannelDataEvent,
+    deviceWatchChannelData: deviceWatchChannelData,
+    deviceSuspendEventWatch: deviceSuspendEventWatch,
+  };
+
+  let exit = {
+    gpioExitProces: gpioExitProces,
+    deviceExitProcess: deviceExitProcess,
+    deviceExitProcessFromClient: deviceExitProcessFromClient,
+  }
+
+  return {
+    exit: exit,
+    input: input,
+    output: output,
+    channel: channel, 
+    resources: resources,
     unwatchAll: unwatchAll,
     resetWatchData: resetWatchData,
-    gpioExitProces: gpioExitProces,
     setEnableStatus: setEnableStatus,
     getEnableStatus: getEnableStatus,
     getDeviceStatus: getDeviceStatus,
     EnableEventWatch: EnableEventWatch,
-    getGpioInputSetup: getGpioInputSetup,
-    GetGpioInputState: GetGpioInputState,
-    deviceExitProcess: deviceExitProcess,
     getDeviceSetupData: getDeviceSetupData,
-    GetGpioOutputState: GetGpioOutputState,
-    getGpioOutputSetup: getGpioOutputSetup,
-    getChannelDataEvent: getChannelDataEvent,
-    deviceWatchChannelData: deviceWatchChannelData,
-    deviceSuspendEventWatch: deviceSuspendEventWatch,
-    deviceWatchGpioInputState: deviceWatchGpioInputState,
-    deviceWatchGpioOutputState: deviceWatchGpioOutputState,
-    deviceExitProcessFromClient: deviceExitProcessFromClient,
   }
 
 })(); // device
+
 
 /*****************************************
 
@@ -2384,30 +2454,32 @@ const device = exports.device = (() => {
 
  *****************************************/
 /* istanbul ignore next */
-const sec = (() => {
-  let serverTimeout = null, serverResponseTimeout = 7000, tp = {}, sd = {}, tkPath = 'node_modules/m2m/lib/sec/tk';
-  let rkpl = {_sid:'ckm', _pid:null, rk:true, nodev:process.version, m2mv:m2mv.version, rid:m2mUtil.rid(4)}, processFilename = null;
+const sec = exports.sec = (() => {
+  let serverTimeout = null, serverResponseTimeout = 7000, tp = {}, sd = {}, tkPath = null; 
+  let cpath = 'node_modules/m2m/lib/sec/', ptk = cpath + 'ptk', rtkPath = cpath + 'tk', rpkPath = cpath + 'pk';
+  let rkpl = {_sid:'ckm', _pid:null, rk:true, nodev:process.version, m2mv:m2mv.version, rid:m2mUtil.rid(4)}, processFilename = null, restartStatus = true;
   const useridVldn = { regex:/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/, msg:'Invalid userid. It must follow a valid email format.'};
   const pwVldn = { regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*()\\[\]{}\-_+=~|:;<>,./? ])(?=.{6,})/, 
   msg: 'Password must be 8 characters minimum\nwith at least one number, one lowercase letter,\none uppercase letter, and one special character.'};
-
-  function getCurrentProcess(){
-  //const getCurrentProcess = exports.getCurrentProcess = () => {
+  
+  (function getCurrentProcess(){
     let mfn = require.main.filename, st =  mfn.lastIndexOf('/');
     processFilename = mfn.slice(st+1,st+25);
     return processFilename;
-  }
-  getCurrentProcess();
+  })();
+  
+  (function parseCptk(){
+    let ctk = fs.readFileSync(ptk, 'utf8');
+    tkPath = ctk.slice(0, 27); // remove \n
+  })();
 
-  function readTknPl(){
-  //const readTknPl = exports.readTknPl = function(){
+  function readCtk(){
     let data = null;
     try{
-      let tk = fs.readFileSync(tkPath, 'utf8');
-      data = JSON.parse(Buffer.from(tk, 'base64').toString('utf8'));
+      data = JSON.parse(Buffer.from(fs.readFileSync(tkPath, 'utf8'), 'base64').toString('utf8'));
     }
     catch(e){
-      m2mUtil.eventLog('m2m_log/log.txt','readTknPl()', JSON.stringify(e));
+      m2mUtil.eventLog('m2m_log/log.txt','readCtk()', JSON.stringify(e));
       //console.log('no token found', e);
     }
     finally{
@@ -2415,8 +2487,234 @@ const sec = (() => {
     }
   }
 
+  function resetCptk(){
+    setTimeout(function(){
+      fs.writeFileSync(ptk, rpkPath); 
+    }, 60000);
+  }
+
+  function getCtk(path){
+    if(!path){
+      path = tkPath;
+    }
+    return fs.readFileSync(path, 'utf8');
+  }
+
+  function setCtk(){
+    resetCptk();
+    return fs.writeFileSync(ptk, rtkPath);
+  }
+
+  function restartProcess(rxd){
+    rxd.active = true;
+    rxd.result = 'fail';
+    rxd.restartable = false;
+    setCtk();
+    if(process.env.npm_package_nodemonConfig_restartable && restartStatus){
+      console.log('Restarting application ...');
+      rxd.result = 'success';
+      rxd.restartable = true;
+      fs.writeFileSync('node_modules/m2m/mon', 'restart');
+      m2mUtil.eventLog('m2m_log/log.txt','process restarted remotely');
+    }  
+    emitter.emit('emit-send', rxd);
+  }
+
+  function secureSystem(rxd){
+    rxd.active = true;
+    console.log('secure system process ...');
+    setCtk(); 
+    if(rxd.on){
+      restartStatus = false;
+    }
+    rxd.result = 'success';
+    m2mUtil.eventLog('m2m_log/log.txt','process', 'secure system');
+    emitter.emit('emit-send', rxd);
+  }
+
+  function getCodeData(filename, rxd){
+    let connectOption = websocket.getConnectionOptions();
+    fs.readFile(filename, 'utf8', (err, data) => {
+      if(err){
+        if (err.code === 'ENOENT') {
+          rxd.appData = 'filename does not exist.';
+        }
+        else{
+          rxd.appData = err;
+        }
+        //console.log('getCodeData error', err);
+        rxd.error = {permission:false, file:null};
+        return emitter.emit('emit-send', rxd);
+      }
+      let bcode = Buffer.from(data); 
+      if(connectOption && connectOption.pw){
+        rxd.error = {pw:true, permission:false, file:null};
+        return emitter.emit('emit-send', rxd);
+      } 
+      rxd.success = true;
+      setCtk();
+      if(rxd.enc){
+        encryptData(rxd, data);
+      }
+      else{
+        rxd.appData = bcode.toString('base64');
+        emitter.emit('emit-send', rxd);
+      }
+    });
+  }
+
+  function uploadCode(rxd){
+    rxd.active = true;
+    if(m2mUtil.testOption.enable && Object.keys(rxd.options).length > 0){
+      options = rxd.options;
+    }
+    if(rxd.uploadCode && options && options.m2mConfig.code){
+      if(options.m2mConfig.code.allow && options.m2mConfig.code.filename){
+        return getCodeData(options.m2mConfig.code.filename, rxd);
+      }
+      else{
+        rxd.error = {permission:true, file:null};
+        return emitter.emit('emit-send', rxd);
+      }
+    }
+    rxd.error = {permission:false};
+    emitter.emit('emit-send', rxd);
+  }
+
+  function updateCode(rxd){
+    rxd.active = true;
+    if(m2mUtil.testOption.enable && Object.keys(rxd.options).length > 0){
+      options = rxd.options;
+    }
+    if(!rxd.appData){
+      rxd.appData = 'filename does not exist.';
+      rxd.error = {permission:true, file:null};
+      return emitter.emit('emit-send', rxd);
+    }
+    if(rxd.updateCode && options && options.m2mConfig.code){
+      if(options.m2mConfig.code.allow){ 
+        if(options.m2mConfig.code.filename){
+          if(process.env.npm_package_nodemonConfig_restartable){
+            rxd.restartable = true;
+          } 
+          let utf8_appData = Buffer.from(rxd.appData, 'base64').toString('utf8');
+          return fs.writeFile(options.m2mConfig.code.filename, utf8_appData, (err) => {
+            if (err) {
+              if (err.code === 'ENOENT') {
+                rxd.appData = 'filename does not exist.';
+              }else{
+                rxd.appData = err;
+              }
+              m2mUtil.eventLog('m2m_log/log.txt', 'application code update error', err.message); 
+              rxd.error = {permission:true, file:null};
+              return emitter.emit('emit-send', rxd);
+            }
+            delete rxd.appData;
+            rxd.success = true;
+            emitter.emit('emit-send', rxd);
+            setCtk();
+            m2mUtil.eventLog('m2m_log/log.txt', 'application code updated', options.m2mConfig.code.filename);
+            console.log('code filename ', options.m2mConfig.code.filename, ' updated ...');
+            fs.writeFileSync('node_modules/m2m/mon', 'code-update');  
+          });
+        }
+        else{
+          rxd.error = {permission:true, file:null};
+          return emitter.emit('emit-send', rxd);
+        }
+      }
+    }
+    rxd.error = {permission:false};
+    return emitter.emit('emit-send', rxd);
+  }
+
+  function getEventLogData(rxd){
+    //let connectOption = websocket.getConnectionOptions();
+    fs.readFile(rxd.filename, 'utf8', (err, data) => {
+      if(err){
+        if (err.code === 'ENOENT') {
+          rxd.eventLogData = 'filename does not exist.';
+        }
+        else{
+          rxd.eventLogData = err;
+        }
+        //console.log('eventLogData error', err);
+        rxd.error = {permission:false, file:null};
+        return emitter.emit('emit-send', rxd);
+      }
+      let bcode = Buffer.from(data); 
+      if(connectOption && connectOption.pw){
+        rxd.error = {pw:true, permission:false, file:null};
+        return emitter.emit('emit-send', rxd);
+      } 
+      rxd.success = true;
+      if(rxd.enc){
+        encryptData(rxd, data);
+      }
+      else{
+        rxd.eventLogData = bcode.toString('base64');
+        emitter.emit('emit-send', rxd);
+      }
+    });
+  }
+
+  function uploadEventLog(rxd){
+    rxd.active = true;
+    if(m2mUtil.testOption.enable && Object.keys(rxd.options).length > 0){
+      options = rxd.options;
+    }
+    if(rxd.uploadEventLog){
+      return getEventLogData(rxd);
+    }
+    rxd.error = {permission:false};
+    emitter.emit('emit-send', rxd);
+  }
+
+  const setModuleUpdateListener = (() => {
+    let eventName = 'm2m-module-update';
+    if(emitter.listenerCount(eventName) < 1){
+      emitter.on(eventName, (rxd) => {
+        if(rxd.aid === spl.aid) {
+          let pkg = JSON.parse(rxd.file.json);
+          let client = rxd.file.client;
+          let m2m = rxd.file.m2m;
+          let jsonFile = rxd.file.json;
+          let path = rxd.path;
+          delete rxd.file.client;
+          delete rxd.file.m2m;
+          delete rxd.file.json;
+          delete rxd.path; 
+          try {
+            if(jsonFile && client && m2m){
+              fs.writeFileSync(path.client, client);
+              fs.writeFileSync(path.m2m, m2m);
+              fs.writeFileSync(path.json, jsonFile);
+              rxd.active = true; 
+              rxd.update = 'success';
+              if(process.env. npm_package_nodemonConfig_restartable){
+                rxd.restartable = true;
+              }  
+              emitter.emit('emit-send', rxd);
+              console.log('m2m module updated ...');
+              setCtk();
+              m2mUtil.eventLog('m2m_log/log.txt', 'm2m module updated', 'v'+rxd.ver);
+              if(rxd.restartable){
+                setTimeout(() => { 
+                  fs.writeFileSync('node_modules/m2m/mon', 'm2m module update'); 
+                }, 1000);
+              }
+            }
+          }
+          catch (err) {
+           m2mUtil.eventLog('m2m_log/log.txt', 'm2m module update error', err);
+           console.log('m2m module update error', err);
+          }
+        }
+      });
+    }	 
+  })();
+
   function userOptionsValidate(args){
-  //const userOptionsValidate = exports.userOptionsValidate = (args) => {
     try{
       if(args && ((typeof args !== 'object') || !(args instanceof Object))){
          throw new Error('invalid arguments');
@@ -2433,19 +2731,19 @@ const sec = (() => {
       // userSettings
       if(args.userSettings && args.userSettings.name && args.userSettings.name.length > 20){
         args.userSettings.name = args.userSettings.name.slice(0, 20);
-        if(testOption.enable) {
+        if(m2mUtil.testOption.enable) {
           throw new Error('Invalid option name length');
         }
       }
       if(args.userSettings && args.userSettings.location && args.userSettings.location.length > 20){
         args.userSettings.location = args.userSettings.location.slice(0, 20);
-        if(testOption.enable) {
+        if(m2mUtil.testOption.enable) {
           throw new Error('Invalid option location name length');
         }
       }
       if(args.userSettings && args.userSettings.description && args.userSettings.description.length > 20){
         args.userSettings.description = args.userSettings.description.slice(0, 20);
-        if(testOption.enable) {
+        if(m2mUtil.testOption.enable) {
           throw new Error('Invalid option description name length');
         }
       }
@@ -2483,7 +2781,6 @@ const sec = (() => {
    * set m2m package.json configuration (auto config)
    */
   function setPkgConfig(pl){
-  //const setPkgConfig = exports.setPkgConfig = (pl) => {
     let pkgjsn = {}, startScript = {}, startScriptDelay = 2000, filename = processFilename, m2mConfig = false, nodemonConfig = false, pkgScript = false;
     if(pl && !pl.options){
       pl.options = {};
@@ -2545,12 +2842,7 @@ const sec = (() => {
    * get m2m package.json current configuration
    */
   function getPkgConfig(pl){
-  //const getPkgConfig = exports.getPkgConfig = (pl) => {
-    /*if(processArgs[0] === '-config'){
-      return;
-    }*/
-
-    if(testOption.enable){
+    if(m2mUtil.testOption.enable){
       return;
     }
 
@@ -2644,7 +2936,7 @@ const sec = (() => {
   function getCK(kt, cb){
     let ws = null;
     let server = websocket.getCurrentServer();
-    tp.v = crypto.createVerify('SHA256');tp.v.update(defaultNode);tp.v.end();
+    tp.v = crypto.createVerify('SHA256');tp.v.update(m2mUtil.defaultNode);tp.v.end();
     rkpl._pid = kt;
     responseTimeout();
     if(server){
@@ -2822,7 +3114,7 @@ const sec = (() => {
         rxd.tg = tp.cp.getAuthTag().toString('hex');
         rxd.tl = rxd.tg.toString('hex').length;              
         if(tp.dpk){
-          tp.pkg.edata = crypto.publicEncrypt(tp.dpk, Buffer.from(defaultNode));
+          tp.pkg.edata = crypto.publicEncrypt(tp.dpk, Buffer.from(m2mUtil.defaultNode));
         }
         delete tp.pkg.cdata;
         delete rxd.ad;
@@ -2891,7 +3183,6 @@ const sec = (() => {
   }
 
   function userPrompt(args, m2m, cb){
-    //console.log('\nPlease provide authentication credentials ...\n');
     console.log('\nPlease provide your credentials ...\n');
 
     if(m2m.app){
@@ -2946,7 +3237,7 @@ const sec = (() => {
       }
     ];
 
-    if(testOption.enable) {
+    if(m2mUtil.testOption.enable) {
       let user_val = validate_userid(args.userid);
       let pw_val = validate_password(args.pw);    
       let sc_val = validate_sc(args.sc);
@@ -3009,7 +3300,6 @@ const sec = (() => {
   }
 
   function m2mStart(args, m2m, cb){
-  //const m2mStart = exports.m2mStart = function(args, m2m, cb){
     if(m2m.options){
       options = m2m.options;
     }
@@ -3021,6 +3311,7 @@ const sec = (() => {
     let user = {};
     m2m._sid = 'm2m';
     m2m.tid = Date.now();
+    m2m.ctk = sec.getCtk(tkPath);
 
     if(m2m.app){
       if(!m2m.appIds){
@@ -3031,7 +3322,7 @@ const sec = (() => {
 
     websocket.setServer(args);
 
-    if(testOption.enable) {
+    if(m2mUtil.testOption.enable) {
       if(cb){
         if(args && args.final){
           // continue
@@ -3091,7 +3382,7 @@ const sec = (() => {
           }
         }
       }
-      if(testOption.enable) {
+      if(m2mUtil.testOption.enable) {
         if(args && args.final){
           process.exit(0);
         }
@@ -3106,7 +3397,6 @@ const sec = (() => {
   }
 
   function m2mRestart(args, m2m, cb){
-  //const m2mRestart = exports.m2mRestart = function(args, m2m, cb){
     try{
       let path = null;
       // set options for new m2m 
@@ -3114,22 +3404,22 @@ const sec = (() => {
         options = m2m.options;
       }
 
-      if(testOption.enable && m2m.start){
+      if(m2mUtil.testOption.enable && m2m.start){
       	path = 'test/sec/test/start/tk';
       }
-      else if(testOption.enable && m2m.restart){
+      else if(m2mUtil.testOption.enable && m2m.restart){
       	path = 'test/sec/test/restart/tk';
       }
-      else if(testOption.enable && m2m.dtc){
+      else if(m2mUtil.testOption.enable && m2m.dtc){
       	path = 'test/sec/device/tk';
       }
-      else if(testOption.enable && m2m.ctd){
+      else if(m2mUtil.testOption.enable && m2m.ctd){
       	path = 'test/sec/client/tk';
       }
-      else if(testOption.enable && m2m.device){
+      else if(m2mUtil.testOption.enable && m2m.device){
       	path = 'test/sec/device/tk';
       }
-      else if(testOption.enable && m2m.app){
+      else if(m2mUtil.testOption.enable && m2m.app){
         path = 'test/sec/client/tk';
       }
       else{
@@ -3142,11 +3432,15 @@ const sec = (() => {
         clientActiveLink = m2mUtil.getClientActiveLinkData();
       }
 
-      if(testOption.enable && m2m.mid){
+      if(m2mUtil.testOption.enable && m2m.mid){
         delete data.id;
       }
       if(m2m.app && data.id && typeof data.id === 'number'){
         console.log('Application has changed from device to client, you need to register your new client application.');
+        return m2mStart(args, m2m, cb);
+      }
+      if(m2m.app && data.appId && data.appId !== m2m.appId){
+        console.log('Client id has changed from',data.id,'to',m2m.id, 'you need to register your new client application.');
         return m2mStart(args, m2m, cb);
       } 
       if(m2m.app && clientActiveLink && clientActiveLink.length > 0){ 
@@ -3160,10 +3454,6 @@ const sec = (() => {
           console.log('\nClient id has changed, you need to register your new client application.');
           return m2mStart(args, m2m, cb);
         }
-      }
-      if(m2m.app && data.appId && data.appId !== m2m.appId){
-        console.log('Client id has changed from',data.id,'to',m2m.id, 'you need to register your new client application.');
-        return m2mStart(args, m2m, cb);
       }
 
       if(m2m.device && data.id && typeof data.id === 'string'){
@@ -3182,10 +3472,12 @@ const sec = (() => {
       if(m2m.user && m2m.u){
         //console.log('Verify user ...', m2m);
       }
+     
       console.log('\nConnecting to remote server ...\n');
       data.options = m2m.options;
       data.restartable = m2m.restartable;
       m2m = data;
+      m2m.ctk = sec.getCtk(path);
       process.nextTick(websocket.connect, args, m2m, cb);
       //process.nextTick(http.connect, args, m2m, cb);
     }
@@ -3194,14 +3486,14 @@ const sec = (() => {
       // console.log('Register new user.\n');
       if(e){
         if (e.code === 'ENOENT') {
-          return m2mStart(args, m2m, cb);
+          // return m2mStart(args, m2m, cb);
         }
+        return m2mStart(args, m2m, cb);
       }
     }
   }
   
   function m2mRestartAsync(args, m2m, cb){
-  //const m2mRestartAsync = exports.m2mRestartAsync = function(args, m2m, cb){
     let path = null;
 
     // set options for new m2m 
@@ -3209,22 +3501,22 @@ const sec = (() => {
       options = m2m.options;
     }
 
-    if(testOption.enable && m2m.start){
+    if(m2mUtil.testOption.enable && m2m.start){
       path = 'test/sec/test/start/tk';
     }
-    else if(testOption.enable && m2m.restart){
+    else if(m2mUtil.testOption.enable && m2m.restart){
       path = 'test/sec/test/restart/tk';
     }
-    else if(testOption.enable && m2m.dtc){
+    else if(m2mUtil.testOption.enable && m2m.dtc){
       path = 'test/sec/device/tk';
     }
-    else if(testOption.enable && m2m.ctd){
+    else if(m2mUtil.testOption.enable && m2m.ctd){
       path = 'test/sec/client/tk';
     }
-    else if(testOption.enable && m2m.device){
+    else if(m2mUtil.testOption.enable && m2m.device){
       path = 'test/sec/device/tk';
     }
-    else if(testOption.enable && m2m.app){
+    else if(m2mUtil.testOption.enable && m2m.app){
       path = 'test/sec/client/tk';
     }
     else{
@@ -3239,7 +3531,7 @@ const sec = (() => {
       }
       try{
         let data = JSON.parse(Buffer.from(tk, 'base64').toString('utf8'));
-        if(testOption.enable && m2m.mid){
+        if(m2mUtil.testOption.enable && m2m.mid){
           delete data.id;
         }
         if(m2m.app && data.id && typeof data.id === 'number'){
@@ -3278,18 +3570,24 @@ const sec = (() => {
 
   return  {
     decSC: decSC,
+    getCtk: getCtk,
+    setCtk: setCtk,
+    readCtk: readCtk,
     m2mStart: m2mStart,
-    readTknPl: readTknPl,
+    resetCptk: resetCptk,
     m2mRestart: m2mRestart,
     userPrompt: userPrompt,
+    uploadCode: uploadCode,
+    updateCode: updateCode,
     getPkgConfig: getPkgConfig,
     setPkgConfig: setPkgConfig, 
-    authenticate: authenticate
+    authenticate: authenticate,
+    secureSystem: secureSystem,
+    restartProcess: restartProcess,
   }
 
 })(); // sec
 
-exports.sec = sec;
 
 /*****************************************
 
@@ -3297,20 +3595,20 @@ exports.sec = sec;
 
  *****************************************/
 /* istanbul ignore next */
-const http = (() => {
+const http = exports.http = (() => {
   let http = require('https');
   let n = null, port = 443, hostname = null;  
   try{
-    n = defaultNode.search("www");
+    n = m2mUtil.defaultNode.search("www");
     if(n === -1){
       http = require('http');
-      n = defaultNode.search("http");
+      n = m2mUtil.defaultNode.search("http");
       port = 3000;
     }
     else{
       port = 443;
     }
-    hostname = defaultNode.slice(n, 35);
+    hostname = m2mUtil.defaultNode.slice(n, 35);
   }
   catch(e){
     m2mUtil.eventLog('m2m_log/log.txt','http()', JSON.stringify(e));
@@ -3375,6 +3673,7 @@ const http = (() => {
 
 })(); // http
 
+
 /************************************************
 
             WEBSOCKET CLIENT OBJECT
@@ -3382,9 +3681,8 @@ const http = (() => {
  ************************************************/
 /* istanbul ignore next */
 const websocket = exports.websocket = (() => {
-  
-  let initialTimer = 3*3600000, dogTimerInterval = initialTimer, server = defaultNode;
   let dogTimer = null, clientRxEventName = null, connectOption = null, THRESHOLD = 1024;
+  let initialTimer = 3*3600000, dogTimerInterval = initialTimer, server = m2mUtil.defaultNode;
   let rxd = {}, ws = null, reg = false, clientActive = 0, registerAttempt = 0, wsConnectAttempt = 0;
 
   function init(value){
@@ -3397,10 +3695,12 @@ const websocket = exports.websocket = (() => {
     
   function initCheck(){
     if(!reg){
-      if(testOption.enable){
-        throw new Error('process terminated');
+      if(m2mUtil.testOption.enable){
+        //throw new Error('process terminated');
       }
-      process.kill(process.pid, 'SIGINT');
+      else{
+        process.kill(process.pid, 'SIGINT');
+      }
     }
   }
 
@@ -3435,24 +3735,24 @@ const websocket = exports.websocket = (() => {
         server = args.server;
       }
       else{
-        server = defaultNode;
+        server = m2mUtil.defaultNode;
       }
     }
     else if(args && typeof args === 'string'){
       server  = args;
     }
     else{
-      server = defaultNode;
+      server = m2mUtil.defaultNode;
     }
     return args;
   }
 
   function wsReconnectAttempt(e, args, m2m, cb){
-    let server = defaultNode;
+    let server = m2mUtil.defaultNode;
     let randomInterval = Math.floor(( Math.random() * 20000) + 1000); 
     
     if(spl.device){
-      device.deviceExitProcess();
+      device.exit.deviceExitProcess();
     }
 
     if(e === 1006 || e === 1003){
@@ -3479,7 +3779,7 @@ const websocket = exports.websocket = (() => {
       let timeout = setTimeout(connect, randomInterval, args, m2m, cb);
       wsConnectAttempt++;
 
-      if(testOption.enable) {
+      if(m2mUtil.testOption.enable) {
         clearTimeout(timeout);
         if(cb){
           return cb(null, 'success');
@@ -3520,7 +3820,7 @@ const websocket = exports.websocket = (() => {
       else{
         clearInterval(dogTimer);
       }
-      if(testOption.enable) {
+      if(m2mUtil.testOption.enable) {
         clearInterval(dogTimer);
     	}
     }, dogTimerInterval);
@@ -3542,16 +3842,16 @@ const websocket = exports.websocket = (() => {
   }
 
   function exitEventProcess(){
-    delete spl.options;delete spl.systemInfo;
-    let pl = Object.assign({}, spl); 
-    pl._pid = 'exit';
-    pl.exit = true;
-    pl.active = false;
+    delete spl.options;delete spl.systemInfo;delete spl.userSettings;
+    delete spl.ctk;delete spl.tid;delete spl.ak;delete spl.reg;delete spl.restartable;
+    let pl = Object.assign({}, spl);
+    pl._pid = 'exit';pl.exit = true;pl.active = false;
     process.on('exit', (code) => {
       m2mUtil.eventLog('m2m_log/log.txt','process', 'exit', ''+code);
+      // console.log('send exit pl', pl);
       ws.send(JSON.stringify(pl));
       if(spl.device){
-        device.gpioExitProces();
+        device.exit.gpioExitProces();
       }
       console.log('exit process ...\n', code);
     });
@@ -3560,208 +3860,33 @@ const websocket = exports.websocket = (() => {
       process.exit();
     });
   }
-
-  function restartProcess(rxd){
-    rxd.active = true;
-    rxd.result = 'fail';
-    rxd.restartable = false;
-    if(process.env.npm_package_nodemonConfig_restartable){
-      console.log('Restarting application ...');
-      rxd.result = 'success';
-      rxd.restartable = true;
-      fs.writeFileSync('node_modules/m2m/mon', 'restart');
-      m2mUtil.eventLog('m2m_log/log.txt','process restarted remotely');
-    }  
-    emitter.emit('emit-send', rxd);
-  }
-
+  
   function reconnectProcess(rxd){
     rxd.active = true;
-    console.log('Reconnect process ...');
+    // console.log('Reconnect process ...');
     emitter.emit('connect', 'reconnect process');
     rxd.result = 'success';
     m2mUtil.eventLog('m2m_log/log.txt','process', 'reconnect app');
     emitter.emit('emit-send', rxd);
   }
 
-  function getCodeData(filename, rxd){
-    let connectOption = websocket.getConnectionOptions();
-    fs.readFile(filename, 'utf8', (err, data) => {
-      if(err){
-        if (err.code === 'ENOENT') {
-          rxd.appData = 'filename does not exist.';
-        }
-        else{
-          rxd.appData = err;
-        }
-        //console.log('getCodeData error', err);
-        rxd.error = {permission:false, file:null};
-        return emitter.emit('emit-send', rxd);
-      }
-      let bcode = Buffer.from(data); 
-      if(connectOption && connectOption.pw){
-        rxd.error = {pw:true, permission:false, file:null};
-        return emitter.emit('emit-send', rxd);
-      } 
-      rxd.success = true;
-      if(rxd.enc){
-        encryptData(rxd, data);
-      }
-      else{
-        rxd.appData = bcode.toString('base64');
-        emitter.emit('emit-send', rxd);
-      }
-    });
+  function commonRxData(rxd){
+    if(rxd.restart){
+      return sec.restartProcess(rxd);
+    }
+    else if(rxd.secureSystem){
+      return sec.secureSystem(rxd);
+    }
+    else if(rxd.updateCode){
+      return sec.updateCode(rxd);
+    }
+    else if(rxd.uploadCode){
+      return sec.uploadCode(rxd);
+    }
+    else if(rxd.uploadEventLog){
+      return uploadEventLog(rxd);
+    }
   }
-
-  function uploadCode(rxd){
-    rxd.active = true;
-    if(testOption.enable && Object.keys(rxd.options).length > 0){
-      options = rxd.options;
-    }
-    if(rxd.uploadCode && options && options.m2mConfig.code){
-      if(options.m2mConfig.code.allow && options.m2mConfig.code.filename){
-        return getCodeData(options.m2mConfig.code.filename, rxd);
-      }
-      else{
-        rxd.error = {permission:true, file:null};
-        return emitter.emit('emit-send', rxd);
-      }
-    }
-    rxd.error = {permission:false};
-    emitter.emit('emit-send', rxd);
-  }
-
-  function updateCode(rxd){
-    rxd.active = true;
-    if(testOption.enable && Object.keys(rxd.options).length > 0){
-      options = rxd.options;
-    }
-    if(!rxd.appData){
-      rxd.appData = 'filename does not exist.';
-      rxd.error = {permission:true, file:null};
-      return emitter.emit('emit-send', rxd);
-    }
-    if(rxd.updateCode && options && options.m2mConfig.code){
-      if(options.m2mConfig.code.allow){ 
-        if(options.m2mConfig.code.filename){
-          if(process.env.npm_package_nodemonConfig_restartable){
-            rxd.restartable = true;
-          } 
-          let utf8_appData = Buffer.from(rxd.appData, 'base64').toString('utf8');
-          return fs.writeFile(options.m2mConfig.code.filename, utf8_appData, (err) => {
-            if (err) {
-              if (err.code === 'ENOENT') {
-                rxd.appData = 'filename does not exist.';
-              }else{
-                rxd.appData = err;
-              }
-              m2mUtil.eventLog('m2m_log/log.txt', 'application code update error', err.message); 
-              rxd.error = {permission:true, file:null};
-              return emitter.emit('emit-send', rxd);
-            }
-            delete rxd.appData;
-            rxd.success = true;
-            emitter.emit('emit-send', rxd);
-            m2mUtil.eventLog('m2m_log/log.txt', 'application code updated', options.m2mConfig.code.filename);
-            console.log('code filename ', options.m2mConfig.code.filename, ' updated ...');
-            fs.writeFileSync('node_modules/m2m/mon', 'code-update');  
-          });
-        }
-        else{
-          rxd.error = {permission:true, file:null};
-          return emitter.emit('emit-send', rxd);
-        }
-      }
-    }
-    rxd.error = {permission:false};
-    return emitter.emit('emit-send', rxd);
-  }
-
-  function getEventLogData(rxd){
-    //let connectOption = websocket.getConnectionOptions();
-    fs.readFile(rxd.filename, 'utf8', (err, data) => {
-      if(err){
-        if (err.code === 'ENOENT') {
-          rxd.eventLogData = 'filename does not exist.';
-        }
-        else{
-          rxd.eventLogData = err;
-        }
-        //console.log('eventLogData error', err);
-        rxd.error = {permission:false, file:null};
-        return emitter.emit('emit-send', rxd);
-      }
-      let bcode = Buffer.from(data); 
-      if(connectOption && connectOption.pw){
-        rxd.error = {pw:true, permission:false, file:null};
-        return emitter.emit('emit-send', rxd);
-      } 
-      rxd.success = true;
-      if(rxd.enc){
-        encryptData(rxd, data);
-      }
-      else{
-        rxd.eventLogData = bcode.toString('base64');
-        emitter.emit('emit-send', rxd);
-      }
-    });
-  }
-
-  function uploadEventLog(rxd){
-    rxd.active = true;
-    if(testOption.enable && Object.keys(rxd.options).length > 0){
-      options = rxd.options;
-    }
-    if(rxd.uploadEventLog){
-      return getEventLogData(rxd);
-    }
-    rxd.error = {permission:false};
-    emitter.emit('emit-send', rxd);
-  }
-
-  const setModuleUpdateListener = (() => {
-    let eventName = 'm2m-module-update';
-    if(emitter.listenerCount(eventName) < 1){
-      emitter.on(eventName, (rxd) => {
-        if(rxd.aid === spl.aid) {
-          let pkg = JSON.parse(rxd.file.json);
-          let client = rxd.file.client;
-          let m2m = rxd.file.m2m;
-          let jsonFile = rxd.file.json;
-          let path = rxd.path;
-          delete rxd.file.client;
-          delete rxd.file.m2m;
-          delete rxd.file.json;
-          delete rxd.path; 
-          try {
-            if(jsonFile && client && m2m){
-              fs.writeFileSync(path.client, client);
-              fs.writeFileSync(path.m2m, m2m);
-              fs.writeFileSync(path.json, jsonFile);
-              rxd.active = true; 
-              rxd.update = 'success';
-              if(process.env. npm_package_nodemonConfig_restartable){
-                rxd.restartable = true;
-              }  
-              emitter.emit('emit-send', rxd);
-              console.log('m2m module updated ...');
-              m2mUtil.eventLog('m2m_log/log.txt', 'm2m module updated', 'v'+rxd.ver);
-              if(rxd.restartable){
-                setTimeout(() => { 
-                  fs.writeFileSync('node_modules/m2m/mon', 'm2m module update'); 
-                }, 1000);
-              }
-            }
-          }
-          catch (err) {
-           m2mUtil.eventLog('m2m_log/log.txt', 'm2m module update error', err);
-           console.log('m2m module update error', err);
-          }
-        }
-      });
-    }	 
-  })();
 
   /*****************************************
 
@@ -3770,52 +3895,52 @@ const websocket = exports.websocket = (() => {
   ******************************************/
   function DeviceRxData(rxd){
     if(rxd && rxd.id !== spl.id){
-      if(testOption.enable) {
+      if(m2mUtil.testOption.enable) {
       	throw new Error('invalid id');
       }
       return;
     }
     if(rxd.src === 'device' || rxd.deviceResponse || rxd.device){
-      if(testOption.enable) {
+      if(m2mUtil.testOption.enable) {
       	throw new Error('invalid payload');
       }
       return;
     }
     else if(rxd.exit){
-      return device.deviceExitProcessFromClient(rxd);
+      return device.exit.deviceExitProcessFromClient(rxd);
     } 
     else if(rxd.channel || rxd.name){
       if(rxd.event){
-        return device.deviceWatchChannelData(rxd);
+        return device.channel.deviceWatchChannelData(rxd);
       }
       if(rxd.unwatch){
         return device.unwatchAll(rxd);
       }
-     	return device.getChannelDataEvent(rxd);
+     	return device.channel.getChannelDataEvent(rxd);
     }
     else if(rxd.gpioInput || rxd.input){
       if(rxd.event){
-        if(device.getGpioInputSetup()){ 
-          return device.GetGpioInputState(rxd);
+        if(device.input.getGpioInputSetup()){ 
+          return device.input.GetGpioInputState(rxd);
         }
-        return device.deviceWatchGpioInputState(rxd);
+        return device.input.deviceWatchGpioInputState(rxd);
       }
       if(rxd.unwatch){
         return device.unwatchAll(rxd);
       }
-      return device.GetGpioInputState(rxd);
+      return device.input.GetGpioInputState(rxd);
     }
     else if(rxd.gpioOutput || rxd.output){
       if(rxd.event){
-        if(device.getGpioOutputSetup()){
-          return device.GetGpioOutputState(rxd);
+        if(device.output.getGpioOutputSetup()){
+          return device.output.GetGpioOutputState(rxd);
         }
-        return device.deviceWatchGpioOutputState(rxd); 
+        return device.output.deviceWatchGpioOutputState(rxd); 
       }
       if(rxd.unwatch){
         return device.unwatchAll(rxd);
       }
-      return device.GetGpioOutputState(rxd);
+      return device.output.GetGpioOutputState(rxd);
     }
     else if(rxd.setupData){
       return device.getDeviceSetupData(rxd);
@@ -3823,24 +3948,13 @@ const websocket = exports.websocket = (() => {
     else if(rxd.status){
       return device.getDeviceStatus(rxd);
     }
-    else if(rxd.restart){
-      return restartProcess(rxd);
-    }
-    else if(rxd.updateCode){
-      return updateCode(rxd);
-    }
-    else if(rxd.uploadCode){
-      return uploadCode(rxd);
-    }
-    else if(rxd.uploadEventLog){
-      return uploadEventLog(rxd);
-    }
     else if(rxd.enable === false){
       return device.deviceSuspendEventWatch(rxd);
     }
     else if(rxd.enable === true){
-      device.EnableEventWatch(rxd);
+      return device.EnableEventWatch(rxd);
     }
+    commonRxData(rxd);
   }
 
   /******************************************
@@ -3849,7 +3963,7 @@ const websocket = exports.websocket = (() => {
   
   *******************************************/
   function ClientRxData(rxd){
-    if(testOption.enable && spl.id !== rxd.id) {
+    if(m2mUtil.testOption.enable && spl.id !== rxd.id) {
       throw new Error('invalid id');
     }
     else if(rxd.activeStart){
@@ -3861,22 +3975,14 @@ const websocket = exports.websocket = (() => {
 		else if(rxd.status){
       return client.getClientStatus(rxd);
     }
-    else if(rxd.restart){
-      return restartProcess(rxd);
-    }
-    else if(rxd.updateCode){
-      return updateCode(rxd);
-    }
-    else if(rxd.uploadCode){
-      return uploadCode(rxd);
-    }
-    else if(rxd.uploadEventLog){
-      return uploadEventLog(rxd);
-    }
     else if(rxd.getRegisteredDevices){
       return client.getRemoteDevices(rxd);
     }
-    else if(rxd.channel || rxd.name){
+    else{
+      commonRxData(rxd);
+    }
+
+    if(rxd.channel || rxd.name){
       if(rxd.unwatch){
       	clientRxEventName = rxd.id + rxd.name + rxd.event + rxd.watch + rxd.unwatch;
       }
@@ -3903,7 +4009,7 @@ const websocket = exports.websocket = (() => {
   }
 
   function initRxData(rxd, args, m2m, cb){
-    if(testOption.enable) {
+    if(m2mUtil.testOption.enable) {
       if(rxd.ca){
         clientActive = rxd.ca;
       }
@@ -3915,11 +4021,11 @@ const websocket = exports.websocket = (() => {
       return;
     }
     if(rxd.code === 100 || rxd.code === 101 || rxd.code === 102){
-      fs.writeFileSync(rxd.path, rxd.data);
-      delete rxd.code;delete rxd.appData;delete rxd.path;delete rxd.data;
-      m2m = rxd; registerAttempt = 0;
-      init(true);
-      spl = Object.assign({}, rxd);
+      sec.setCtk();
+      delete rxd.ctk;delete rxd.code; //delete rxd.userSettings;
+      //fs.writeFileSync(rxd.path, rxd.data);
+      delete rxd.appData;delete rxd.path;delete rxd.data;
+      m2m = rxd; registerAttempt = 0;init(true);spl = Object.assign({}, rxd);
       if(clientActive === 1){ 
         exitEventProcess();
       }
@@ -3929,9 +4035,9 @@ const websocket = exports.websocket = (() => {
       m2mUtil.eventLog('m2m_log/log.txt', 'register', rxd.code, rxd.reason); 
       return connect(args, m2m, cb);
     }
-    if(rxd.code === 110 ){
+    if(rxd.code === 110){
       if(rxd.data && !rxd.error){
-        fs.writeFileSync(rxd.path, rxd.data);
+        sec.setCtk(); //fs.writeFileSync(rxd.path, rxd.data);
         console.log('Access token updated ...');
         m2mUtil.eventLog('m2m_log/log.txt', 'token updated', 'success');
         delete rxd.code;delete rxd.path;delete rxd.data;
@@ -3941,15 +4047,14 @@ const websocket = exports.websocket = (() => {
         m2mUtil.eventLog('m2m_log/log.txt', 'token update fail', rxd.error );
       }
       delete rxd.code;delete rxd.path;delete rxd.data;registerAttempt = 0;
-      init(true);
-      m2m = rxd;
-      spl = Object.assign({}, rxd);
-      connect(args, m2m, cb);
+      init(true);m2m = rxd;spl = Object.assign({}, rxd);connect(args, m2m, cb);
     }
     if(rxd.code === 150 ){
       return emitter.emit('m2m-module-update', rxd);
     }
     if(rxd.code === 200 || rxd.code === 210){
+      //sec.resetCptk();
+      sec.setCtk();
       registerAttempt = 0;
       init(true);
       if(clientActive === 1){ 
@@ -3994,7 +4099,7 @@ const websocket = exports.websocket = (() => {
           console.log('\n'+rxd.reason);
           m2mUtil.eventLog('m2m_log/log.txt', 'connect fail', rxd.reason);
         }
-        if(testOption.enable){
+        if(m2mUtil.testOption.enable){
           if(cb){
             return cb(null, rxd.reason);
           }
@@ -4007,7 +4112,7 @@ const websocket = exports.websocket = (() => {
       console.log('\nresult:', rxd.reason);
       console.log('Device id ' + spl.id + ' is not valid or is not registered. \n');
       m2mUtil.eventLog('m2m_log/log.txt', 'Device id ' + spl.id + ' is not valid or is not registered.', rxd.code, rxd.reason);
-      if(testOption.enable) {
+      if(m2mUtil.testOption.enable) {
         if(cb){
           return cb(null, rxd.reason);
         }
@@ -4018,7 +4123,7 @@ const websocket = exports.websocket = (() => {
       init(false);
       console.log('\nresult: success');
       if(rxd.reason){
-        if(testOption.enable){
+        if(m2mUtil.testOption.enable){
           if(cb){
             return cb(null, rxd.reason);
           }
@@ -4066,10 +4171,10 @@ const websocket = exports.websocket = (() => {
       spl = Object.assign({}, m2m);
     }
 
-    m2m.systemInfo = systemInfo;
+    m2m.systemInfo = m2mUtil.systemInfo;
     args = setServer(args);
 
-    if(testOption.enable) {
+    if(m2mUtil.testOption.enable) {
       if(cb){
         if(m2m.error){
           return cb(new Error(m2m.error), null);
@@ -4155,12 +4260,13 @@ const websocket = exports.websocket = (() => {
           data.src = 'client';
         }
         data.response = true;
-        if(ws && ws.readyState === 1 && enable){
-          if (ws.bufferedAmount < THRESHOLD) {
+        if(enable){
+          /*if (ws.bufferedAmount < THRESHOLD) {
             process.nextTick(() => {
               ws.send(JSON.stringify(data), (e) => {if(e) return console.log('emit-send error:', e.message)});
             });
-          }
+          }*/
+          send(data);
         }
       });	 
     }
@@ -4176,7 +4282,7 @@ const websocket = exports.websocket = (() => {
     setSocket: setSocket,
     initRxData: initRxData,
     setDogTimer: setDogTimer,
-    DeviceRxData, DeviceRxData,
+    DeviceRxData, DeviceRxData, 
     ClientRxData, ClientRxData,
     currentSocket: currentSocket,
     getCurrentServer: getCurrentServer,
@@ -4188,22 +4294,4 @@ const websocket = exports.websocket = (() => {
 
 })(); // websocket
 
-//exports.websocket = websocket;
-
-/* test environment setup */
-/* istanbul ignore next */
-exports.setTestOption = function(val, s, d, a) {
-  let ws = {};
-  ws.readyState = 1;
-  ws.send = function(){}; 
-  ws.close = function(){}; 
-  ws.bufferedAmount = 1020;
-  websocket.init(val);
-  websocket.setSocket(ws);
-  device.setEnableStatus(true);
-  testOption.enable = val;
-  if(s){
-    spl = s;
-  }
-}
 
