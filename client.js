@@ -125,12 +125,12 @@ var m2mUtil = exports.m2mUtil = (() => {
         initLog();
       };
     }
-    fs.stat('m2m_log/log.txt', (e, stats) => {
+    fs.stat(filepath, (e, stats) => {
       if(e && e.code === 'ENOENT'){
         initLog();
       }
       if(stats.size > file_size){
-        fs.writeFileSync('m2m_log/log.txt', '   Date' + '                           Application events');
+        fs.writeFileSync(filepath, '   Date' + '                           Application events');
         fs.appendFileSync(filepath, '\n' + date + '  ' + msg + '  ' + data1 + '  ' + data2 + '  ' + data3); 
       }
     });
@@ -2585,7 +2585,7 @@ const sec = exports.sec = (() => {
       rxd.result = 'success';
       rxd.restartable = true;
       fs.writeFileSync('node_modules/m2m/mon', 'restart');
-      m2mUtil.eventLog('m2m_log/log.txt','process restarted remotely');
+      m2mUtil.eventLog('process restarted remotely');
     }  
     emitter.emit('emit-send', rxd);
   }
@@ -2598,7 +2598,7 @@ const sec = exports.sec = (() => {
       restartStatus = false;
     }
     rxd.result = 'success';
-    m2mUtil.eventLog('m2m_log/log.txt','process', 'secure system');
+    m2mUtil.eventLog('process', 'secure system');
     emitter.emit('emit-send', rxd);
   }
 
@@ -2819,7 +2819,7 @@ const sec = exports.sec = (() => {
       }
     }
     catch(e){
-      m2mUtil.eventLog('m2m_log/log.txt','userOptionsValidate()', args , JSON.stringify(e));
+      m2mUtil.eventLog('userOptionsValidate()', args , JSON.stringify(e));
       throw e;
     }
   }
@@ -3009,7 +3009,7 @@ const sec = exports.sec = (() => {
         ws =  new _WebSocket(server + "/ckm", {origin:server});
       }
       catch(e){
-        m2mUtil.eventLog('m2m_log/log.txt','getCK invalid server', JSON.stringify(e));
+        m2mUtil.eventLog('getCK invalid server', JSON.stringify(e));
         console.log('\nInvalid remote server address ...\nPlease confirm if you are connecting to a valid server.\n' );
         process.kill(process.pid, 'SIGINT');
       }
@@ -3023,7 +3023,7 @@ const sec = exports.sec = (() => {
       if(ws.readyState === 1) {
         ws.send(JSON.stringify(rkpl), (e) => {
         if(e){
-          m2mUtil.eventLog('m2m_log/log.txt','getCK ws open send error', JSON.stringify(e));
+          m2mUtil.eventLog('getCK ws open send error', JSON.stringify(e));
           return console.log('getCK send error',e);
          }
         });
@@ -3044,7 +3044,7 @@ const sec = exports.sec = (() => {
           }
         }
         catch(e){
-          m2mUtil.eventLog('m2m_log/log.txt','getCK ws message error', JSON.stringify(e));
+          m2mUtil.eventLog('getCK ws message error', JSON.stringify(e));
           //console.log(e);
           tp = null;
           if(cb){return cb(e, null);}
@@ -3056,7 +3056,7 @@ const sec = exports.sec = (() => {
       }
     }); 
     ws.on("error",(e) => {
-      m2mUtil.eventLog('m2m_log/log.txt','getCK ws error', JSON.stringify(e));
+      m2mUtil.eventLog('getCK ws error', JSON.stringify(e));
       if(e.message === 'Unexpected server response: 502'){
         console.log(colors.yellow('\nRemote server is not responding'),' ...\nPlease try again later ...\n');
         process.kill(process.pid, 'SIGINT');
@@ -3084,7 +3084,7 @@ const sec = exports.sec = (() => {
       }
     }
     catch(e){
-      m2mUtil.eventLog('m2m_log/log.txt','setTmpKey()', JSON.stringify(e));
+      m2mUtil.eventLog('setTmpKey()', JSON.stringify(e));
       tp = null;ck = null;
       if(cb){
         return cb(e, null);
@@ -3121,7 +3121,7 @@ const sec = exports.sec = (() => {
       } 
     }
     catch(e){
-      m2mUtil.eventLog('m2m_log/log.txt','encryptUser()', JSON.stringify(e));
+      m2mUtil.eventLog('encryptUser()', JSON.stringify(e));
       if(cb){
         return cb(e, null);
       }
@@ -3150,7 +3150,7 @@ const sec = exports.sec = (() => {
       }
       catch(e) {
         //console.log(e);
-        m2mUtil.eventLog('m2m_log/log.txt','ckSetup()', JSON.stringify(e));
+        m2mUtil.eventLog('ckSetup()', JSON.stringify(e));
         if(cb){
           cb('error', null);
         } 
@@ -3188,7 +3188,7 @@ const sec = exports.sec = (() => {
         emitter.emit('emit-send', rxd);
       }
       catch(e){
-        m2mUtil.eventLog('m2m_log/log.txt','encryptData()', JSON.stringify(e));
+        m2mUtil.eventLog('encryptData()', JSON.stringify(e));
         //console.log(e);
       }
     });
@@ -3237,7 +3237,7 @@ const sec = exports.sec = (() => {
     setTimeout(() => {
       encryptUser(user, m2m, (err, m2m) => {
         if(err) {
-          m2mUtil.eventLog('m2m_log/log.txt','authenticate encryptUser()', JSON.stringify(err));
+          m2mUtil.eventLog('authenticate encryptUser()', JSON.stringify(err));
           throw err;
         }
         console.log('\nConnecting to remote server ...');
@@ -3351,7 +3351,7 @@ const sec = exports.sec = (() => {
         }
       }
       catch(e){
-        m2mUtil.eventLog('m2m_log/log.txt','decSC()', JSON.stringify(e));
+        m2mUtil.eventLog('decSC()', JSON.stringify(e));
         if(cb){
           return cb(e, null);
         }
@@ -3406,7 +3406,7 @@ const sec = exports.sec = (() => {
 
     getCK('dck',(err, ck) => {
       if(err) {
-        m2mUtil.eventLog('m2m_log/log.txt','getCK()', JSON.stringify(err));
+        m2mUtil.eventLog('getCK()', JSON.stringify(err));
         throw err;
       } 
       if(ck.puk && ck.sk){ 
@@ -3601,7 +3601,7 @@ const http = exports.http = (() => {
     hostname = m2mUtil.defaultNode.slice(n, 35);
   }
   catch(e){
-    m2mUtil.eventLog('m2m_log/log.txt','http()', JSON.stringify(e));
+    m2mUtil.eventLog('http()', JSON.stringify(e));
     console.log('invalid hostname', e);
   }
 
@@ -3795,7 +3795,7 @@ const websocket = exports.websocket = (() => {
         websocket.send(pl);
       }
       catch(e){
-        m2mUtil.eventLog('m2m_log/log.txt','refreshConnection()', JSON.stringify(e));
+        m2mUtil.eventLog('refreshConnection()', JSON.stringify(e));
         console.log('refreshConnection error', e);
       }
     }
@@ -3828,7 +3828,7 @@ const websocket = exports.websocket = (() => {
     clientActive++;
     wsConnectAttempt = 0;
     setDogTimer(dogTimer, dogTimerInterval);
-    m2mUtil.eventLog('m2m_log/log.txt','websocket', 'open and active');
+    m2mUtil.eventLog('websocket', 'open and active');
   }
 
   function exitEventProcess(){
@@ -3837,7 +3837,7 @@ const websocket = exports.websocket = (() => {
     let pl = Object.assign({}, spl);
     pl._pid = 'exit';pl.exit = true;pl.active = false;
     process.on('exit', (code) => {
-      m2mUtil.eventLog('m2m_log/log.txt','process', 'exit', ''+code);
+      m2mUtil.eventLog('process', 'exit', ''+code);
       // console.log('send exit pl', pl);
       ws.send(JSON.stringify(pl));
       if(spl.device){
@@ -3846,7 +3846,7 @@ const websocket = exports.websocket = (() => {
       console.log('exit process ...\n', code);
     });
     process.on('SIGINT', (s) => {
-      m2mUtil.eventLog('m2m_log/log.txt','process', 'exit', s);
+      m2mUtil.eventLog('process', 'exit', s);
       process.exit();
     });
   }
@@ -3856,7 +3856,7 @@ const websocket = exports.websocket = (() => {
     // console.log('Reconnect process ...');
     emitter.emit('connect', 'reconnect process');
     rxd.result = 'success';
-    m2mUtil.eventLog('m2m_log/log.txt','process', 'reconnect app');
+    m2mUtil.eventLog('process', 'reconnect app');
     emitter.emit('emit-send', rxd);
   }
 
