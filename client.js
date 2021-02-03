@@ -1479,7 +1479,7 @@ const device = exports.device = (() => {
       if(arrayData.length > 0){
         for (let i = 0; i < arrayData.length; i++ ) {
           if(arrayData[i] && arrayData[i].appId === rxd.appId){
-            console.log('arrayData[i].appId', arrayData[i].appId);
+            //console.log('arrayData[i].appId', arrayData[i].appId);
             clearTimeout(arrayData[i].watchTimeout);
             if(cb){
               process.nextTick(cb, true);
