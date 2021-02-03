@@ -8,8 +8,8 @@
 'use strict';
 
 const os = require('os'), colors = require('colors');
+const {m2mUtil, client, device, sec} = require('./client.js');
 const m2mv = require('../package.json'), processArgs = process.argv.slice(2);
-const {defaultNode, m2mUtil, client, device, sec} = require('./client.js');
 var pl = {options:{}}, remoteServer = null, userSettings = null;
 
 m2mUtil.st();
@@ -67,11 +67,11 @@ const Server = exports.Server = function(){
   pl.src = 'device';
   this.id = pl.id;
   this.server = true;
-  this.getApi = device.setApi;
-  this.postApi = device.setApi;
+  this.getApi = device.resources.setApi;
+  this.postApi = device.resources.setApi;
   this.connect = connect;
-  this.setData = device.setData;
-  this.setChannel = device.setData;
+  this.setData = device.resources.setData;
+  this.setChannel = device.resources.setData;
   this.setOption = sec.userOptionsValidate;
   this.setOptions = sec.userOptionsValidate;
 };
@@ -84,13 +84,13 @@ const Device = exports.Device = function(){
   Server.call(this, arguments[0]);
 };
 
-Device.prototype.setGpio = device.setGpio;
+Device.prototype.setGpio = device.resources.setGpio;
 
 /**
  * client application constructor
  */
 const Client = exports.Client = function(){
-  let appIds = null, rpl = sec.readTknPl();
+  let appIds = null, rpl = sec.readCtk();
   if(rpl){
     pl = rpl;
     pl._pid = 'a-c';
@@ -102,16 +102,19 @@ const Client = exports.Client = function(){
     pl._pid = 'a-c';
     pl.appId = pl.id;
     pl.src = 'client';
-    this.id = pl.appId;
-    this.client = true;
     appIds = m2mUtil.trackClientId(pl.id);
     if(appIds){
       pl.appIds = JSON.parse(appIds);
     }
-  } 
+  }
+  this.id = pl.appId;
+  this.client = true; 
   if(arguments.length > 0 && typeof arguments[0] === 'object'){
     //sec.userOptionsValidate(arguments[0]);
     pl.userSettings = arguments[0];
+    if(m2mUtil.testOption.enable){
+      this.userSettings = arguments[0];
+    }
   }
 };
 
@@ -146,10 +149,12 @@ function connect(args, cb){
     remoteServer = args;
   }
   else{
-    remoteServer = defaultNode;
+    remoteServer = m2mUtil.defaultNode;
   }
 
-  m2minfo(pl);
+  if(!m2mUtil.testOption.enable){
+    m2minfo(pl);
+  }
 
   pl.reg = true;
 

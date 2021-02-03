@@ -1224,7 +1224,7 @@ const client = exports.client = (() => {
 
   function getRegisteredDevices(cb){ 
     websocket.initCheck();
- 	  if(userDevices){
+    if(userDevices){
       if(userDevices.length > 0){
         clientDeviceId = userDevices;
       }
@@ -2504,7 +2504,7 @@ const device = exports.device = (() => {
 
 /*****************************************
 
-              SECURITY OBJECT
+                SEC OBJECT
 
  *****************************************/
 /* istanbul ignore next */
