@@ -4,12 +4,9 @@ m2m is a client module for machine-to-machine communication framework  [node-m2m
 
 [![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
 
-#[![Build](https://img.shields.io/github/workflow/status/Node-M2M/m2m/CI/master?label=build&logo=github)](https://github.com/Node-M2M/m2m/actions?query=workflow%3ACI+branch%3Amaster)
+[[Build](https://img.shields.io/github/workflow/status/Node-M2M/m2m/CI/master?label=build&logo=github)](https://github.com/Node-M2M/m2m/actions?query=workflow%3ACI+branch%3Amaster)
 
-#/github/workflow/status/:user/:repo/:workflow?event=push
-
-
-[![Build](https://img.shields.io/github/workflow/status/Node-M2M/m2m/workflow?event=push?label=build&logo=github)](Passing)
+[[Build](https://img.shields.io/github/workflow/status/Node-M2M/m2m/workflow?event=push?label=build&logo=github)](Passing)
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, IoT network gateways, workflow orchestration and many others.
 
