@@ -12,6 +12,8 @@ m2m is a client module for machine-to-machine communication framework  [node-m2m
 
 ![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Ftest-hook%2F2021)
 
+![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Ftest-hook%2F2021)
+
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, IoT network gateways, workflow orchestration and many others.
 
 Each user can create multiple client applications accessing multiple remote devices/micro servers through its user assigned device *id's*.
