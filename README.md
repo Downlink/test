@@ -2,15 +2,7 @@
 
 m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
 
-[![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
-
-[[Build](https://img.shields.io/github/workflow/status/Node-M2M/m2m/CI/master?label=build&logo=github)](https://github.com/Node-M2M/m2m/actions?query=workflow%3ACI+branch%3Amaster)
-
-[![Build](https://img.shields.io/github/workflow/status/Node-M2M/m2m/workflow?event=push?label=build&logo=github)](Passing)
-
-[![Build](https://img.shields.io/badge/Build-Passing-green.svg)](https://github.com/EdAlegrid/badges)
-
-![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Ftest-hook%2F2021)
+[![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)[![Build](https://img.shields.io/badge/Build-Passing-green.svg)](https://github.com/EdAlegrid/badges)
 
 ![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Ftest-hook%2F2021)
 
