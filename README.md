@@ -14,6 +14,10 @@ array-gpio
 [![Version npm](https://img.shields.io/npm/v/array-gpio.svg?logo=npm)](https://www.npmjs.com/package/array-gpio)
 ![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Farray-gpio%2Fbuild-badge)
 
+m2m-can
+
+[![Version npm](https://img.shields.io/npm/v/m2m-can.svg?logo=npm)](https://www.npmjs.com/package/m2m-can)
+![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m-can%2Fbuild-badge)
 
 
 array-gpio html url
