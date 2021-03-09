@@ -1,4 +1,4 @@
-# m2m
+# build - test
 
 [![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
 [![Build](https://img.shields.io/badge/Build-Passing-green.svg)](https://github.com/EdAlegrid/badges)
