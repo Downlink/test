@@ -28,9 +28,9 @@ To use this module, users must create an account and register their devices with
    - [Remote Application Code Editing](#remote-application-code-editing)
    - [Auto Restart Setup](#auto-restart-setup)
    - [Auto Configuration for Code Edit and Auto Restart](#auto-configuration-for-code-edit-and-auto-restart)
-8. [Other FaaS functions](#other-faas-functions)
-   - [Client request to get all available remote devices](#client-request-to-get-all-available-remote-devices)
-   - [Client request to get each device resources setup](#client-request-to-get-each-device-resources-setup)
+8. [Node-M2M Server Query](#node-m2m-server-query)
+   - [Client query to get all available remote devices](#client-query-to-get-all-available-remote-devices)
+   - [Client query to get each device resources setup](#client-query-to-get-each-device-resources-setup)
 
 
 ## Supported Devices
@@ -532,7 +532,6 @@ function machineControl(devices){
 ### Example 4 Sending Data to Remote Device or Server
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
-### Sending Data To Remote Server
 
 #### Device/Server
 ```js
@@ -600,7 +599,7 @@ client.connect(function(err, result){
   // sending a text file to a remote server
   let myfile = fs.readFileSync('myFile.txt', 'utf8');
 
-  server.channel('send-file').sendData( myfile , function(err, result){
+  server.sendData('send-file', myfile , function(err, result){
     if(err) return console.error('send-file error:', err.message);
 
     console.log('send-file', result); // {result: 'success'}
@@ -609,7 +608,7 @@ client.connect(function(err, result){
   // sending json data to a remote server
   let mydata = [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
 
-  server.channel('send-data').sendData( mydata , function(err, result){
+  server.sendData('send-data', mydata , function(err, result){
     if(err) return console.error('send-data error:', err.message);
 
     console.log('send-data', result); // {data: 'valid'}
@@ -617,7 +616,7 @@ client.connect(function(err, result){
 
   // sending data to a remote server w/o a response
   let num = 1.2456;
-  server.channel('number').sendData(num);
+  server.sendData('number', num);
 
 });
 ```
@@ -778,9 +777,9 @@ $ npm start
 Your node process or application will automatically restart after a remote code update, an npm module update, a remote restart command etc. using the browser interface.
 
 
-## Other FaaS functions
+## Node-M2M Server Query
 
-### Client request to get all available remote devices
+### Client query to get all available remote devices
 ```js
 const m2m = require('m2m');
 
@@ -804,7 +803,7 @@ client.connect((err, result) => {
 });
 ```
 
-### Client request to get each device resources setup
+### Client query to get each device resources setup
 ```js
 const m2m = require('m2m');
 
