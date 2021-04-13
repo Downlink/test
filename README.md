@@ -1,3 +1,4 @@
+# m2m
 # build - test
 
 [![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
@@ -23,7 +24,9 @@ m2m-can
 array-gpio html url
 <img alt="Custom badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Farray-gpio%2Fbuild-badge">
 
+
 m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
+
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, IoT network gateways, workflow orchestration and many others.
 
 Each user can create multiple client applications accessing multiple remote devices/micro servers through its user assigned device *id's*.
@@ -57,10 +60,10 @@ To use this module, users must create an account and register their devices with
 
 ## Supported Devices
 
-* Raspberry Pi Models: B+, 2, 3, Zero & Zero W, Compute Module 3, 3B+, 3A+ (generally all 40-pin models)
-* Linux Computer
-* Windows PC
-* Mac Computer
+* Raspberry Pi Models: B+, 2, 3, Zero & Zero W, Compute Module 3, 3B+, 3A+, 4B (generally all 40-pin models)
+* Linux
+* Windows
+* Mac OS
 
 ## Node.js version requirement
 
@@ -87,11 +90,11 @@ We will create a micro server (*remote device*) that will generate random number
 
 And a client application (*remote client*) that will access the random numbers from the remote device.
 
-The remote client will access the random numbers using two methods.
+We will access the random numbers using a *pull* and *push* methods.
 
-The first one using a pull-method, the client will capture the random numbers using a one time function call.
+Using a *pull-method*, the client will capture the random numbers using a one time function call.
 
-And the second one using a push-method, the client will watch the random numbers for any changes to its value <br> every 5 seconds. If the value changes, only then the remote device will send the new random value to the remote client.   
+And using the *push-method*, the client will watch the random numbers every 5 seconds for any changes. If the value changes, only then the remote device will send the new random value to the remote client.   
 
 
 
@@ -120,7 +123,8 @@ device.connect(function(err, result){
 
     console.log('result:', result);
 
-    device.setChannel('random', function(err, data){
+    // set the random data using a random generator  
+    device.setData('random', function(err, data){
       if(err) return console.error('setData random error:', err.message);
 
       let value =   Math.floor(( Math.random() * 100) + 25);
@@ -154,7 +158,12 @@ Similar with the remote device setup, create a client project directory and inst
 ```js
 $ npm install m2m
 ```
-Create the file below as client.js within your client project directory.
+Create one the file below as client.js within your client project directory.
+
+There are two ways we can access the data from the remote device.
+
+The first one is to create a local device object with access to remote device 100. This method is appropriate if we have only one remote device/server to access.
+
 ```js
 const m2m = require('m2m');
 
@@ -170,7 +179,7 @@ client.connect(function(err, result){
     let device = client.accessDevice(100);
 
     // capture 'random' data using a one-time function call
-    device.channel('random').getData(function(err, value){
+    device.getData('random', function(err, value){
         if(err) return console.error('getData random error:', err.message);
         console.log('random value', value); // 97
     });
@@ -178,12 +187,40 @@ client.connect(function(err, result){
     // capture 'random' data using an event-based method
     // data value will be pushed from the remote device if 'random' data value changes
     // the remote device will scan/poll the data every 5 secs for any value changes
-    device.channel('random').watch(function(err, value){
+    device.watch('random', function(err, value){
         if(err) return console.error('watch random error:', err.message);
         console.log('watch random value', value); // 81, 68, 115 ...
     });
 });
 ```
+
+The second method is to access the remote device directly from the client object and provide the device id everytime. This is handy if we have multiple remote devices/servers to access;    
+```js
+const m2m = require('m2m');
+
+// create a client application object
+let client = new m2m.Client();
+
+client.connect(function(err, result){
+    if(err) return console.error('connect error:', err);
+
+    console.log('result:', result);
+
+    // get 'random' data using a one-time function call from device 100
+    client.getData(100, 'random', function(err, value){
+        if(err) return console.error('getData random error:', err.message);
+        console.log('random value', value); // 97
+    });
+
+    // watch 'random' data using an event-based method from device 100
+    client.watch(100, 'random', function(err, value){
+        if(err) return console.error('watch random error:', err.message);
+        console.log('watch random value', value); // 81, 68, 115 ...
+    });
+});
+```
+
+
 Start your application.
 ```js
 $ node client.js
@@ -232,7 +269,7 @@ device.connect(function(err, result){
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  device.setChannel('temperature', function(err, data){
+  device.setData('temperature', function(err, data){
     if(err) return console.error('set temperature error:', err.message);
 
     let value =  i2c.getTemp();
@@ -256,20 +293,9 @@ client.connect(function(err, result){
 
   let device = client.accessDevice(110);
 
-  device.channel('temperature').watch(function(err, value){
+  device.watch('temperature', function(err, value){
     if(err) return console.error('temperature error:', err.message);
     console.log('temperature value', value); // 23.51, 23.49, 23.11
-  });
-
-  // or use accessDevice() method w/ a callback
-
-  client.accessDevice(110, function (err, device){
-    if(err) return console.error('accessDevice 110 error:', err.message);
-
-    device.channel('temperature').watch(function(err, value){
-      if(err) return console.error('temperature error:', err.message);
-      console.log('temperature value', value); // 23.51, 23.49, 23.11
-    });
   });
 });
 ```
@@ -291,7 +317,7 @@ client.connect(function(err, result){
 
   // watch temperature data
   // the remote server will scan/poll it every 15 secs for any value changes
-  device.channel('temperature').watch({interval:15000}, function(err, value){
+  device.watch({name:'temperature', interval:15000}, function(err, value){
     if(err) return console.error('temperature error:', err.message);
     console.log('temperature value', value); // 23.51, 23.49, 23.11
   });
@@ -299,8 +325,8 @@ client.connect(function(err, result){
   // unwatch temperature data after 5 minutes
   // client will stop receiving temperature data from the remote device
   setTimeout(function(){
-    device.channel('temperature').unwatch();
-  }, 5*60*1000);
+    device.unwatch('temperature');
+  }, 5*60000);
 });
 ```
 
@@ -355,12 +381,13 @@ device.connect(function(err, result){
   });
 });
 ```
-
 ### Client to monitor device1 gpio inputs and control device2 gpio outputs
 ```js
 $ npm install m2m
 ```
+There are two ways we can access the gpio input and output pins from our remote devices.
 
+The 1st one is to create a local device object for each remote devices.
 ```js
 const m2m = require('m2m');
 
@@ -370,6 +397,7 @@ client.connect(function(err, result){
     if(err) return console.error('connect error:', err);
     console.log('result:', result);
 
+    // create a local device object for each device
     let device1 = client.accessDevice(120);
     let device2 = client.accessDevice(130);
 
@@ -402,6 +430,45 @@ client.connect(function(err, result){
       else{
         console.log('turn ON device2 output 35');
         device2.out(35).on();
+      }
+    });
+});
+```
+The 2nd one is to access the input and output pins directly from the client object by providing the device id of each remote device.
+```js
+const m2m = require('m2m');
+
+let client = new m2m.Client();
+
+client.connect(function(err, result){
+    if(err) return console.error('connect error:', err);
+    console.log('result:', result);
+    // watch pin 11 from device 120
+    client.input(120, 11).watch(function(err, state){    
+      if(err) return console.error('watch pin 11 error:', err.message);
+      console.log('device 120 input 11 state', state);
+
+      if(state){
+        console.log('turn ON device 130 output 33');
+        client.output(130, 33).on();
+      }
+      else{
+        console.log('turn OFF device 130 output 33');
+        client.output(130, 33).off();
+      }
+    });
+    // watch pin 13 from device 120
+    client.input(120, 13).watch(function(err, state){
+      if(err) return console.error('watch pin 13 error:', err.message);
+      console.log('device 120 input 13 state', state);
+
+      if(state){
+        console.log('turn OFF device 130 output 35');
+        client.output(130, 35).off();
+      }
+      else{
+        console.log('turn ON device 120 output 35');
+        client.output(130, 35).on();
       }
     });
 });
@@ -543,7 +610,7 @@ server.connect(function(err, result){
   console.log('result:', result);
 
   // channel 'send-file' service
-  server.setChannel('send-file', function(err, data){
+  server.setData('send-file', function(err, data){
     if(err) return console.error('send-file error:', err.message);
 
     let file = data.payload;
@@ -557,7 +624,7 @@ server.connect(function(err, result){
   });
 
   // channel 'send-data' service
-  server.setChannel('send-data', function(err, data){
+  server.setData('send-data', function(err, data){
     if(err) return console.error('send-data error:', err.message);
 
     // data.payload  [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
@@ -572,7 +639,7 @@ server.connect(function(err, result){
   });
 
   // channel 'number' service
-  server.setChannel('number', function(err, data){
+  server.setData('number', function(err, data){
     if(err) return console.error('number error:', err.message);
 
     console.log('data.payload', data.payload); // 1.2456
@@ -644,18 +711,18 @@ server.connect((err, result) => {
 });
 ```
 
-## Browser Interaction
+## Using The Browser Interface
 
 ### Naming Your Client Application for Tracking Purposes
 
-Unlike *device/server* applications, users can create *client* applications without registering it with **node-m2m** server.
+Unlike *device/server* applications, users can create *client* applications on the fly without needing to register it with **node-m2m** server.
 
-Node-m2m tracks all client applications through a dynamic string *client id*.
-If you have multiple client applications, <br> it may be difficult to track all your clients by just referring to its *client id* from the browser interface.
+Node-m2m tracks all client applications through a dynamic *client id*.
+If you have multiple client applications, it may be difficult to track all your clients by just referring to its *client id* from the browser interface.
 
-You can assign a **name**, **location** and a **description** properties to your clients as shown below.
+You can assign a **name**, **location** and a **description** properties when you create a client object as shown below.
 
-This will make it easy to track your clients using the browser interface by referring to  its name, location and description.
+This makes it easy to track all your clients using the browser interface by referring to its name, location and description instead of just looking at the client id's which are basically just random alpha-numeric id's.
 ```js
 const m2m = require('m2m');
 
