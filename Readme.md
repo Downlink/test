@@ -18,10 +18,10 @@ To use this module, users must create an account and register their devices with
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
 5. [Examples](#examples)
-   - [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
-   - [GPIO Input Monitor and Output Control](#gpio-input-monitor-and-output-control)
-   - [Remote Machine Control](#remote-machine-control)
-   - [Sending Data to Remote Device or Server](#sending-data-to-remote-device-or-server)
+   - [Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
+   - [GPIO Input Monitor and Output Control](#example-2-gpio-input-monitor-and-output-control)
+   - [Remote Machine Control](#example-3-remote-machine-control)
+   - [Sending Data to Remote Device or Server](#example-4-sending-data-to-remote-device-or-server)
 6. [HTTP API](#http-api)
 7. [Using The Browser Interface](#using-the-browser-interface)
    - [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
@@ -291,7 +291,7 @@ client.connect(function(err, result){
 
   // watch temperature data
   // the remote server will scan/poll it every 15 secs for any value changes
-  // instead of the 5 secs default interval 
+  // instead of the 5 secs default interval
   device.watch({name:'temperature', interval:15000}, function(err, value){
     if(err) return console.error('temperature error:', err.message);
     console.log('temperature value', value); // 23.51, 23.49, 23.11
