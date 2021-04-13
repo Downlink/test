@@ -1,29 +1,4 @@
 # m2m
-# build - test
-
-[![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
-[![Build](https://img.shields.io/badge/Build-Passing-green.svg)](https://github.com/EdAlegrid/badges)
-![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Ftest-hook%2F2021)
-
-m2m
-
-[![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
-![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Fbuild-badge%2F2021)
-
-array-gpio
-
-[![Version npm](https://img.shields.io/npm/v/array-gpio.svg?logo=npm)](https://www.npmjs.com/package/array-gpio)
-![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Farray-gpio%2Fbuild-badge)
-
-m2m-can
-
-[![Version npm](https://img.shields.io/npm/v/m2m-can.svg?logo=npm)](https://www.npmjs.com/package/m2m-can)
-![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m-can%2Fbuild-badge)
-
-
-array-gpio html url
-<img alt="Custom badge" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Farray-gpio%2Fbuild-badge">
-
 
 m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
 
@@ -43,12 +18,12 @@ To use this module, users must create an account and register their devices with
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
 5. [Examples](#examples)
-   - [Example 1 Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
-   - [Example 2 GPIO Input Monitor and Output Control](#example-2-gpio-input-monitor-and-output-control)
-   - [Example 3 Remote Machine Control](#example-3-remote-machine-control)
-   - [Example 4 Sending Data to Remote Device or Server](#example-4-sending-data-to-remote-device-or-server)
-6. [Http REST API Simulation](#http-rest-api-simulation)
-7. [Browser Interaction](#browser-interaction)
+   - [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
+   - [GPIO Input Monitor and Output Control](#gpio-input-monitor-and-output-control)
+   - [Remote Machine Control](#remote-machine-control)
+   - [Sending Data to Remote Device or Server](#sending-data-to-remote-device-or-server)
+6. [HTTP API](#http-api)
+7. [Using The Browser Interface](#using-the-browser-interface)
    - [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
    - [Remote Application Code Editing](#remote-application-code-editing)
    - [Auto Restart Setup](#auto-restart-setup)
@@ -160,10 +135,9 @@ $ npm install m2m
 ```
 Create one the file below as client.js within your client project directory.
 
-There are two ways we can access the data from the remote device.
+There are two ways we can access the data from the remote device from a client application.
 
-The first one is to create a local device object with access to remote device 100. This method is appropriate if we have only one remote device/server to access.
-
+The first is to create a local device object with access to remote device 100. This method is convenient if we need only to access one remote device/server. We need to provide only once the client id of the device/server we want to access.
 ```js
 const m2m = require('m2m');
 
@@ -317,6 +291,7 @@ client.connect(function(err, result){
 
   // watch temperature data
   // the remote server will scan/poll it every 15 secs for any value changes
+  // instead of the 5 secs default interval 
   device.watch({name:'temperature', interval:15000}, function(err, value){
     if(err) return console.error('temperature error:', err.message);
     console.log('temperature value', value); // 23.51, 23.49, 23.11
@@ -387,7 +362,7 @@ $ npm install m2m
 ```
 There are two ways we can access the gpio input and output pins from our remote devices.
 
-The 1st one is to create a local device object for each remote devices.
+The first one is to create a local device object for each remote devices.
 ```js
 const m2m = require('m2m');
 
@@ -434,7 +409,7 @@ client.connect(function(err, result){
     });
 });
 ```
-The 2nd one is to access the input and output pins directly from the client object by providing the device id of each remote device.
+The second one is to access the input and output pins directly from the client object by providing the device id of each remote device.
 ```js
 const m2m = require('m2m');
 
@@ -559,45 +534,6 @@ function machineControl(devices){
 [](example1.svg)
 ### Sending Data To Remote Server
 
-#### Client
-```js
-const fs = require('fs');
-const m2m = require('m2m');
-
-let client = new m2m.Client();
-
-client.connect(function(err, result){
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-
-  let server = client.accessDevice(500);
-
-  // sending a text file to a remote server
-  let myfile = fs.readFileSync('myFile.txt', 'utf8');
-
-  server.channel('send-file').sendData( myfile , function(err, result){
-    if(err) return console.error('send-file error:', err.message);
-
-    console.log('send-file', result); // {result: 'success'}
-  });
-
-  // sending json data to a remote server
-  let mydata = [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
-
-  server.channel('send-data').sendData( mydata , function(err, result){
-    if(err) return console.error('send-data error:', err.message);
-
-    console.log('send-data', result); // {data: 'valid'}
-  });
-
-  // sending data to a remote server w/o a response
-  let num = 1.2456;
-  server.channel('number').sendData(num);
-
-});
-```
-
-
 #### Device/Server
 ```js
 const m2m = require('m2m');
@@ -648,38 +584,45 @@ server.connect(function(err, result){
 });
 ```
 
-
-### Http REST API Simulation
-
-#### Client GET and POST method request
+#### Client
 ```js
+const fs = require('fs');
 const m2m = require('m2m');
 
-const client = new m2m.Client();
+let client = new m2m.Client();
 
-client.connect((err, result) => {
+client.connect(function(err, result){
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // access server 300 using a callback
-  client.accessServer(300, (err, server) => {
-    if(err) return console.error('accessDevice 300 error:', err.message);
+  let server = client.accessDevice(500);
 
-    // GET method api request
-    server.api('/random').get((err, result) => {
-      if(err) return console.error('/random error:', err.message);
-      console.log('/random result', result); // 24
-    });
+  // sending a text file to a remote server
+  let myfile = fs.readFileSync('myFile.txt', 'utf8');
 
-    // POST method api request
-    server.api('/findData').post({name:'ed'}, (err, result) => {
-      if(err) return console.error('/findData error:', err.message);
-      console.log('/findData result', result); // {result: 'ok'}
-    });
+  server.channel('send-file').sendData( myfile , function(err, result){
+    if(err) return console.error('send-file error:', err.message);
+
+    console.log('send-file', result); // {result: 'success'}
   });
+
+  // sending json data to a remote server
+  let mydata = [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
+
+  server.channel('send-data').sendData( mydata , function(err, result){
+    if(err) return console.error('send-data error:', err.message);
+
+    console.log('send-data', result); // {data: 'valid'}
+  });
+
+  // sending data to a remote server w/o a response
+  let num = 1.2456;
+  server.channel('number').sendData(num);
 
 });
 ```
+
+### HTTP API
 
 #### Server GET and POST method setup
 ```js
@@ -708,6 +651,36 @@ server.connect((err, result) => {
       data.send({result: 'ok'});
     }, 5000);
   });
+});
+```
+
+#### Client GET and POST method request
+```js
+const m2m = require('m2m');
+
+const client = new m2m.Client();
+
+client.connect((err, result) => {
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  // access server 300 using a callback
+  client.accessServer(300, (err, server) => {
+    if(err) return console.error('accessDevice 300 error:', err.message);
+
+    // GET method api request
+    server.api('/random').get((err, result) => {
+      if(err) return console.error('/random error:', err.message);
+      console.log('/random result', result); // 24
+    });
+
+    // POST method api request
+    server.api('/findData').post({name:'ed'}, (err, result) => {
+      if(err) return console.error('/findData error:', err.message);
+      console.log('/findData result', result); // {result: 'ok'}
+    });
+  });
+
 });
 ```
 
@@ -761,7 +734,7 @@ From the example above, the filename of the application is *device.js*. Replace 
 
 Using the browser interface, you may need to restart your application after a module update, application code edit/update, remote restart command etc.
 
-Node-m2m uses the **nodemon** module to restart your application process.
+Node-m2m uses **nodemon** to restart your application.
 
 You can add the following *nodemonConfig* and *scripts* properties in your project's npm package.json as a basic auto restart configuration.
 ```js
