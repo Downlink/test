@@ -2,11 +2,11 @@
 
 m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
 
-The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, IoT network gateways, workflow orchestration and many others.
+The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
 
-Each user can create multiple client applications accessing multiple remote devices/micro servers through its user assigned device *id's*.
+Users can create multiple device micro servers on the fly from anywhere. Each device server is publicly accessible through its user assigned device *id*.
 
-Access to remote devices/servers is restricted to authenticated users only. Communications between client and device/server applications are fully encrypted using TLS protocol.
+Access to remote device servers is restricted to authenticated users only. Communications between client and device/server applications are fully encrypted using TLS protocol.
 
 To use this module, users must create an account and register their devices with [node-m2m](https://www.node-m2m.com).
 
@@ -63,13 +63,13 @@ For this quick tour, we will let two computers communicate with each other using
 
 We will create a micro server (*remote device*) that will generate random numbers as its sole service.
 
-And a client application (*remote client*) that will access the random numbers from the remote device.
+And a client application (*remote client*) that will access the random numbers.
 
 We will access the random numbers using a *pull* and *push* methods.
 
 Using a *pull-method*, the client will capture the random numbers using a one time function call.
 
-And using the *push-method*, the client will watch the random numbers every 5 seconds for any changes. If the value changes, only then the remote device will send the new random value to the remote client.   
+And using the *push-method*, the client will watch the random numbers every 5 seconds for any changes. If the value changes, the remote device will send the new random value to the remote client.   
 
 
 
@@ -137,7 +137,7 @@ Create one the file below as client.js within your client project directory.
 
 There are two ways we can access the data from the remote device from a client application.
 
-The first is to create a local device object with access to remote device 100. This method is convenient if we need only to access one remote device/server. We need to provide only once the client id of the device/server we want to access.
+The first is to create a local device object with access to remote device 100. This method is convenient if we need only to access one remote device server. We only need to provide once the client id of the device server we want to access.
 ```js
 const m2m = require('m2m');
 
@@ -159,8 +159,8 @@ client.connect(function(err, result){
     });
 
     // capture 'random' data using an event-based method
-    // data value will be pushed from the remote device if 'random' data value changes
-    // the remote device will scan/poll the data every 5 secs for any value changes
+    // the remote device will scan/poll the data every 5 secs (default) for any value changes
+    // if the value changes, it will be pushed/sent to the client
     device.watch('random', function(err, value){
         if(err) return console.error('watch random error:', err.message);
         console.log('watch random value', value); // 81, 68, 115 ...
@@ -168,7 +168,7 @@ client.connect(function(err, result){
 });
 ```
 
-The second method is to access the remote device directly from the client object and provide the device id everytime. This is handy if we have multiple remote devices/servers to access;    
+The second method is to access the remote device directly from the client object and provide the device id every time. This is handy if we have multiple remote device servers to access;    
 ```js
 const m2m = require('m2m');
 
@@ -289,10 +289,10 @@ client.connect(function(err, result){
 
   let device = client.accessDevice(110);
 
-  // watch temperature data
-  // the remote server will scan/poll it every 15 secs for any value changes
-  // instead of the 5 secs default interval
-  device.watch({name:'temperature', interval:15000}, function(err, value){
+  // scan/poll the data every 15 secs
+  // instead of the default 5 secs
+  //device.watch({channel:'temperature', interval:15000}, function(err, value){
+  device.watch('temperature', 15000}, function(err, value){
     if(err) return console.error('temperature error:', err.message);
     console.log('temperature value', value); // 23.51, 23.49, 23.11
   });
