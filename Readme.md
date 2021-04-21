@@ -571,19 +571,19 @@ server.connect((err, result) => {
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  let data = {name:'Jim', age:34};
+  let myData = {name:'Jim', age:34};
   // set server GET method using 'data/random' path
   server.get('data/current', (err, data) => {
     if(err) return console.error('data/current error:', err.message);
     // send current data
-    data.send(data);
+    data.send(myData);
   });
 
   // set server POST method using 'data/update' path
   server.post('data/update', (err, data) => {
     if(err) return console.error('data/update error:', err.message);
 
-    data = data.payload;
+    myData = data.payload;
     // send a 'success' response
     data.send('success');
   });
@@ -612,17 +612,9 @@ client.connect((err, result) => {
   // POST method request
   server.post('data/update', {name:'ed', age:35} , (err, data) => {   
     if(err) return console.error('data/update error:', err.message);
+    
     console.log('data/update', data); // 'success'
   });
-
-  // get current data after update
-  server.get('data/current', (err, data) => {    
-    if(err) return console.error('data/current error:', err.message);
-
-    console.log('data/current', data); // {name:'ed', age:35}
-  });
-
-  // or
 
   // get current data after update
   server.get('data/current');
