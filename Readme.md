@@ -159,7 +159,7 @@ client.connect(function(err, result){
         console.log('random data', data); // 97
     });
 
-    // get 'random' data using an push method
+    // get 'random' data using a push method
     // the remote device will scan/poll the data every 5 secs (default) for any value changes
     // if the value changes, it will push/send the data to the client
     device.watch('random', function(err, data){
@@ -334,7 +334,7 @@ device.connect(function(err, result){
 ```js
 $ npm install m2m
 ```
-There are two methods we can access the GPIO input/output pins from the remote devices.
+There are two ways we can access the GPIO input/output pins from the remote devices.
 
 ```js
 const m2m = require('m2m');
@@ -349,7 +349,7 @@ client.connect(function(err, result){
     let device1 = client.accessDevice(120);
     let device2 = client.accessDevice(130);
 
-    // 1st method
+    // using gpio method
     device1.gpio({mode:'in', pin:11}).watch(function(err, state){
       if(err) return console.error('watch pin 13 error:', err.message);
       console.log('device1 input 11 state', state);
@@ -364,7 +364,7 @@ client.connect(function(err, result){
       }
     });
 
-    // 2nd method
+    // using input/output method
     device1.input(13).watch(function(err, state){
       if(err) return console.error('watch pin 11 error:', err.message);
       console.log('device1 input 13 state', state);
