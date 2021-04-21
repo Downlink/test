@@ -618,9 +618,8 @@ client.connect((err, result) => {
   });
 
   // get data after update
-  server.get('data/current');
-  // using the 1st request callback for the result
-  // data/current {name:'ed', age:35}
+  server.get('data/current'); // data/current {name:'ed', age:35}
+  // using the 'data/current' initial callback for the result
 
 });
 ```
@@ -670,7 +669,7 @@ From the example above, the filename of the application is *device.js*. Replace 
 
 ### Application Auto Restart
 
-Using the browser interface, you may need to restart your application after a module update, code edit/update, or by sending remote restart command.
+Using the browser interface, you may need to restart your application after a module update, code edit/update, or by sending a remote restart command.
 
 Node-m2m uses **nodemon** to restart your application.
 
@@ -712,7 +711,7 @@ If the configuration is correct, you can now run your node process using *npm st
 ```js
 $ npm start
 ```
-Your node application should restart automatically after a remote code update, an npm module update, or a remote restart command using the browser interface.
+Your node application should restart automatically after a remote code update, an npm module update, or  a remote restart command is issued from the browser interface.
 
 ## Node-M2M Server Query
 
