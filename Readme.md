@@ -4,7 +4,7 @@ m2m is a client module for machine-to-machine communication framework  [node-m2m
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
 
-Easily build multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Clients will access the device servers through its user assigned device *id*.   
+Deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Clients will access the device servers through its user assigned device *id*.   
 
 Access to devices is restricted to authenticated users only. Communications between client and device servers are fully encrypted using TLS protocol.
 
@@ -28,7 +28,7 @@ To use this module, users must create an account and register their devices with
 7. Using The Browser Interface
    - [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
    - [Remote Application Code Editing](#remote-application-code-editing)
-   - [Auto Restart Setup](#auto-restart-setup)
+   - [Application Auto Restart](#application-auto-restart)
    - [Code Edit and Auto Restart Automatic Configuration](#code-edit-and-auto-restart-automatic-configuration)
 8. Node-M2M Server Query
    - [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices)
@@ -612,7 +612,7 @@ client.connect((err, result) => {
   // POST method request
   server.post('data/update', {name:'ed', age:35} , (err, data) => {   
     if(err) return console.error('data/update error:', err.message);
-    
+
     console.log('data/update', data); // 'success'
   });
 
@@ -667,7 +667,7 @@ Set the property *allow* to true and provide the *filename* of your application.
 From the example above, the filename of the application is *device.js*. Replace it with the actual filename of your application.
 
 
-### Auto Restart
+### Application Auto Restart
 
 Using the browser interface, you may need to restart your application after a module update, code edit/update, or by sending remote restart command.
 
