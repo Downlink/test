@@ -67,7 +67,7 @@ We will create a server (*remote device*) that will generate random numbers as i
 
 And a client application (*remote client*) that will access the random numbers.
 
-We will access the random numbers using a pull and push methods.
+We will access the random numbers using a pull and push method.
 
 Using a *pull-method*, the client will capture the random numbers using a one time function call.
 
