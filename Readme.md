@@ -67,7 +67,7 @@ We will create a server (*remote device*) that will generate random numbers as i
 
 And a client application (*remote client*) that will access the random numbers.
 
-We will access the random numbers in two methods.
+We will access the random numbers using a pull and push methods.
 
 Using a *pull-method*, the client will capture the random numbers using a one time function call.
 
@@ -124,7 +124,7 @@ The first time you run your application, it will ask for your credentials.
 ```
 The next time you run your application, it will start automatically without asking for your credentials. It will use a saved user token for authentication.
 
-However, if you leave your application running for more than 30 minutes it will ask again for your credentials for security reason.
+However, if you leave your application running for more than 30 minutes it will ask again for your credentials.
 
 At anytime you can renew your user token using the command line argument **-r** when you restart your application.
 ```js
@@ -159,7 +159,7 @@ client.connect(function(err, result){
         console.log('random value', value); // 97
     });
 
-    // get 'random' data using an event-based method
+    // get 'random' data using an push method
     // the remote device will scan/poll the data every 5 secs (default) for any value changes
     // if the value changes, it will push/send the data to the client
     device.watch('random', function(err, value){
