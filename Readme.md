@@ -4,9 +4,9 @@ m2m is a client module for machine-to-machine communication framework  [node-m2m
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
 
-Users can create multiple device micro servers on the fly from anywhere. Each device server is publicly accessible through its user assigned device *id*.
+Provision multiple public device servers on the fly from anywhere. Clients will access the device servers through its user assigned device *id*.   
 
-Access to remote device servers is restricted to authenticated users only. Communications between client and device/server applications are fully encrypted using TLS protocol.
+Access to devices is restricted to authenticated users only. Communications between client and device/server applications are fully encrypted using TLS protocol.
 
 To use this module, users must create an account and register their devices with [node-m2m](https://www.node-m2m.com).
 
@@ -17,20 +17,22 @@ To use this module, users must create an account and register their devices with
 2. [Node.js version requirement](#nodejs-version-requirement)
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
-5. [Examples](#examples)
+5. Examples
    - [Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
    - [GPIO Input Monitor and Output Control](#example-2-gpio-input-monitor-and-output-control)
    - [Remote Machine Control](#example-3-remote-machine-control)
-   - [Sending Data to Remote Device or Server](#example-4-sending-data-to-remote-device-or-server)
-6. [HTTP API](#http-api)
-7. [Using The Browser Interface](#using-the-browser-interface)
+   - [Sending Data to Remote Device](#example-4-sending-data-to-remote-device)
+6. HTTP API
+    - [Server GET and POST method](#server-get-and-post-method)
+    - [Client GET and POST request](#client-get-and-post-request)
+7. Using The Browser Interface
    - [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
    - [Remote Application Code Editing](#remote-application-code-editing)
    - [Auto Restart Setup](#auto-restart-setup)
    - [Auto Configuration for Code Edit and Auto Restart](#auto-configuration-for-code-edit-and-auto-restart)
-8. [Node-M2M Server Query](#node-m2m-server-query)
-   - [Client query to get all available remote devices](#client-query-to-get-all-available-remote-devices)
-   - [Client query to get each device resources setup](#client-query-to-get-each-device-resources-setup)
+8. Node-M2M Server Query
+   - [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices)
+   - [Server query to get each device resources](#server-query-to-get-each-device-resources)
 
 
 ## Supported Devices
@@ -61,15 +63,15 @@ $ npm install array-gpio
 
 For this quick tour, we will let two computers communicate with each other using the internet.
 
-We will create a micro server (*remote device*) that will generate random numbers as its sole service.
+We will create a server (*remote device*) that will generate random numbers as its sole service.
 
 And a client application (*remote client*) that will access the random numbers.
 
-We will access the random numbers using a *pull* and *push* methods.
+We will access the random numbers in two methods.
 
 Using a *pull-method*, the client will capture the random numbers using a one time function call.
 
-And using the *push-method*, the client will watch the random numbers every 5 seconds for any changes. If the value changes, the remote device will send the new random value to the remote client.   
+Using a *push-method*, the client will watch the random numbers every 5 seconds for any changes. If the value changes, the remote device will send the new value to the remote client.   
 
 
 
@@ -102,7 +104,7 @@ device.connect(function(err, result){
     device.setData('random', function(err, data){
       if(err) return console.error('setData random error:', err.message);
 
-      let value =   Math.floor(( Math.random() * 100) + 25);
+      let rvvalue =   Math.floor(( Math.random() * 100) + 25);
       data.send(value);
     });
 });
@@ -135,9 +137,9 @@ $ npm install m2m
 ```
 Create one the file below as client.js within your client project directory.
 
-There are two ways we can access the data from the remote device from a client application.
+There are two ways clients can access the data from the remote device.
 
-The first is to create a local device object with access to remote device 100. This method is convenient if we need only to access one remote device server. We only need to provide once the client id of the device server we want to access.
+1. Create a local device object with access to the remote device. This method is convenient if we need only to access one remote device server. You provide only once the device id of the device server you want to access.
 ```js
 const m2m = require('m2m');
 
@@ -167,8 +169,7 @@ client.connect(function(err, result){
     });
 });
 ```
-
-The second method is to access the remote device directly from the client object and provide the device id every time. This is handy if we have multiple remote device servers to access;    
+2. Access the remote device directly from the client object and provide the device id every time for each request method. This is handy if we have multiple remote device servers to access;    
 ```js
 const m2m = require('m2m');
 
@@ -180,13 +181,13 @@ client.connect(function(err, result){
 
     console.log('result:', result);
 
-    // get 'random' data using a one-time function call from device 100
+    // get 'random' data using a one-time function call
     client.getData(100, 'random', function(err, value){
         if(err) return console.error('getData random error:', err.message);
         console.log('random value', value); // 97
     });
 
-    // watch 'random' data using an event-based method from device 100
+    // watch 'random' data using an event-based method
     client.watch(100, 'random', function(err, value){
         if(err) return console.error('watch random error:', err.message);
         console.log('watch random value', value); // 81, 68, 115 ...
@@ -529,7 +530,7 @@ function machineControl(devices){
   });
 }
 ```
-### Example 4 Sending Data to Remote Device or Server
+### Example 4 Sending Data to Remote Device
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
 
@@ -623,7 +624,7 @@ client.connect(function(err, result){
 
 ### HTTP API
 
-#### Server GET and POST method setup
+#### Server GET and POST method
 ```js
 const m2m = require('m2m');
 
@@ -653,7 +654,7 @@ server.connect((err, result) => {
 });
 ```
 
-#### Client GET and POST method request
+#### Client GET and POST request
 ```js
 const m2m = require('m2m');
 
@@ -668,15 +669,17 @@ client.connect((err, result) => {
     if(err) return console.error('accessDevice 300 error:', err.message);
 
     // GET method api request
-    server.api('/random').get((err, result) => {
+    //server.api('/random').get((err, result) => {
+    server.get('random/data', (err, data) => {    
       if(err) return console.error('/random error:', err.message);
-      console.log('/random result', result); // 24
+      console.log('get random', data); // 24
     });
 
     // POST method api request
-    server.api('/findData').post({name:'ed'}, (err, result) => {
+    //server.api('/findData').post({name:'ed'}, (err, result) => {
+    server.post('random/data', {name:'ed'} , (err, data) => {   
       if(err) return console.error('/findData error:', err.message);
-      console.log('/findData result', result); // {result: 'ok'}
+      console.log('post random/data', data); // {result: 'ok'}
     });
   });
 
@@ -779,7 +782,7 @@ Your node process or application will automatically restart after a remote code 
 
 ## Node-M2M Server Query
 
-### Client query to get all available remote devices
+### Server query to get all available remote devices
 ```js
 const m2m = require('m2m');
 
@@ -803,7 +806,7 @@ client.connect((err, result) => {
 });
 ```
 
-### Client query to get each device resources setup
+### Server query to get each device resources
 ```js
 const m2m = require('m2m');
 
