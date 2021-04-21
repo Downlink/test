@@ -154,17 +154,17 @@ client.connect(function(err, result){
     let device = client.accessDevice(100);
 
     // get 'random' data using a one-time function call
-    device.getData('random', function(err, value){
+    device.getData('random', function(err, data){
         if(err) return console.error('getData random error:', err.message);
-        console.log('random value', value); // 97
+        console.log('random data', data); // 97
     });
 
     // get 'random' data using an push method
     // the remote device will scan/poll the data every 5 secs (default) for any value changes
     // if the value changes, it will push/send the data to the client
-    device.watch('random', function(err, value){
+    device.watch('random', function(err, data){
         if(err) return console.error('watch random error:', err.message);
-        console.log('watch random value', value); // 81, 68, 115 ...
+        console.log('watch random data', data); // 81, 68, 115 ...
     });
 });
 ```
@@ -176,13 +176,11 @@ Similar with remote device setup, you will be prompted to enter your credentials
 
 You should get a similar output result as shown below.
 ```js
-random value 97
-watch random value 81
-watch random value 68
-watch random value 115
+random data 97
+watch random data 81
+watch random data 68
+watch random data 115
 ```
-## Examples
-
 ### Example 1 Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
@@ -216,8 +214,8 @@ device.connect(function(err, result){
   device.setData('temperature', function(err, data){
     if(err) return console.error('set temperature error:', err.message);
 
-    let value =  i2c.getTemp();
-    data.send(value);
+    let td =  i2c.getTemp();
+    data.send(td);
   });
 });
 ```
@@ -237,9 +235,9 @@ client.connect(function(err, result){
 
   let device = client.accessDevice(110);
 
-  device.watch('temperature', function(err, value){
+  device.watch('temperature', function(err, data){
     if(err) return console.error('temperature error:', err.message);
-    console.log('temperature value', value); // 23.51, 23.49, 23.11
+    console.log('temperature data', data); // 23.51, 23.49, 23.11
   });
 });
 ```
@@ -260,9 +258,9 @@ client.connect(function(err, result){
   let device = client.accessDevice(110);
 
   // scan/poll the data every 15 secs instead of the default 5 secs
-  device.watch('temperature', 15000, function(err, value){
+  device.watch('temperature', 15000, function(err, data){
     if(err) return console.error('temperature error:', err.message);
-    console.log('temperature value', value); // 23.51, 23.49, 23.11
+    console.log('temperature data', data); // 23.51, 23.49, 23.11
   });
 
   // unwatch temperature data after 5 minutes
@@ -527,28 +525,28 @@ client.connect(function(err, result){
   let server = client.accessDevice(500);
 
   // send 'hello server' payload data to 'echo-server' channel
-  server.sendData('echo-server', 'hello server', function(err, result){
+  server.sendData('echo-server', 'hello server', function(err, data){
     if(err) return console.error('echo-server error:', err.message);
 
-    console.log('echo-server', result); // 'hello server'
+    console.log('echo-server', data); // 'hello server'
   });
 
   // sending a text file
   let myfile = fs.readFileSync('myFile.txt', 'utf8');
 
-  server.sendData('send-file', myfile , function(err, result){
+  server.sendData('send-file', myfile , function(err, data){
     if(err) return console.error('send-file error:', err.message);
 
-    console.log('send-file', result); // {result: 'success'}
+    console.log('send-file', data); // {result: 'success'}
   });
 
   // sending a json data
   let mydata = [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
 
-  server.sendData('send-data', mydata , function(err, result){
+  server.sendData('send-data', mydata , function(err, data){
     if(err) return console.error('send-data error:', err.message);
 
-    console.log('send-data', result); // {data: 'valid'}
+    console.log('send-data', data); // {data: 'valid'}
   });
 
   // sending data w/o a response
