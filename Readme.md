@@ -572,14 +572,15 @@ server.connect((err, result) => {
   console.log('result:', result);
 
   let myData = {name:'Jim', age:34};
-  // set server GET method using 'data/random' path
+
+  // set server GET method
   server.get('data/current', (err, data) => {
     if(err) return console.error('data/current error:', err.message);
     // send current data
     data.send(myData);
   });
 
-  // set server POST method using 'data/update' path
+  // set server POST method
   server.post('data/update', (err, data) => {
     if(err) return console.error('data/update error:', err.message);
 
@@ -616,7 +617,7 @@ client.connect((err, result) => {
     console.log('data/update', data); // 'success'
   });
 
-  // get current data after update
+  // get data after update
   server.get('data/current');
   // using the 1st request callback for the result
   // data/current {name:'ed', age:35}
