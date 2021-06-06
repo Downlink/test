@@ -20,15 +20,15 @@ To use this module, users must create an account and register their devices with
 2. [Node.js version requirement](#nodejs-version-requirement)
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
-5. [Examples]()
+5. [Examples](#examples)
    * [Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
    * [GPIO Input Monitoring and Output Control](#example-2-gpio-input-monitor-and-output-control)
    * [Remote Machine Control](#example-3-remote-machine-control)
    * [Send Data to Remote Device](#example-4-sending-data-to-remote-device)
-6. [HTTP API]()
+6. [HTTP API](#http-api)
     * [Server GET and POST method Setup](#server-get-and-post-method)
     * [Client GET and POST request](#client-get-and-post-request)
-7. [Managing Your Remote Devices Using The Browser Interface]()
+7. [Managing Your Remote Devices Using The Browser Interface](#Managing-your-remote-devices)
    * [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
@@ -184,6 +184,8 @@ watch random data 81
 watch random data 68
 watch random data 115
 ```
+## Examples
+
 ### Example 1 Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
@@ -560,9 +562,9 @@ client.connect(function(err, result){
 });
 ```
 
-### HTTP API
+## HTTP API
 
-#### Server GET and POST method
+### Server GET and POST method
 ```js
 const m2m = require('m2m');
 
@@ -592,7 +594,7 @@ server.connect((err, result) => {
 });
 ```
 
-#### Client GET and POST request
+### Client GET and POST request
 ```js
 const m2m = require('m2m');
 
@@ -625,7 +627,7 @@ client.connect((err, result) => {
 });
 ```
 
-## Using The Browser Interface
+## Managing Your Remote Devices Using The Browser Interface
 
 ### Naming Your Client Application for Tracking Purposes
 
