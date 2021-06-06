@@ -3,11 +3,11 @@
 [![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
 ![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Fbuild-badge%2F2021)
 
-m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
+m2m is a multi-platform client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
 
-Deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Clients will access the device servers through its user assigned device *id*.   
+Deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Device servers are accessible through its user assigned device *id*.   
 
 Access to devices is restricted to authenticated users only. Communications between client and device servers are fully encrypted using TLS protocol.
 
@@ -16,7 +16,7 @@ To use this module, users must create an account and register their devices with
 [](https://raw.githubusercontent.com/EdoLabs/src/master/m2mSystem2.svg?sanitize=true)
 
 # Table of contents
-1. [Supported Devices](#supported-devices)
+1. [Supported Platform](#supported-platform)
 2. [Node.js version requirement](#nodejs-version-requirement)
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
@@ -33,12 +33,12 @@ To use this module, users must create an account and register their devices with
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
    * [Configure Your Application Process for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
-8. [Node-M2M Server Query]()
+8. [Node-M2M Server Query](#node-m2m-server-query)
    * [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices)
    * [Server query to get each device resources](#server-query-to-get-each-device-resources)
 
 
-## Supported Devices
+## Supported Platform
 
 * Raspberry Pi Models: B+, 2, 3, Zero & Zero W, Compute Module 3, 3B+, 3A+, 4B (generally all 40-pin models)
 * Linux
@@ -64,13 +64,11 @@ $ npm install array-gpio
 ![]()
 ## Quick Tour
 
-For this quick tour, we will let two computers communicate with each other using the internet.
-
 We will create a server (*remote device*) that will generate random numbers as its sole service.
 
 And a client application (*remote client*) that will access the random numbers.
 
-We will access the random numbers using a pull and push method.
+The client will access the random numbers using a pull and push method.
 
 Using a *pull-method*, the client will capture the random numbers using a one time function call.
 
@@ -118,16 +116,16 @@ Start your device application.
 $ node device.js
 ```
 
-The first time you run your application, it will ask for your credentials.
+The first time you run your application, it will ask for your full credentials.
 ```js
 ? Enter your userid (email):
 ? Enter your password:
 ? Enter your security code:
 
 ```
-The next time you run your application, it will start automatically without asking for your credentials. It will use a saved user token for authentication.
+The next time you run your application, it will start automatically. It will use a saved user token for authentication.
 
-However, if you leave your application running for more than 30 minutes it will ask again for your credentials.
+However, if you leave your application running for more than 15 minutes restarting your application will require you to provide credentials again.
 
 At anytime you can renew your user token using the command line argument **-r** when you restart your application.
 ```js
@@ -156,18 +154,18 @@ client.connect(function(err, result){
     // create a local device object with access to remote device 100
     let device = client.accessDevice(100);
 
-    // get 'random' data using a one-time function call
+    // capture 'random' data using a one-time function call
     device.getData('random', function(err, data){
-        if(err) return console.error('getData random error:', err.message);
-        console.log('random data', data); // 97
+      if(err) return console.error('getData random error:', err.message);
+      console.log('random data', data); // 97
     });
 
-    // get 'random' data using a push method
-    // the remote device will scan/poll the data every 5 secs (default) for any value changes
+    // capture 'random' data using a push method
+    // the remote device will scan/poll the data every 5 secs (default)
     // if the value changes, it will push/send the data to the client
     device.watch('random', function(err, data){
-        if(err) return console.error('watch random error:', err.message);
-        console.log('watch random data', data); // 81, 68, 115 ...
+      if(err) return console.error('watch random error:', err.message);
+      console.log('watch random data', data); // 81, 68, 115 ...
     });
 });
 ```
@@ -347,42 +345,42 @@ const m2m = require('m2m');
 let client = new m2m.Client();
 
 client.connect(function(err, result){
-    if(err) return console.error('connect error:', err);
-    console.log('result:', result);
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
 
-    // create a local device object for each device
-    let device1 = client.accessDevice(120);
-    let device2 = client.accessDevice(130);
+  // create a local device object for each device
+  let device1 = client.accessDevice(120);
+  let device2 = client.accessDevice(130);
 
-    // using gpio method
-    device1.gpio({mode:'in', pin:11}).watch(function(err, state){
-      if(err) return console.error('watch pin 13 error:', err.message);
-      console.log('device1 input 11 state', state);
+  // using gpio method
+  device1.gpio({mode:'in', pin:11}).watch(function(err, state){
+    if(err) return console.error('watch pin 13 error:', err.message);
+    console.log('device1 input 11 state', state);
 
-      if(state){
-        // turn ON device2 output 33
-        device2.gpio({mode:'out', pin:33}).on();
-      }
-      else{
-        // 'turn OFF device2 output 33'
-        device2.gpio({mode:'out', pin:33}).off();
-      }
-    });
+    if(state){
+      // turn ON device2 output 33
+      device2.gpio({mode:'out', pin:33}).on();
+    }
+    else{
+      // 'turn OFF device2 output 33'
+      device2.gpio({mode:'out', pin:33}).off();
+    }
+  });
 
-    // using input/output method
-    device1.input(13).watch(function(err, state){
-      if(err) return console.error('watch pin 11 error:', err.message);
-      console.log('device1 input 13 state', state);
+  // using input/output method
+  device1.input(13).watch(function(err, state){
+    if(err) return console.error('watch pin 11 error:', err.message);
+    console.log('device1 input 13 state', state);
 
-      if(state){
-        // turn OFF device2 output 35
-        device2.output(35).off();
-      }
-      else{
-        // 'turn ON device2 output 35'
-        device2.output(35).on();
-      }
-    });
+    if(state){
+      // turn OFF device2 output 35
+      device2.output(35).off();
+    }
+    else{
+      // 'turn ON device2 output 35'
+      device2.output(35).on();
+    }
+  });
 });
 ```
 ### Example 3 Remote Machine Control
