@@ -1,5 +1,8 @@
 # m2m
 
+[![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
+![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Fbuild-badge%2F2021)
+
 m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
@@ -17,22 +20,22 @@ To use this module, users must create an account and register their devices with
 2. [Node.js version requirement](#nodejs-version-requirement)
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
-5. Examples
-   - [Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
-   - [GPIO Input Monitor and Output Control](#example-2-gpio-input-monitor-and-output-control)
-   - [Remote Machine Control](#example-3-remote-machine-control)
-   - [Sending Data to Remote Device](#example-4-sending-data-to-remote-device)
-6. HTTP API
-    - [Server GET and POST method](#server-get-and-post-method)
-    - [Client GET and POST request](#client-get-and-post-request)
-7. Using The Browser Interface
-   - [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
-   - [Remote Application Code Editing](#remote-application-code-editing)
-   - [Application Auto Restart](#application-auto-restart)
-   - [Code Edit and Auto Restart Automatic Configuration](#code-edit-and-auto-restart-automatic-configuration)
-8. Node-M2M Server Query
-   - [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices)
-   - [Server query to get each device resources](#server-query-to-get-each-device-resources)
+5. [Examples]()
+   * [Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
+   * [GPIO Input Monitoring and Output Control](#example-2-gpio-input-monitor-and-output-control)
+   * [Remote Machine Control](#example-3-remote-machine-control)
+   * [Send Data to Remote Device](#example-4-sending-data-to-remote-device)
+6. [HTTP API]()
+    * [Server GET and POST method Setup](#server-get-and-post-method)
+    * [Client GET and POST request](#client-get-and-post-request)
+7. [Managing Your Remote Devices Using The Browser Interface]()
+   * [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
+   * [Remote Code Editing](#remote-application-code-editing)
+   * [Application Process Auto Restart](#application-auto-restart)
+   * [Configure Your Application Process for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
+8. [Node-M2M Server Query]()
+   * [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices)
+   * [Server query to get each device resources](#server-query-to-get-each-device-resources)
 
 
 ## Supported Devices
@@ -370,11 +373,11 @@ client.connect(function(err, result){
       console.log('device1 input 13 state', state);
 
       if(state){
-        // turn OFF device2 output 33
+        // turn OFF device2 output 35
         device2.output(35).off();
       }
       else{
-        // 'turn ON device2 output 33'
+        // 'turn ON device2 output 35'
         device2.output(35).on();
       }
     });
