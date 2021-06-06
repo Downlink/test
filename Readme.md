@@ -28,7 +28,7 @@ To use this module, users must create an account and register their devices with
 6. [HTTP API](#http-api)
     * [Server GET and POST method Setup](#server-get-and-post-method)
     * [Client GET and POST request](#client-get-and-post-request)
-7. [Managing Your Remote Devices Using The Browser Interface](#Managing-your-remote-devices)
+7. [Managing Your Remote Devices Using The Browser Interface](#Managing-your-remote-devices-using-the-browser-interface)
    * [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
