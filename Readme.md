@@ -30,6 +30,7 @@ To use this module, users must create an account and register their devices with
    * [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
    * [GPIO Input Monitoring and Output Control](#gpio-input-monitoring-and-output-control)
    * [Remote Machine Control](#remote-machine-control)
+   * [Using Channel Data for GPIO Control](#using-channel-data-for-gpio-control)
    * [Sending Data to Remote Device](#sending-data-to-remote-device)
 6. [HTTP API](#http-api)
     * [Server GET and POST method Setup](#server-get-and-post-method)
@@ -343,12 +344,12 @@ device.connect(function(err, result){
   });
 });
 ```
-#### Client to access GPIO input and output object resources from device1 and device2
+#### Client accessing GPIO input/output resources from device1 and device2
 ```js
 $ npm install m2m
 ```
 There are two ways we can access the GPIO input/output objects from remote devices as shown below.
-Both ways will allow you to manipulate GPIO object resources directly from client applications.  
+Both ways will allow you to manipulate GPIO input/output resources directly from client applications.  
 ```js
 const m2m = require('m2m');
 
@@ -374,11 +375,11 @@ client.connect(function(err, result){
     console.log('watch input pin 11 state', state);
 
     if(state){
-      // turn ON device2 output pin 33
+      // turn ON output pin 33
       device2.gpio({mode:'out', pin:33}).on();
     }
     else{
-      // turn OFF device2 output pin 33
+      // turn OFF output pin 33
       device2.gpio({mode:'out', pin:33}).off();
     }
   });
@@ -396,14 +397,138 @@ client.connect(function(err, result){
     console.log('watch input pin 13 state', state);
 
     if(state){
-      // turn OFF device2 output pin 35
+      // turn OFF output pin 35
       device2.output(35).off();
     }
     else{
-      // turn ON device2 output pin 35
+      // turn ON output pin 35
       device2.output(35).on();
     }
   });
+});
+```
+### Using Channel Data for GPIO Control
+
+Aside from the available standard api for Raspberry Pi direct GPIO control, we can also use the channel data api to manipulate and control GPIO input/output resources from any Raspberry Pi devices.
+
+If you notice, the standard gpio api requires us to use *array-gpio* as dependency.
+
+With channel data api, we can use other *npm modules* for Raspberry Pi GPIO control.
+
+### Example 1
+#### Device/Server Raspberry Pi setup
+```js
+const m2m = require('m2m');
+const { setOutput } = require('array-gpio');
+
+const led = setOutput(33);
+
+let server = new m2m.Device(200);
+
+server.connect(function(err, result){
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  // 'gpio-output-pin-33-off' channel data resource
+  server.setData('gpio-output-pin-33-off', function(err, data){
+    if(err) return console.error('gpio-output-pin-33-off error:', err.message);
+
+    led.off();
+    // send back a response
+    data.send('led is off');
+  });
+
+  // 'gpio-output-pin-33-on' channel data resource
+  server.setData('gpio-output-pin-33-on', function(err, data){
+    if(err) return console.error('gpio-output-pin-33-on error:', err.message);
+
+    led.on();
+    // send back a response
+    data.send('led is on');
+  });
+});
+```
+
+#### Client application to turn ON and OFF the remote Raspberry Pi's led using channel data
+```js
+const m2m = require('m2m');
+
+let client = new m2m.Client();
+
+client.connect(function(err, result){
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  let device = client.accessDevice(200);
+
+  device.getData('gpio-output-pin-33-on', function(err, data){
+    if(err) return console.error('gpio-output-pin-33-on error:', err.message);
+
+    console.log('gpio-output-pin-33-on', data); // 'led is on'
+  });
+
+  device.getData('gpio-output-pin-33-off', function(err, data){
+    if(err) return console.error('gpio-output-pin-33-off error:', err.message);
+
+    console.log('gpio-output-pin-33-off', data); // 'led is off'
+  });      
+
+});
+```
+### Example 2
+#### Device/Server Raspberry Pi setup
+```js
+const m2m = require('m2m');
+const { setOutput } = require('array-gpio');
+
+const led = setOutput(33);
+
+let server = new m2m.Device(200);
+
+server.connect(function(err, result){
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  // 'gpio-output-pin-33-off' channel data resource
+  server.setData('gpio-output-pin-33', function(err, data){
+    if(err) return console.error('gpio-output-pin-33 error:', err.message);
+
+    if(data.payload === 'on'){
+      led.on();
+      data.send('led is on');
+    }
+    else{
+      led.off();
+      data.send('led is off');
+    }
+
+  });
+});  
+```
+#### Client application to turn ON and OFF the led using senData method
+```js
+const m2m = require('m2m');
+
+let client = new m2m.Client();
+
+client.connect(function(err, result){
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  let device = client.accessDevice(200);
+
+  device.sendData('gpio-output-pin-33', 'on', function(err, data){
+    if(err) return console.error('gpio-output-pin-33 on error:', err.message);
+
+    console.log('gpio-output-pin-33-on', data); // 'led is on'
+  });
+
+  device.sendData('gpio-output-pin-33', 'off', function(err, data){
+    if(err) return console.error('gpio-output-pin-33 off error:', err.message);
+
+    console.log('gpio-output-pin-33-off', data); // 'led is off'
+  });      
+
 });
 ```
 ### Remote Machine Control
@@ -482,7 +607,7 @@ function machineControl(devices){
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
 
-#### Device/Server
+#### Device/Server Setup
 Instead of the usual capturing of data from remote devices, we can send data to remote devices for resource updates or as part of an application requirement.  
 
 ```js
@@ -542,7 +667,7 @@ server.connect(function(err, result){
 });
 ```
 
-#### Client
+#### Client sending data to remote device
 ```js
 const fs = require('fs');
 const m2m = require('m2m');
