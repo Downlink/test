@@ -7,9 +7,15 @@ m2m is a multi-platform client module for machine-to-machine communication frame
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
 
-Deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Device servers are accessible through its user assigned device *id*.   
+With m2m, you can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server.
 
-Access to devices is restricted to authenticated users only. Communications between client and device servers are fully encrypted using TLS protocol.
+Your can set multiple *channel data*, *GPIO objects* and *HTTP API* methods as resources for your device servers.
+
+Your device servers will be accessible through its user assigned device *id* from your remote client applications.
+
+Access to devices is restricted to authenticated users only.
+
+All communications between client and device servers are fully encrypted using TLS protocol.
 
 To use this module, users must create an account and register their devices with [node-m2m](https://www.node-m2m.com).
 
@@ -74,8 +80,6 @@ Using a *pull-method*, the client will capture the random numbers using a one ti
 
 Using a *push-method*, the client will watch the random numbers every 5 seconds for any changes. If the value changes, the remote device will send the new value to the remote client.   
 
-
-
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/quicktour.svg?sanitize=true)
 [](quicktour.svg)
 
@@ -95,19 +99,18 @@ const m2m = require('m2m');
 // this id must must be registered with node-m2m
 let device = new m2m.Device(100);
 
-// authenticate and connect with node-m2m server
 device.connect(function(err, result){
-    if(err) return console.error('connect error:', err);
+  if(err) return console.error('connect error:', err);
 
-    console.log('result:', result);
+  console.log('result:', result);
 
-    // set data source 'random' channel  
-    device.setData('random', function(err, data){
-      if(err) return console.error('setData random error:', err.message);
+  // set 'random' channel as resource  
+  device.setData('random', function(err, data){
+    if(err) return console.error('setData random error:', err.message);
 
-      let rd = Math.floor(Math.random() * 100);
-      data.send(rd);
-    });
+    let rd = Math.floor(Math.random() * 100);
+    data.send(rd);
+  });
 });
 ```
 
@@ -125,14 +128,13 @@ The first time you run your application, it will ask for your full credentials.
 ```
 The next time you run your application, it will start automatically. It will use a saved user token for authentication.
 
-However, if you leave your application running for more than 15 minutes restarting your application will require you to provide credentials again.
+However, if you leave your application running for more than 15 minutes restarting your application will require you to provide your credentials again.
 
-At anytime you can renew your user token using the command line argument **-r** when you restart your application.
+At anytime, you can re-authenticate with full credentials using the *-r* flag when restarting your application as shown below.
+
 ```js
 $ node device.js -r
 ```
-It will ask you to enter your credentials again. Enter your credentials to renew your token.
-
 ### Remote Client Setup
 Similar with the remote device setup, create a client project directory and install m2m.
 ```js
@@ -140,33 +142,34 @@ $ npm install m2m
 ```
 Create the file below as client.js within your client project directory.
 
+To access resources from your remote device, create a remote device object from client's *accessDevice* method as shown below.
+
 ```js
 const m2m = require('m2m');
 
-// create a client application object
 let client = new m2m.Client();
 
 client.connect(function(err, result){
-    if(err) return console.error('connect error:', err);
+  if(err) return console.error('connect error:', err);
 
-    console.log('result:', result);
+  console.log('result:', result);
 
-    // create a local device object with access to remote device 100
-    let device = client.accessDevice(100);
+  // create a remote device object from client accessDevice method
+  let device = client.accessDevice(100);
 
-    // capture 'random' data using a one-time function call
-    device.getData('random', function(err, data){
-      if(err) return console.error('getData random error:', err.message);
-      console.log('random data', data); // 97
-    });
+  // capture 'random' data using a one-time function call
+  device.getData('random', function(err, data){
+    if(err) return console.error('getData random error:', err.message);
+    console.log('random data', data); // 97
+  });
 
-    // capture 'random' data using a push method
-    // the remote device will scan/poll the data every 5 secs (default)
-    // if the value changes, it will push/send the data to the client
-    device.watch('random', function(err, data){
-      if(err) return console.error('watch random error:', err.message);
-      console.log('watch random data', data); // 81, 68, 115 ...
-    });
+  // capture 'random' data using a push method
+  // the remote device will scan/poll the data every 5 secs (default)
+  // if the value changes, it will push/send the data to the client
+  device.watch('random', function(err, data){
+    if(err) return console.error('watch random error:', err.message);
+    console.log('watch random data', data); // 81, 68, 115 ...
+  });
 });
 ```
 Start your application.
