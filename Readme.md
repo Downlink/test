@@ -3,17 +3,17 @@
 [![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
 ![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Fbuild-badge%2F2021)
 
-m2m is a multi-platform client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
+m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
 
-With m2m, you can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server.
+You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server.
 
-Your can set multiple *channel data*, *GPIO objects* and *HTTP API* methods as resources for your device servers.
+You can set multiple *channel data*, *GPIO objects* and *HTTP API* methods as resources of device servers.
 
-Your device servers will be accessible through its user assigned device *id* from your remote client applications.
+Your device servers will be accessible through its user assigned device *id* from client applications.
 
-Access to devices is restricted to authenticated users only.
+Access to clients and devices is restricted to authenticated users only.
 
 All communications between client and device servers are fully encrypted using TLS protocol.
 
@@ -27,14 +27,14 @@ To use this module, users must create an account and register their devices with
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
 5. [Examples](#examples)
-   * [Using MCP 9808 Temperature Sensor](#example-1-using-mcp-9808-temperature-sensor)
-   * [GPIO Input Monitoring and Output Control](#example-2-gpio-input-monitor-and-output-control)
-   * [Remote Machine Control](#example-3-remote-machine-control)
-   * [Send Data to Remote Device](#example-4-sending-data-to-remote-device)
+   * [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
+   * [GPIO Input Monitoring and Output Control](#gpio-input-monitoring-and-output-control)
+   * [Remote Machine Control](#remote-machine-control)
+   * [Sending Data to Remote Device](#sending-data-to-remote-device)
 6. [HTTP API](#http-api)
     * [Server GET and POST method Setup](#server-get-and-post-method)
     * [Client GET and POST request](#client-get-and-post-request)
-7. [Managing Your Remote Devices Using The Browser Interface](#Managing-your-remote-devices-using-the-browser-interface)
+7. [Using The Browser Interface To Access Clients and Devices](#using-the-browser-interface-to-access-clients-and-devices)
    * [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
@@ -126,9 +126,11 @@ The first time you run your application, it will ask for your full credentials.
 ? Enter your security code:
 
 ```
-The next time you run your application, it will start automatically. It will use a saved user token for authentication.
+The next time you run your application, it will start automatically using a saved user token for authentication.
 
-However, if you leave your application running for more than 15 minutes restarting your application will require you to provide your credentials again.
+However, if you leave your application running for more than 15 minutes restarting your application will require re-authentication.
+
+This process will make your application immutable after 15 minutes. Any changes to your application code will require you to re-authenticate for security reason.
 
 At anytime, you can re-authenticate with full credentials using the *-r* flag when restarting your application as shown below.
 
@@ -187,7 +189,7 @@ watch random data 115
 ```
 ## Examples
 
-### Example 1 Using MCP 9808 Temperature Sensor
+### Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
 [](example1.svg)
@@ -285,11 +287,11 @@ client.connect(function(err, result){
 });
 ```
 
-### Example 2 GPIO Input Monitor and Output Control
+### GPIO Input Monitoring and Output Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
-### Configure device1 for gpio input monitoring
+#### Configure device1 for gpio input monitoring
 Install array-gpio both on device1 and device2
 ```js
 $ npm install m2m array-gpio
@@ -305,6 +307,7 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
+  // set GPIO input object as resource
   device.setGpio({mode:'input', pin:[11, 13]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
@@ -314,7 +317,7 @@ device.connect(function(err, result){
 });
 ```
 
-### Configure device2 for gpio output control
+#### Configure device2 for gpio output control
 ```js
 $ npm install m2m array-gpio
 ```
@@ -328,6 +331,7 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
+  // set GPIO output object as resource
   device.setGpio({mode:'output', pin:[33, 35]}, function(err, gpio){
     if(err) return console.error('setGpio output error:', err.message);
 
@@ -336,7 +340,7 @@ device.connect(function(err, result){
   });
 });
 ```
-### Client to monitor device1 gpio inputs and control device2 gpio outputs
+#### Client to access gpio input objects and gpio output objects
 ```js
 $ npm install m2m
 ```
@@ -386,12 +390,12 @@ client.connect(function(err, result){
   });
 });
 ```
-### Example 3 Remote Machine Control
+### Remote Machine Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
 [](example3.svg)
 
-#### Configure each remote machine's embedded rpi microcontroller with a unique device *id* <br> and set pin 40 for GPIO output control
+#### Configure each remote machine's rpi microcontroller with a unique device *id* <br> and set pin 40 for GPIO output control
 
 Install array-gpio on all remote machines for GPIO output control
 ```js
@@ -455,7 +459,7 @@ function machineControl(devices){
   });
 }
 ```
-### Example 4 Sending Data to Remote Device
+### Sending Data to Remote Device
 [](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
 [](example1.svg)
 
@@ -470,14 +474,14 @@ server.connect(function(err, result){
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // set channel 'echo-server' service
+  // set channel 'echo-server' resource
   server.setData('echo-server', function(err, data){
     if(err) return console.error('echo-server error:', err.message);
     // send back the payload to client
     data.send(data.payload);
   });
 
-  // set channel 'send-file' service
+  // set channel 'send-file' resource
   server.setData('send-file', function(err, data){
     if(err) return console.error('send-file error:', err.message);
 
@@ -491,7 +495,7 @@ server.connect(function(err, result){
     });
   });
 
-  // set channel 'send-data' service
+  // set channel 'send-data' resource
   server.setData('send-data', function(err, data){
     if(err) return console.error('send-data error:', err.message);
 
@@ -507,7 +511,7 @@ server.connect(function(err, result){
     }
   });
 
-  // set channel 'number' service
+  // set channel 'number' resource
   server.setData('number', function(err, data){
     if(err) return console.error('number error:', err.message);
 
@@ -577,14 +581,14 @@ server.connect((err, result) => {
 
   let myData = {name:'Jim', age:34};
 
-  // set server GET method
+  // set a GET method resource
   server.get('data/current', (err, data) => {
     if(err) return console.error('data/current error:', err.message);
     // send current data
     data.send(myData);
   });
 
-  // set server POST method
+  // set a POST method resource
   server.post('data/update', (err, data) => {
     if(err) return console.error('data/update error:', err.message);
 
@@ -627,12 +631,11 @@ client.connect((err, result) => {
 
 });
 ```
-
-## Managing Your Remote Devices Using The Browser Interface
+## Using The Browser Interface To Access Clients and Devices
 
 ### Naming Your Client Application for Tracking Purposes
 
-Unlike *device/server* applications, users can create *client* applications on the fly without needing to register it with **node-m2m** server.
+Unlike *device/server* applications, users can create *client* applications without server registration.
 
 Node-m2m tracks all client applications through a dynamic *client id* from the browser.
 If you have multiple clients, tracking all your clients by just referring to its *client id* maybe difficult.
