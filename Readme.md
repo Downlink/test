@@ -361,32 +361,46 @@ client.connect(function(err, result){
   let device1 = client.accessDevice(120);
   let device2 = client.accessDevice(130);
 
-  // using .gpio() method
+  /* using .gpio() method */
+  // get current state of device1 input pin 11
+  device1.gpio({mode:'in', pin:11}).getState(function(err, state){
+    if(err) return console.error('get input pin 11 state error:', err.message);
+    console.log('get input pin 11 state', state);
+  });
+
+  // watch device1 input pin 11 for state changes every 5 secs
   device1.gpio({mode:'in', pin:11}).watch(function(err, state){
-    if(err) return console.error('watch pin 13 error:', err.message);
-    console.log('device1 input pin 11 state', state);
+    if(err) return console.error('watch input pin 13 state error:', err.message);
+    console.log('watch input pin 11 state', state);
 
     if(state){
-      // turn ON device2 output 33
+      // turn ON device2 output pin 33
       device2.gpio({mode:'out', pin:33}).on();
     }
     else{
-      // 'turn OFF device2 output 33'
+      // turn OFF device2 output pin 33
       device2.gpio({mode:'out', pin:33}).off();
     }
   });
 
-  // using .input()/output() method
+  /* using .input()/output() method */
+  // get current state of device1 input pin 13
+  device1.input(13).getState(function(err, state){
+    if(err) return console.error('get input pin 13 state error:', err.message);
+    console.log('get input pin 13 state', state);
+  });
+
+  // watch device1 input pin 13 for state changes every 5 secs
   device1.input(13).watch(function(err, state){
     if(err) return console.error('watch pin 11 error:', err.message);
-    console.log('device1 input pin 13 state', state);
+    console.log('watch input pin 13 state', state);
 
     if(state){
-      // turn OFF device2 output 35
+      // turn OFF device2 output pin 35
       device2.output(35).off();
     }
     else{
-      // 'turn ON device2 output 35'
+      // turn ON device2 output pin 35
       device2.output(35).on();
     }
   });
@@ -469,7 +483,7 @@ function machineControl(devices){
 [](example1.svg)
 
 #### Device/Server
-Instead of the usual capturing of data from remote devices, we can send data to remote devices for resources updates or as part of any application requirement.  
+Instead of the usual capturing of data from remote devices, we can send data to remote devices for resource updates or as part of an application requirement.  
 
 ```js
 const m2m = require('m2m');
