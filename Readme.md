@@ -9,9 +9,9 @@ The module's API is a FaaS (Function as a Service) also called "serverless" maki
 
 You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server.
 
-You can set multiple *channel data*, *GPIO objects* and *HTTP API* methods as server resources.
+You can set multiple *channel data*, *GPIO objects* and *HTTP API* as server resources.
 
-Your device servers will be accessible through its user assigned device *id* from client applications.
+Your device servers will be accessible through its user assigned *device id* from client applications.
 
 Access to clients and devices is restricted to authenticated and authorized users only.
 
@@ -126,7 +126,9 @@ The first time you run your application, it will ask for your full credentials.
 ? Enter your security code:
 
 ```
-The next time you run your application, it will start automatically using a saved user token for authentication. However, after 15 minutes your application becomes immutable. Any changes to your application code will require you to re-authenticate for security reason.
+The next time you run your application, it will start automatically using a saved user token.
+
+However, when your application is already running for more than 15 minutes, your application becomes immutable. Any changes to your application code will require you to re-authenticate for security reason.
 
 At anytime, you can re-authenticate with full credentials using the *-r* flag when restarting your application as shown below.
 
@@ -140,9 +142,10 @@ $ npm install m2m
 ```
 Create the file below as client.js within your client project directory.
 
-To access resources from your remote device, create a device object using the client's *accessDevice* method as shown below. The device object created as expected represents a specific remote device server as indicated by the *device id* argument.
+#### Accessing resources from your remote device
+To access resources from your remote device, create a device object using the client's *accessDevice* method as shown below. The device object created as expected represents a specific remote device as indicated by the *device id* argument. In this tour, the device id is the integer value **100**;
 
-It provides various methods to access channel data, GPIO data and HTTP API methods resources from your remote device servers.
+The device object provides various methods to access channel data, GPIO data and HTTP API resources from your remote device servers.
 
 ```js
 const m2m = require('m2m');
@@ -338,7 +341,7 @@ device.connect(function(err, result){
   });
 });
 ```
-#### Client to monitor GPIO input object and control (on/off) GPIO output object resources
+#### Client to access GPIO input and output object resources from device1 and device2
 ```js
 $ npm install m2m
 ```
@@ -536,7 +539,7 @@ client.connect(function(err, result){
 
   let server = client.accessDevice(500);
 
-  // send a simple string payload data to 'echo-server' channel
+  // sending a simple string payload data to 'echo-server' channel
   let payload = 'hello server';
 
   server.sendData('echo-server', payload , function(err, data){
@@ -707,7 +710,7 @@ $ npm start
 For other custom nodemon configuration, please read the nodemon documentation.
 
 ## Code Edit and Auto Restart Automatic Configuration
-To automatically configure your package.json for code editing and auto restart, start your node process with *-config* flag.
+To automatically configure your package.json for code editing and auto restart without manually editing your package.json, start your node process with *-config* flag.
 
 **m2m** will attempt to configure your package.json by adding/creating the *m2mConfig*, *nodemonConfig*, and *scripts* properties to your existing project's package.json. If your m2m project does not have an existing package.json, it will create a new one.  
 
@@ -726,7 +729,7 @@ Your node application should restart automatically after a remote code update, a
 
 ## Node-M2M Server Query
 
-### Server query to get all available remote devices
+### Server query to get all available remote devices for each user
 ```js
 const m2m = require('m2m');
 
