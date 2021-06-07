@@ -9,11 +9,11 @@ The module's API is a FaaS (Function as a Service) also called "serverless" maki
 
 You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server.
 
-You can set multiple *channel data*, *GPIO objects* and *HTTP API* methods as resources of device servers.
+You can set multiple *channel data*, *GPIO objects* and *HTTP API* methods as server resources.
 
 Your device servers will be accessible through its user assigned device *id* from client applications.
 
-Access to clients and devices is restricted to authenticated users only.
+Access to clients and devices is restricted to authenticated and authorized users only.
 
 All communications between client and device servers are fully encrypted using TLS protocol.
 
@@ -126,11 +126,7 @@ The first time you run your application, it will ask for your full credentials.
 ? Enter your security code:
 
 ```
-The next time you run your application, it will start automatically using a saved user token for authentication.
-
-However, if you leave your application running for more than 15 minutes restarting your application will require re-authentication.
-
-This process will make your application immutable after 15 minutes. Any changes to your application code will require you to re-authenticate for security reason.
+The next time you run your application, it will start automatically using a saved user token for authentication. However, after 15 minutes your application becomes immutable. Any changes to your application code will require you to re-authenticate for security reason.
 
 At anytime, you can re-authenticate with full credentials using the *-r* flag when restarting your application as shown below.
 
@@ -144,7 +140,9 @@ $ npm install m2m
 ```
 Create the file below as client.js within your client project directory.
 
-To access resources from your remote device, create a remote device object from client's *accessDevice* method as shown below.
+To access resources from your remote device, create a device object using the client's *accessDevice* method as shown below. The device object created as expected represents a specific remote device server as indicated by the *device id* argument.
+
+It provides various methods to access channel data, GPIO data and HTTP API methods resources from your remote device servers.
 
 ```js
 const m2m = require('m2m');
@@ -291,7 +289,7 @@ client.connect(function(err, result){
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
-#### Configure device1 for gpio input monitoring
+#### Configure GPIO input as resource on device1
 Install array-gpio both on device1 and device2
 ```js
 $ npm install m2m array-gpio
@@ -307,17 +305,17 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
-  // set GPIO input object as resource
+  // set GPIO input as resource
   device.setGpio({mode:'input', pin:[11, 13]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
     console.log('input pin', gpio.pin, 'state', gpio.state);
-    // add your custom logic here
+    // you can provide additional custom logic here
   });
 });
 ```
 
-#### Configure device2 for gpio output control
+#### Configure GPIO output as resource on device2
 ```js
 $ npm install m2m array-gpio
 ```
@@ -331,21 +329,21 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
-  // set GPIO output object as resource
+  // set GPIO output as resource
   device.setGpio({mode:'output', pin:[33, 35]}, function(err, gpio){
     if(err) return console.error('setGpio output error:', err.message);
 
     console.log('output pin', gpio.pin, 'state', gpio.state);
-    // add your custom logic here
+    // you can provide additional custom logic here
   });
 });
 ```
-#### Client to access gpio input objects and gpio output objects
+#### Client to monitor GPIO input object and control (on/off) GPIO output object resources
 ```js
 $ npm install m2m
 ```
-There are two ways we can access the GPIO input/output pins from the remote devices.
-
+There are two ways we can access the GPIO input/output objects from remote devices as shown below.
+Both ways will allow you to manipulate GPIO object resources directly from client applications.  
 ```js
 const m2m = require('m2m');
 
@@ -355,14 +353,13 @@ client.connect(function(err, result){
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // create a local device object for each device
   let device1 = client.accessDevice(120);
   let device2 = client.accessDevice(130);
 
-  // using gpio method
+  // using .gpio() method
   device1.gpio({mode:'in', pin:11}).watch(function(err, state){
     if(err) return console.error('watch pin 13 error:', err.message);
-    console.log('device1 input 11 state', state);
+    console.log('device1 input pin 11 state', state);
 
     if(state){
       // turn ON device2 output 33
@@ -374,10 +371,10 @@ client.connect(function(err, result){
     }
   });
 
-  // using input/output method
+  // using .input()/output() method
   device1.input(13).watch(function(err, state){
     if(err) return console.error('watch pin 11 error:', err.message);
-    console.log('device1 input 13 state', state);
+    console.log('device1 input pin 13 state', state);
 
     if(state){
       // turn OFF device2 output 35
@@ -410,7 +407,8 @@ let device = new m2m.Device(1001);
 device.connect((err, result) => {
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
-  // set pin 40 as digital output to activate the actuator
+
+  // set pin 40 as GPIO output to activate the actuator
   device.setGpio({mode:'output', pin:40});
 });
 ```
@@ -431,7 +429,7 @@ client.connect((err, result) => {
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // accessing multiple devices using an array object
+  // accessing multiple remote devices using an array object
   let devices = client.accessDevice([1001, 1002, 1003]);
 
   clearInterval(interval);
@@ -446,10 +444,12 @@ function machineControl(devices){
   let pin = 40; // actuator gpio output pin
   devices.forEach((device) => {
     t += 2000;
+
     // turn ON device gpio output pin 40
     device.output(pin).on(t, (err, state) => {
       if(err) return console.error('actuator ON err:', err.message);
       console.log('machine ', device.id, ' pin ', pin, ' output ON', state);
+
       // turn OFF device gpio output pin 40
       device.output(pin).off(t + 400, (err, state) => {
         if(err) return console.error('actuator OFF err:', err.message);
@@ -464,6 +464,8 @@ function machineControl(devices){
 [](example1.svg)
 
 #### Device/Server
+Instead of the usual capturing of data from remote devices, we can send data to remote devices for resources updates or as part of any application requirement.  
+
 ```js
 const m2m = require('m2m');
 const fs = require('fs');
@@ -474,14 +476,14 @@ server.connect(function(err, result){
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // set channel 'echo-server' resource
+  // 'echo-server' channel data resource
   server.setData('echo-server', function(err, data){
     if(err) return console.error('echo-server error:', err.message);
     // send back the payload to client
     data.send(data.payload);
   });
 
-  // set channel 'send-file' resource
+  // 'send-file' channel data resource
   server.setData('send-file', function(err, data){
     if(err) return console.error('send-file error:', err.message);
 
@@ -495,7 +497,7 @@ server.connect(function(err, result){
     });
   });
 
-  // set channel 'send-data' resource
+  // 'send-data' channel data resource
   server.setData('send-data', function(err, data){
     if(err) return console.error('send-data error:', err.message);
 
@@ -511,7 +513,7 @@ server.connect(function(err, result){
     }
   });
 
-  // set channel 'number' resource
+  // 'number' channel data resource
   server.setData('number', function(err, data){
     if(err) return console.error('number error:', err.message);
 
@@ -534,8 +536,10 @@ client.connect(function(err, result){
 
   let server = client.accessDevice(500);
 
-  // send 'hello server' payload data to 'echo-server' channel
-  server.sendData('echo-server', 'hello server', function(err, data){
+  // send a simple string payload data to 'echo-server' channel
+  let payload = 'hello server';
+
+  server.sendData('echo-server', payload , function(err, data){
     if(err) return console.error('echo-server error:', err.message);
 
     console.log('echo-server', data); // 'hello server'
