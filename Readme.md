@@ -409,14 +409,11 @@ client.connect(function(err, result){
 ```
 ### Using Channel Data for GPIO Control
 
-Aside from the available standard api for Raspberry Pi direct GPIO control, we can also use the channel data api to manipulate and control GPIO input/output resources from any Raspberry Pi devices.
+Aside from the available direct GPIO control api for Raspberry Pi, you can also use the channel data api to manipulate and control GPIO input/output resources from remote Raspberry Pi devices.
 
-If you notice, the standard gpio api requires us to use *array-gpio* as dependency.
+We will use *array-gpio* for GPIO peripheral access. You can also use other npm modules for Raspberry pi GPIO access.  
 
-With channel data api, we can use other *npm modules* for Raspberry Pi GPIO control.
-
-### Example 1
-#### Device/Server Raspberry Pi setup
+#### Device/Server setup
 ```js
 const m2m = require('m2m');
 const { setInput, setOutput } = require('array-gpio');
@@ -432,27 +429,37 @@ server.connect(function(err, result){
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
+  // set 'sw1-state' resource
   server.setData('sw1-state', function(err, data){
     if(err) return console.error('sw1-state error:', err.message);
 
-    // send sw1 state only if the state changes
-    let sw1State = sw1.state;
-    console.log('sw1 state', sw1State)
-    data.send(sw1State);  
+    data.send(sw1.state);  
   });
 
+  // set 'led-state' resource
   server.setData('led-state', function(err, data){
     if(err) return console.error('led-state error:', err.message);
 
-    // send led state only if the state changes
-    led ledState = led.state;
-    console.log('led state', ledState)
+    data.send(led.state);
+  });
+
+  // set 'led-control' resource
+  server.setData('led-control', function(err, data){
+    if(err) return console.error('led-control error:', err.message);
+    let ledState = null;
+
+    if(data.payload === 'on'){
+      ledState = led.on();
+    }
+    else{
+      ledState = led.off();
+    }
     data.send(ledState);
   });
 });
 ```
 
-#### Client application to monitor the remote Raspberry Pi's sw1 and led state
+#### Client setup
 ```js
 const m2m = require('m2m');
 
@@ -464,76 +471,33 @@ client.connect(function(err, result){
 
   let device = client.accessDevice(200);
 
-  // monitor sw1 state every minute
-  // sw1 state will be pushed from remote device
-  // if there is state transitions
-  device.watch('sw1-state', 60000, function(err, data){
+  // monitor sw1 state transitions every 5 secs
+  device.watch('sw1-state', function(err, data){
     if(err) return console.error('sw1-state error:', err.message);
 
-    console.log('sw1-state value', data); // true false true false
-  });
+    console.log('sw1-state value', data);
+    if(data === true){
+      device.sendData('led-control', 'on', function(err, data){
+        if(err) return console.error('led-control on error:', err.message);
 
-  // monitor led state every 30 secs
-  // led state will be pushed from remote device
-  // if there is state transitions
-  device.watch('led-state', 30000, function(err, data){
-    if(err) return console.error('led-state error:', err.message);
-
-    console.log('led-state value', data); // true false true false
-  });   
-});
-```
-### Example 2
-#### Device/Server Raspberry Pi setup
-```js
-const m2m = require('m2m');
-const { setOutput } = require('array-gpio');
-
-const led = setOutput(33);
-
-let server = new m2m.Device(200);
-
-server.connect(function(err, result){
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-
-  server.setData('gpio-output-pin-33', function(err, data){
-    if(err) return console.error('gpio-output-pin-33 error:', err.message);
-
-    if(data.payload === 'on'){
-      led.on();
-      data.send('led is on');
+        console.log('led-control on', data); // true
+      });
     }
     else{
-      led.off();
-      data.send('led is off');
+      device.sendData('led-control', 'off', function(err, data){
+        if(err) return console.error('led-control off error:', err.message);
+
+        console.log('led-control off', data); // false
+      });
     }
   });
-});  
-```
-#### Client application to turn ON and OFF the led using .sendData() method
-```js
-const m2m = require('m2m');
 
-let client = new m2m.Client();
+  // monitor led state transitions every 5 secs
+  device.watch('led-state', function(err, data){
+    if(err) return console.error('led-state error:', err.message);
 
-client.connect(function(err, result){
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-
-  let device = client.accessDevice(200);
-
-  device.sendData('gpio-output-pin-33', 'on', function(err, data){
-    if(err) return console.error('gpio-output-pin-33 on error:', err.message);
-
-    console.log('gpio-output-pin-33-on', data); // 'led is on'
+    console.log('led-state value', data);
   });
-
-  device.sendData('gpio-output-pin-33', 'off', function(err, data){
-    if(err) return console.error('gpio-output-pin-33 off error:', err.message);
-
-    console.log('gpio-output-pin-33-off', data); // 'led is off'
-  });      
 });
 ```
 ### Remote Machine Control
