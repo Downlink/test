@@ -111,8 +111,8 @@ device.connect(function(err, result){
   console.log('result:', result);
 
   // set 'random' channel as resource  
-  device.setData('random-value', function(err, data){
-    if(err) return console.error('setData random-value error:', err.message);
+  device.setData('random-number', function(err, data){
+    if(err) return console.error('setData random-number error:', err.message);
 
     let rd = Math.floor(Math.random() * 100);
     data.send(rd);
@@ -168,17 +168,17 @@ client.connect(function(err, result){
   // create a remote device object from client accessDevice method
   let device = client.accessDevice(100);
 
-  // capture 'random' data using a one-time function call
-  device.getData('random-value', function(err, data){
-    if(err) return console.error('getData random-value error:', err.message);
+  // capture 'random-number' data using a one-time function call
+  device.getData('random-number', function(err, data){
+    if(err) return console.error('getData random-number error:', err.message);
     console.log('random data', data); // 97
   });
 
-  // capture 'random' data using a push method
+  // capture 'random-number' data using a push method
   // the remote device will scan/poll the data every 5 secs (default)
   // if the value changes, it will push/send the data to the client
-  device.watch('random-value', function(err, data){
-    if(err) return console.error('watch random-value error:', err.message);
+  device.watch('random-number', function(err, data){
+    if(err) return console.error('watch random-number error:', err.message);
     console.log('watch random data', data); // 81, 68, 115 ...
   });
 });
