@@ -691,7 +691,7 @@ client.connect((err, result) => {
 ### Using A Workflow
 #### Server setup
 
-Assuming you have three remote devices with *device id's* *100*, *200* and *300* respectively. You can configure each device with the following setup.   
+Configure each device (100, 200 and 300) with the following setup.   
 
 ```js
 const { Device } = require('m2m');
@@ -720,7 +720,7 @@ device.connect(function(err, result){
 ```
 
 #### Client application
-The client will iterate over each device and perform a list of tasks or workflow as shown below.
+The client will iterate over each device once and perform a list of tasks or workflow as shown below.
 ```js
 const { Client } = require('m2m');
 
@@ -740,36 +740,32 @@ client.connect((err, result) => {
     t = t + 100;  
     setTimeout(() => {
 
-      // task 1 - get node version
+      // task 1
       device.getData('node-version', (err, data) => {
         if(err) return console.error(device.id, 'node-version error:', err.message);
         console.log(device.id, 'result', data);
       });
 
-      // task 2 - get npm version
+      // task 2
       device.getData('npm-version', (err, data) => {
         if(err) return console.error(device.id, 'node-version error:', err.message);
         console.log(device.id, 'result', data);
       });
 
-      // task 3 - install latest version of lts node.js
-      // task n - restart device application
+      // task 3
+      // task n
     }, t);
   });
 });
 ```
-
 ### Remote Machine Monitoring
-
-![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
-[](example3.svg)
-
-#### Configure each remote machine's rpi microcontroller with the following GPIO input/output and channel data resources
 
 Install array-gpio to each remote machine.
 ```js
 $ npm install m2m array-gpio
 ```
+#### Server setup
+Configure each remote machine's rpi microcontroller with the following GPIO input/output and channel data resources
 ```js
 const { Device } = require('m2m');
 const { setInput, setOutput, watchInput } = require('array-gpio');
@@ -782,7 +778,7 @@ const actuator2 = setOutput(35); // connected to alarm actuator2
 
 let status = {};
 
-// I/O process to control actuator1 and actuator2
+// Local I/O machine process
 watchInput(() => {
   // monitor sensor1
   if(sensor1.isOn){
@@ -807,12 +803,6 @@ device.connect((err, result) => {
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // set pin 11 and 13 as GPIO input for sensor1 and sensor2 respectively
-  //device.setGpio({mode:'output', pin:[33, 35]});
-
-  // set pin 33 and 35 as GPIO output for actuator1 and actuator2 respectively
-  //device.setGpio({mode:'output', pin:[33, 35]});
-
   device.setData('machine-status', function(err, data){
     if(err) return console.error('machine-status error:', err.message);
 
@@ -828,7 +818,6 @@ device.connect((err, result) => {
   });
 });
 ```
-
 #### Client application to monitor the remote machines
 In this example, the client will iterate over the remote machines once and start watching each machine's sensor and actuactor status. If one the sensor and actuator state changes, the status will be pushed to the client.     
 ```js
@@ -849,10 +838,10 @@ client.connect((err, result) => {
         device.watch('machine-status', 10000, (err, data) => {
           if(err) return console.error(device.id, 'machine-status error:', err.message);
           console.log(device.id, 'machine-status', data);
-          // 100 machine-status {"sensor1":false,"sensor2":true,"actuator1":false,"actuator2":true}
-          // 200 machine-status {"sensor1":false,"sensor2":false,"actuator1":false,"actuator2":false}
-          // 300 machine-status {"sensor1":false,"sensor2":false,"actuator1":false,"actuator2":false}
-          // add logic to process the machine-status data
+          // If one of the machine's status has changed,
+          // it will receive only the status from the affected machine
+          // 200 machine-status {"sensor1":false,"sensor2":false,"actuator1":false,"actuator2":true}
+          // add logic to process the 'machine-status' channel data
         });
       }, t);
     });
@@ -909,7 +898,7 @@ $ npm start
 For other custom nodemon configuration, please read the nodemon documentation.
 
 ## Code Edit and Auto Restart Automatic Configuration
-To automatically configure your package.json for code editing and auto restart without manually editing your package.json, start your node process with *-config* flag.
+To configure your package.json for code editing and auto-restart without manual editing of package.json, start your node process with *-config* flag.
 
 **m2m** will attempt to configure your package.json by adding/creating the *m2mConfig*, *nodemonConfig*, and *scripts* properties to your existing project's package.json. If your m2m project does not have an existing package.json, it will create a new one.  
 
