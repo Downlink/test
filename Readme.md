@@ -837,11 +837,13 @@ client.connect((err, result) => {
         // device watch interval is every 10 secs
         device.watch('machine-status', 10000, (err, data) => {
           if(err) return console.error(device.id, 'machine-status error:', err.message);
-          console.log(device.id, 'machine-status', data);
-          // If one of the machine's status has changed,
-          // it will receive only the status from the affected machine
-          // 200 machine-status {"sensor1":false,"sensor2":false,"actuator1":false,"actuator2":true}
-          // add logic to process the 'machine-status' channel data
+          console.log(device.id, 'machine-status', data); // machine-status {"sensor1":false,"sensor2":false,"actuator1":false,"actuator2":true}
+
+          /* If one of the machine's status has changed,
+           * it will receive only the status from the affected machine
+           *
+           * Add logic to process the 'machine-status' channel data
+           */
         });
       }, t);
     });
