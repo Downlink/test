@@ -9,7 +9,9 @@ The module's API is a FaaS (Function as a Service) also called "serverless" maki
 
 You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server.
 
-You can set multiple *channel data*, *GPIO objects* and *HTTP API* as server resources.
+Your m2m device server can run alongside with other applications from any of your remote endpoints.
+
+You can set multiple *channel data* or *HTTP API* resources on your device servers. On Raspberry Pi devices, you can set GPIO objects as server resources directly from the API.
 
 Your device servers will be accessible through its user assigned *device id* from client applications.
 
@@ -29,20 +31,20 @@ To use this module, users must create an account and register their devices with
 5. [Examples](#examples)
    * [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
    * [GPIO Input Monitoring and Output Control](#gpio-input-monitoring-and-output-control)
-   * [Remote Machine Control](#remote-machine-control)
-   * [Using Channel Data for GPIO Control](#using-channel-data-for-gpio-control)
    * [Sending Data to Remote Device](#sending-data-to-remote-device)
+   * [Using Channel Data for GPIO Control](#using-channel-data-for-gpio-control)
+   * [Remote Machine Control](#remote-machine-control)
 6. [HTTP API](#http-api)
     * [Server GET and POST method Setup](#server-get-and-post-method)
     * [Client GET and POST request](#client-get-and-post-request)
 7. [Using The Browser Interface To Access Clients and Devices](#using-the-browser-interface-to-access-clients-and-devices)
-   * [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
-   * [Configure Your Application Process for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
+   * [Configure Your Application for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
+   * [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
 8. [Node-M2M Server Query](#node-m2m-server-query)
    * [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices)
-   * [Server query to get each device resources](#server-query-to-get-each-device-resources)
+   * [Server query to get a specific device resource](#server-query-to-get-a-device-resource)
 
 
 ## Supported Platform
@@ -295,7 +297,7 @@ client.connect(function(err, result){
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
-#### Configure GPIO input as resource on device1
+#### Configure GPIO input resource on device1
 Install array-gpio both on device1 and device2
 ```js
 $ npm install m2m array-gpio
@@ -321,7 +323,7 @@ device.connect(function(err, result){
 });
 ```
 
-#### Configure GPIO output as resource on device2
+#### Configure GPIO output resource on device2
 ```js
 $ npm install m2m array-gpio
 ```
@@ -344,7 +346,7 @@ device.connect(function(err, result){
   });
 });
 ```
-#### Client accessing GPIO input/output resources from device1 and device2
+#### Client application accessing GPIO input/output resources from device1 and device2
 ```js
 $ npm install m2m
 ```
@@ -394,6 +396,7 @@ client.connect(function(err, result){
   // watch device1 input pin 13 for state changes every 5 secs
   device1.input(13).watch(function(err, state){
     if(err) return console.error('watch pin 11 error:', err.message);
+
     console.log('watch input pin 13 state', state);
 
     if(state){
@@ -407,11 +410,122 @@ client.connect(function(err, result){
   });
 });
 ```
+### Sending Data to Remote Device
+[](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
+[](example1.svg)
+
+#### Device/Server Setup
+Instead of the usual capturing of data from remote devices, we can send data to remote devices for resource updates or as part of an application requirement.  
+
+```js
+const m2m = require('m2m');
+const fs = require('fs');
+
+let server = new m2m.Device(500);
+
+server.connect(function(err, result){
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  // 'echo-server' channel data resource
+  server.setData('echo-server', function(err, data){
+    if(err) return console.error('echo-server error:', err.message);
+    // send back the payload to client
+    data.send(data.payload);
+  });
+
+  // 'send-file' channel data resource
+  server.setData('send-file', function(err, data){
+    if(err) return console.error('send-file error:', err.message);
+
+    let file = data.payload;
+
+    fs.writeFile('myFile.txt', file, function (err) {
+      if (err) throw err;
+      console.log('file has been saved!');
+      // send a response
+      data.send({result: 'success'});
+    });
+  });
+
+  // 'send-data' channel data resource
+  server.setData('send-data', function(err, data){
+    if(err) return console.error('send-data error:', err.message);
+
+    console.log('data.payload', data.payload);
+    // data.payload  [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
+
+    // send a response
+    if(Array.isArray(data.payload)){
+      data.send({data: 'valid'});
+    }
+    else{
+      data.send({data: 'invalid'});
+    }
+  });
+
+  // 'number' channel data resource
+  server.setData('number', function(err, data){
+    if(err) return console.error('number error:', err.message);
+
+    console.log('data.payload', data.payload); // 1.2456
+  });
+
+});
+```
+#### Client sending data to remote device
+```js
+const fs = require('fs');
+const m2m = require('m2m');
+
+let client = new m2m.Client();
+
+client.connect(function(err, result){
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  let server = client.accessDevice(500);
+
+  // sending a simple string payload data to 'echo-server' channel
+  let payload = 'hello server';
+
+  server.sendData('echo-server', payload , function(err, data){
+    if(err) return console.error('echo-server error:', err.message);
+
+    console.log('echo-server', data); // 'hello server'
+  });
+
+  // sending a text file
+  let myfile = fs.readFileSync('myFile.txt', 'utf8');
+
+  server.sendData('send-file', myfile , function(err, data){
+    if(err) return console.error('send-file error:', err.message);
+
+    console.log('send-file', data); // {result: 'success'}
+  });
+
+  // sending a json data
+  let mydata = [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
+
+  server.sendData('send-data', mydata , function(err, data){
+    if(err) return console.error('send-data error:', err.message);
+
+    console.log('send-data', data); // {data: 'valid'}
+  });
+
+  // sending data w/o a response
+  let num = 1.2456;
+
+  server.sendData('number', num);
+
+});
+```
+
 ### Using Channel Data for GPIO Control
 
 Aside from the available direct GPIO control api for Raspberry Pi, you can also use the channel data api to manipulate and control GPIO input/output resources from remote Raspberry Pi devices.
 
-We will use *array-gpio* for GPIO peripheral access. You can also use other npm modules for Raspberry pi GPIO access.  
+We will use *array-gpio* for GPIO peripheral access in this example but you are free to use other npm modules for your preference.  
 
 #### Device/Server setup
 ```js
@@ -420,10 +534,11 @@ const { setInput, setOutput } = require('array-gpio');
 
 // set pin 11 as input sw1
 const sw1 = setInput(11);
+
 // set pin 33 as output led
 const led = setOutput(33);
 
-let server = new m2m.Device(200);
+const server = new m2m.Device(200);
 
 server.connect(function(err, result){
   if(err) return console.error('connect error:', err);
@@ -500,187 +615,151 @@ client.connect(function(err, result){
   });
 });
 ```
-### Remote Machine Control
+### Remote Device Orchestration
+
+[](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
+[](example3.svg)
+
+#### Server setup
+
+Assuming we have remote device's *100*, *200* and *300*, set the following to each device.   
+
+```js
+const { Device } = require('m2m');
+const { exec } = require('child_process');
+
+// same with device 200 and 300
+let device = new Device(100);
+
+device.connect(function(err, result){
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  device.setData('node-version', function(err, data){
+    if(err) return console.error('cli-command error:', err.message);
+
+    const child = exec('node -v', function(error, stdout, stderr){
+      if(error) {
+        return data.send(error);
+      }
+      console.log(stderr);
+      console.log('stdout', stdout);
+      data.send(stdout);
+    });
+  });
+});
+```
+
+#### Client application
+The client will iterate each device and perform the task below.
+```js
+const { Client } = require('m2m');
+
+const client = new Client();
+
+client.connect((err, result) => {
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+
+  client.accessDevice([100, 200, 300], function(err, devices){
+    let t = 0;
+    devices.forEach((device) => {
+      t = t + 100;
+      setTimeout(() => {
+        // task 1 - get node version
+        device.getData('node-version', (err, data) => {
+          if(err) return console.error(device.id, 'node-version error:', err.message);
+          console.log(device.id, 'result', data);
+        });
+
+        // task 2 - get npm version
+        device.getData('npm-version', (err, data) => {
+          if(err) return console.error(device.id, 'node-version error:', err.message);
+          console.log(device.id, 'result', data);
+        });
+      }, t);
+    });
+  });
+});
+```
+
+### Remote Machine Monitoring
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example3.svg?sanitize=true)
 [](example3.svg)
 
 #### Configure each remote machine's rpi microcontroller with a unique device *id* <br> and set pin 40 for GPIO output control
 
-Install array-gpio on all remote machines for GPIO output control
+Install array-gpio to each remote machine.
 ```js
 $ npm install m2m array-gpio
 ```
 ```js
-const m2m = require('m2m');
+const { Device } = require('m2m');
+const { setInput, setOutput } = require('array-gpio');
+
+const sensor1 = setInput(11); // connected to digital sensor1
+const sensor2 = setInput(13); // connected to digital sensor2
+
+const actuator1 = setOutput(33); // connected to pneumatic cylinder1
+const actuator2 = setOutput(35); // connected to pneumatic cylinder2
+
+let status = {};
+
+// process to control actuator1 and actuator2
 
 // assign 1001, 1002 and 1003 respectively for each remote machine
-let device = new m2m.Device(1001);
+let device = new Device(1001);
 
 device.connect((err, result) => {
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // set pin 40 as GPIO output to activate the actuator
-  device.setGpio({mode:'output', pin:40});
+  // set pin 11 and 13 as GPIO input for sensor1 and sensor2 respectively
+  //device.setGpio({mode:'output', pin:[33, 35]});
+
+  // set pin 33 and 35 as GPIO output for actuator1 and actuator2 respectively
+  //device.setGpio({mode:'output', pin:[33, 35]});
+
+  device.setData('machine-status', function(err, data){
+    if(err) return console.error('machine-status error:', err.message);
+
+    status.sensor1 = sensor1.state;
+    status.sensor2 = sensor2.state;
+
+    status.actuator1 = actuator1.state;
+    status.actuator2 = actuator2.state;
+
+    console.log('status', status);
+
+    data.send(JSON.stringify(status));
+  });
 });
 ```
 
-#### Client application to control the remote machines
+#### Client application to monitor the remote machines
+In this example, the client will iterate over the remote machines once and start watching each machine's sensor and actuactor status. If one the sensor and actuator state changes, the status will be pushed to the client.     
 ```js
-$ npm install m2m
-```
+const { Client } = require('m2m');
 
-```js
-const m2m = require('m2m');
-
-const client = new m2m.Client();
-
-let interval;
+const client = new Client();
 
 client.connect((err, result) => {
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
 
-  // accessing multiple remote devices using an array object
-  let devices = client.accessDevice([1001, 1002, 1003]);
-
-  clearInterval(interval);
-  machineControl(devices);
-  // iterate over the remote machines every 15 secs
-  interval = setInterval(machineControl, 15000, devices);
-
-});
-
-function machineControl(devices){
-  let t = 0;    // initial output time delay
-  let pin = 40; // actuator gpio output pin
-  devices.forEach((device) => {
-    t += 2000;
-
-    // turn ON device gpio output pin 40
-    device.output(pin).on(t, (err, state) => {
-      if(err) return console.error('actuator ON err:', err.message);
-      console.log('machine ', device.id, ' pin ', pin, ' output ON', state);
-
-      // turn OFF device gpio output pin 40
-      device.output(pin).off(t + 400, (err, state) => {
-        if(err) return console.error('actuator OFF err:', err.message);
-        console.log('machine ', device.id, ' pin ', pin, ' output OFF', state);
-      });
+  client.accessDevice([100, 200, 300], function(err, devices){
+    let t = 0;
+    devices.forEach((device) => {
+      t = t + 100;
+      setTimeout(() => {
+        device.watch('machine-status', 10000, (err, data) => {
+          if(err) return console.error(device.id, 'machine-status error:', err.message);
+          console.log(device.id, 'machine-status', data);
+        });
+      }, t);
     });
   });
-}
-```
-### Sending Data to Remote Device
-[](https://raw.githubusercontent.com/EdoLabs/src2/master/example4.svg?sanitize=true)
-[](example1.svg)
-
-#### Device/Server Setup
-Instead of the usual capturing of data from remote devices, we can send data to remote devices for resource updates or as part of an application requirement.  
-
-```js
-const m2m = require('m2m');
-const fs = require('fs');
-
-let server = new m2m.Device(500);
-
-server.connect(function(err, result){
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-
-  // 'echo-server' channel data resource
-  server.setData('echo-server', function(err, data){
-    if(err) return console.error('echo-server error:', err.message);
-    // send back the payload to client
-    data.send(data.payload);
-  });
-
-  // 'send-file' channel data resource
-  server.setData('send-file', function(err, data){
-    if(err) return console.error('send-file error:', err.message);
-
-    let file = data.payload;
-
-    fs.writeFile('myFile.txt', file, function (err) {
-      if (err) throw err;
-      console.log('file has been saved!');
-      // send a response
-      data.send({result: 'success'});
-    });
-  });
-
-  // 'send-data' channel data resource
-  server.setData('send-data', function(err, data){
-    if(err) return console.error('send-data error:', err.message);
-
-    console.log('data.payload', data.payload);
-    // data.payload  [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
-
-    // send a response
-    if(Array.isArray(data.payload)){
-      data.send({data: 'valid'});
-    }
-    else{
-      data.send({data: 'invalid'});
-    }
-  });
-
-  // 'number' channel data resource
-  server.setData('number', function(err, data){
-    if(err) return console.error('number error:', err.message);
-
-    console.log('data.payload', data.payload); // 1.2456
-  });
-
-});
-```
-
-#### Client sending data to remote device
-```js
-const fs = require('fs');
-const m2m = require('m2m');
-
-let client = new m2m.Client();
-
-client.connect(function(err, result){
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-
-  let server = client.accessDevice(500);
-
-  // sending a simple string payload data to 'echo-server' channel
-  let payload = 'hello server';
-
-  server.sendData('echo-server', payload , function(err, data){
-    if(err) return console.error('echo-server error:', err.message);
-
-    console.log('echo-server', data); // 'hello server'
-  });
-
-  // sending a text file
-  let myfile = fs.readFileSync('myFile.txt', 'utf8');
-
-  server.sendData('send-file', myfile , function(err, data){
-    if(err) return console.error('send-file error:', err.message);
-
-    console.log('send-file', data); // {result: 'success'}
-  });
-
-  // sending a json data
-  let mydata = [{name:'Ed'}, {name:'Jim', age:30}, {name:'Kim', age:42, address:'Seoul, South Korea'}];
-
-  server.sendData('send-data', mydata , function(err, data){
-    if(err) return console.error('send-data error:', err.message);
-
-    console.log('send-data', data); // {data: 'valid'}
-  });
-
-  // sending data w/o a response
-  let num = 1.2456;
-
-  server.sendData('number', num);
-
 });
 ```
 
@@ -750,28 +829,6 @@ client.connect((err, result) => {
 ```
 ## Using The Browser Interface To Access Clients and Devices
 
-### Naming Your Client Application for Tracking Purposes
-
-Unlike *device/server* applications, users can create *client* applications without server registration.
-
-Node-m2m tracks all client applications through a dynamic *client id* from the browser.
-If you have multiple clients, tracking all your clients by just referring to its *client id* maybe difficult.
-
-You can add a **name**, **location** and a **description** properties to your clients as shown below for tracking purposes.
-
-This will make it easy to track all your clients from the browser interface.
-```js
-const m2m = require('m2m');
-
-const client = new m2m.Client({name:'Main client', location:'Boston, MA', description:'Test client app'});
-
-client.connect((err, result) => {
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-  ...
-});
-```
-
 ### Remote Application Code Editing
 
 Using the browser interface, you can download, edit and upload your application code from your remote clients and devices from anywhere.
@@ -835,11 +892,33 @@ If the configuration is correct, you can now run your node process using *npm st
 ```js
 $ npm start
 ```
-Your node application should restart automatically after a remote code update, an npm module update, or  a remote restart command is issued from the browser interface.
+Your node application should restart automatically after a remote code update, an npm module update, or  a remote restart command from the browser interface.
+
+### Naming Your Client Application for Tracking Purposes
+
+Unlike *device/server* applications, users can create *client* applications without server registration.
+
+Node-m2m tracks all client applications through a dynamic *client id* from the browser.
+If you have multiple clients, tracking all your clients by *client id* is not easy.
+
+You can add a **name**, **location** and a **description** properties to your clients as shown below.
+
+This will make it easy to track all your clients from the browser interface.
+```js
+const m2m = require('m2m');
+
+const client = new m2m.Client({name:'Main client', location:'Boston, MA', description:'Test client app'});
+
+client.connect((err, result) => {
+  if(err) return console.error('connect error:', err);
+  console.log('result:', result);
+  ...
+});
+```
 
 ## Node-M2M Server Query
 
-### Server query to get all available remote devices for each user
+### Server query to get all available remote devices per user
 ```js
 const m2m = require('m2m');
 
@@ -863,7 +942,7 @@ client.connect((err, result) => {
 });
 ```
 
-### Server query to get each device resources
+### Server query to get a device resource
 ```js
 const m2m = require('m2m');
 
@@ -875,9 +954,10 @@ client.connect((err, result) => {
 
   let device = client.accessDevice(300);
 
-  // server request to get device 300 resources
-  // e.g. gpio input/output pins, available channels, system information
-  device.setupInfo(function(err, data){
+  // request to get device 300 resources
+  // GPIO input/output objects, available channels and HTTP url paths, system information etc.
+  //device.setupInfo(function(err, data){
+  device.resourcesInfo(function(err, data){
     if(err) return console.log('device1 setup error:', err.message);
     console.log('device1 setup data', data);
     // data output
