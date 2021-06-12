@@ -762,7 +762,7 @@ client.connect((err, result) => {
 
 Install array-gpio to each remote machine.
 ```js
-$ npm install m2m array-gpio
+$ npm install array-gpio
 ```
 #### Server setup
 Configure each remote machine's rpi microcontroller with the following GPIO input/output and channel data resources
@@ -819,7 +819,7 @@ device.connect((err, result) => {
 });
 ```
 #### Client application to monitor the remote machines
-In this example, the client will iterate over the remote machines once and start watching each machine's sensor and actuactor status. If one the sensor and actuator state changes, the status will be pushed to the client.     
+In this example, the client will iterate over the remote machines once and start watching each machine's sensor and actuactor status. If one the sensors and actuator's state changes, the status will be pushed to the client.     
 ```js
 const { Client } = require('m2m');
 
@@ -837,8 +837,7 @@ client.connect((err, result) => {
         // device watch interval is every 10 secs
         device.watch('machine-status', 10000, (err, data) => {
           if(err) return console.error(device.id, 'machine-status error:', err.message);
-          console.log(device.id, 'machine-status', data); // machine-status {"sensor1":false,"sensor2":false,"actuator1":false,"actuator2":true}
-
+          console.log(device.id, 'machine-status', data); // 200 machine-status {"sensor1":false,"sensor2":false,"actuator1":false,"actuator2":true}
           /* If one of the machine's status has changed,
            * it will receive only the status from the affected machine
            *
