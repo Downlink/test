@@ -134,7 +134,7 @@ The first time you run your application, it will ask for your full credentials.
 ```
 The next time you run your application, it will start automatically using a saved user token.
 
-However, when your application is already running for more than 15 minutes, your application becomes immutable. Any changes to your application code will require you to re-authenticate for security reason.
+However, after 15 minutes of your application running, your application becomes immutable. Any changes to your application code will require you to re-authenticate for security reason.
 
 Restart your application using `$ node device.js` or with the *-r* flag as shown below.
 
@@ -144,16 +144,13 @@ $ node device.js -r
 ```
 ### Remote Client Setup
 Similar with the remote device setup, create a client project directory and install m2m.
-```js
-$ npm install m2m
-```
-Create the file below as client.js within your client project directory.
-
 #### Accessing resources from your remote device
-To access resources from your remote device, create a device object using the client's *accessDevice* method as shown below. The device object created as expected represents a specific remote device as indicated by the *device id* argument. In this case, the *device id* is the integer value *100* ;
+To access resources from your remote device, create an object using the client's *accessDevice* method as shown in the code below. The object created becomes an *alias* of the remote device you are trying to access as indicated by the *device id* argument.
 
-The device object provides various methods to access channel data, GPIO object and HTTP API resources from your remote devices.
+In this case, the *device id* is *100*.
+The *alias* object provides various methods to access channel data, GPIO object and HTTP API resources from your remote devices.
 
+Save the code below as client.js within your client project directory.
 ```js
 const m2m = require('m2m');
 
@@ -297,7 +294,7 @@ client.connect(function(err, result){
 ### Sending Data to Remote Device
 
 #### Device/Server Setup
-Instead of the usual data capturing from remote devices, we can send data to a remote device for resource updates, data movement, control signal, alerts or for whatever purposes it may serve your application.  
+Instead of just capturing data from remote devices, we can send data to a remote device for resource updates, data movement, control signal, alerts or for whatever purpose you will need it in your application.  
 
 ```js
 const m2m = require('m2m');
@@ -410,7 +407,7 @@ client.connect(function(err, result){
 #### Configure GPIO input resource on device1
 Install array-gpio both on device1 and device2
 ```js
-$ npm install m2m array-gpio
+$ npm install array-gpio
 ```
 
 ```js
@@ -434,9 +431,7 @@ device.connect(function(err, result){
 ```
 
 #### Configure GPIO output resource on device2
-```js
-$ npm install m2m array-gpio
-```
+
 ```js
 const m2m = require('m2m');
 
@@ -457,11 +452,9 @@ device.connect(function(err, result){
 });
 ```
 #### Client application accessing GPIO input/output resources from device1 and device2
-```js
-$ npm install m2m
-```
+
 There are two ways we can access the GPIO input/output objects from remote devices as shown below.
-Both ways will allow you to manipulate GPIO input/output resources directly from client applications.  
+Both methods will allow you to manipulate GPIO input/output resources directly from your client applications. Choose one whichever is convenient to you.    
 ```js
 const m2m = require('m2m');
 
@@ -474,7 +467,7 @@ client.connect(function(err, result){
   let device1 = client.accessDevice(120);
   let device2 = client.accessDevice(130);
 
-  /**
+  /*
    * using .gpio() method
    */
 
@@ -487,6 +480,7 @@ client.connect(function(err, result){
   // watch device1 input pin 11 for state changes every 5 secs
   device1.gpio({mode:'in', pin:11}).watch(function(err, state){
     if(err) return console.error('watch input pin 13 state error:', err.message);
+
     console.log('watch input pin 11 state', state);
 
     if(state){
@@ -499,7 +493,7 @@ client.connect(function(err, result){
     }
   });
 
-  /**
+  /*
    * using .input()/output() method
    */
 
@@ -526,11 +520,11 @@ client.connect(function(err, result){
   });
 });
 ```
-### Using Channel Data for GPIO Control
+### Using Channel Data API for Raspberry Pi GPIO Control
 
-If the available API for setting GPIO resources from your Raspberry Pi devices does not meet your requirements, you can use the channel data API to set GPIO input/output resources.
+If the standard API for setting GPIO resources does not meet your requirements, you can use the channel data API to set GPIO input/output resources from your remote devices.
 
-We will use *array-gpio* for GPIO peripheral access in this example but you are free to use any other npm modules for your preference.  
+In this example, we will use again the *array-gpio* module as low level GPIO peripheral access library but you are always free to use any other npm modules you prefer.  
 
 #### Device/Server setup
 ```js
@@ -705,9 +699,12 @@ const sensor2 = setInput(13); // connected to switch sensor2
 const actuator1 = setOutput(33); // connected to alarm actuator1
 const actuator2 = setOutput(35); // connected to alarm actuator2
 
+// assign 1001, 1002 and 1003 respectively for each remote machine
+const device = new Device(1001);
+
 let status = {};
 
-// Local I/O machine process
+// Local I/O machine control process
 watchInput(() => {
   // monitor sensor1
   if(sensor1.isOn){
@@ -725,9 +722,7 @@ watchInput(() => {
   }
 });
 
-// assign 1001, 1002 and 1003 respectively for each remote machine
-let device = new Device(1001);
-
+// m2m device application
 device.connect((err, result) => {
   if(err) return console.error('connect error:', err);
   console.log('result:', result);
