@@ -40,12 +40,12 @@ To use this module, users must create an account and register their devices with
 7. [Device Orchestration](#device-orchestration)
     * [Using A Workflow](#using-a-workflow)
     * [Remote Machine Monitoring](remote-machine-monitoring)
-8. [Using The Browser Interface To Access Clients and Devices](#using-the-browser-interface-to-access-clients-and-devices)
+8. [Using the Browser Interface to Access Clients and Devices](#using-the-browser-interface-to-access-clients-and-devices)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
-   * [Configure Your Application for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
-   * [Naming Your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
-9. [Node-M2M Server Query](#node-m2m-server-query)
+   * [Configure your Application for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
+   * [Naming your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
+9. [Query for Available Devices and Resources](#query-for-available-devices-and-resources)
    * [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices)
    * [Server query to get a specific device resource](#server-query-to-get-a-device-resource)
 
@@ -59,7 +59,7 @@ To use this module, users must create an account and register their devices with
 
 ## Node.js version requirement
 
-* Node.js versions: 8.x, 9.x, 10.x, 11.x, 12.x, 14.x
+* Node.js versions: 10.x, 11.x, 12.x, 14.x
 
 ## Installation
 ```js
@@ -134,7 +134,7 @@ The first time you run your application, it will ask for your full credentials.
 ```
 The next time you run your application, it will start automatically using a saved user token.
 
-However, after 15 minutes of your application running, your application becomes immutable. Any changes to your application code will require you to re-authenticate for security reason.
+However, after 15 minutes of running your application, your application becomes immutable. Any changes to your application code will require you to re-authenticate for security reason.
 
 Restart your application using `$ node device.js` or with the *-r* flag as shown below.
 
@@ -294,7 +294,7 @@ client.connect(function(err, result){
 ### Sending Data to Remote Device
 
 #### Device/Server Setup
-Instead of just capturing data from remote devices, we can send data to a remote device for resource updates, data movement, control signal, alerts or for whatever purpose you will need it in your application.  
+Instead of just capturing data from remote devices, we can send data to a remote device for resource updates, data movement, control signal, alerts or for whatever purpose it serves your application.  
 
 ```js
 const m2m = require('m2m');
@@ -773,7 +773,7 @@ client.connect((err, result) => {
   });
 });
 ```
-## Using The Browser Interface To Access Clients and Devices
+## Using the Browser Interface To Access Clients and Devices
 
 ### Remote Application Code Editing
 
@@ -840,7 +840,7 @@ $ npm start
 ```
 Your node application should restart automatically after a remote code update, an npm module update, or  a remote restart command from the browser interface.
 
-### Naming Your Client Application for Tracking Purposes
+### Naming your Client Application for Tracking Purposes
 
 Unlike *device/server* applications, users can create *client* applications without server registration.
 
@@ -862,7 +862,7 @@ client.connect((err, result) => {
 });
 ```
 
-## Node-M2M Server Query
+## Query for Available Devices and Resources    
 
 ### Server query to get all available remote devices per user
 ```js
@@ -888,7 +888,7 @@ client.connect((err, result) => {
 });
 ```
 
-### Server query to get a device resource
+### Server query to get the available resources from a specific device
 ```js
 const m2m = require('m2m');
 
@@ -902,7 +902,6 @@ client.connect((err, result) => {
 
   // request to get device 300 resources
   // GPIO input/output objects, available channels and HTTP url paths, system information etc.
-  //device.setupInfo(function(err, data){
   device.resourcesInfo(function(err, data){
     if(err) return console.log('device1 setup error:', err.message);
     console.log('device1 setup data', data);
