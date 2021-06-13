@@ -110,7 +110,7 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
-  // set 'random' channel as resource  
+  // set 'random-number' channel as resource  
   device.setData('random-number', function(err, data){
     if(err) return console.error('setData random-number error:', err.message);
 
@@ -134,12 +134,11 @@ The first time you run your application, it will ask for your full credentials.
 ```
 The next time you run your application, it will start automatically using a saved user token.
 
-However, when your application is already running for more than 15 minutes, your application becomes immutable. Any changes to your application code will require you to re-authenticate to restart your application for security reason.
+However, when your application is already running for more than 15 minutes, your application becomes immutable. Any changes to your application code will require you to re-authenticate to run for security reason.
 
-Restart your application using `$ node device.js` or using the CLI below.
+Restart your application using `$ node device.js` or `$ node device.js -r`.
 
-At anytime, you can re-authenticate with full credentials using the *-r* flag when restarting your application as shown below.
-
+At anytime, you can re-authenticate with full credentials using the *-r* flag as shown below.
 ```js
 $ node device.js -r
 ```
@@ -153,7 +152,7 @@ Create the file below as client.js within your client project directory.
 #### Accessing resources from your remote device
 To access resources from your remote device, create a device object using the client's *accessDevice* method as shown below. The device object created as expected represents a specific remote device as indicated by the *device id* argument. In this case, the *device id* is the integer value *100* ;
 
-The device object provides various methods to access channel data, GPIO data and HTTP API resources from your remote device servers.
+The device object provides various methods to access channel data, GPIO object and HTTP API resources from your remote devices.
 
 ```js
 const m2m = require('m2m');
@@ -688,76 +687,6 @@ client.connect((err, result) => {
 ```
 ## Device Orchestration
 
-### Using A Workflow
-#### Server setup
-
-Configure each device (100, 200 and 300) with the following setup.   
-
-```js
-const { Device } = require('m2m');
-const { exec } = require('child_process');
-
-// set the same with device 200 and 300
-let device = new Device(100);
-
-device.connect(function(err, result){
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-
-  device.setData('node-version', function(err, data){
-    if(err) return console.error('cli-command error:', err.message);
-
-    const child = exec('node -v', function(error, stdout, stderr){
-      if(error) {
-        return data.send(error);
-      }
-      console.log(stderr);
-      console.log('stdout', stdout);
-      data.send(stdout);
-    });
-  });
-});
-```
-
-#### Client application
-The client will iterate over each device once and perform a list of tasks or workflow as shown below.
-```js
-const { Client } = require('m2m');
-
-const client = new Client();
-
-let t = 0;
-
-client.connect((err, result) => {
-  if(err) return console.error('connect error:', err);
-  console.log('result:', result);
-
-  const devices = client.accessDevice([100, 200, 300]);
-
-  devices.forEach((device) => {
-    // set a little time delay for each device so as not
-    // to overwhelm the server w/ a surge of requests
-    t = t + 100;  
-    setTimeout(() => {
-
-      // task 1
-      device.getData('node-version', (err, data) => {
-        if(err) return console.error(device.id, 'node-version error:', err.message);
-        console.log(device.id, 'result', data);
-      });
-
-      // task 2
-      device.getData('npm-version', (err, data) => {
-        if(err) return console.error(device.id, 'node-version error:', err.message);
-        console.log(device.id, 'result', data);
-      });
-
-      // task 3
-      // task n
-    }, t);
-  });
-});
-```
 ### Remote Machine Monitoring
 
 Install array-gpio to each remote machine.
