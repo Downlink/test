@@ -293,7 +293,7 @@ client.connect(function(err, result){
 ### Sending Data to Remote Device
 
 #### Device/Server Setup
-Instead of just capturing data from remote devices, we can send data to a remote device for resource updates, data movement, control signal, alerts or for whatever purpose it serves your application.  
+Instead of just capturing data from remote devices, we can send data to our remote devices for resource updates, data movement, as control signal, or for whatever purposes you need it in your application.  
 
 ```js
 const m2m = require('m2m');
