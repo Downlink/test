@@ -29,7 +29,7 @@ To use this module, users must create an account and register their devices with
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
 5. [Channel Data Resources](#channel-data-resources)
-   * [Watch/Monitor Data from Remote Device](#watch/monitor-data-from-remote-revice)
+   * [Watch/Monitor Data from Remote Device](#Watch-Data-from-Remote-Device)
    * [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
    * [Capture Data from Remote Device](#Capture-Data-from-Remote-Device)
    * [Sending Data to Remote Device](#sending-data-to-remote-device)
@@ -195,7 +195,7 @@ watch random data 115
 ```
 ## Channel Data Resources
 
-### Watch/Monitor Data from Remote Device
+### Watch Data from Remote Device
 ### Capture Data from Remote Device
 
 ### Using MCP 9808 Temperature Sensor
