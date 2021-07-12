@@ -29,9 +29,9 @@ To use this module, users must create an account and register their devices with
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
 5. [Channel Data Resources](#channel-data-resources)
+   * [Capture Data from Remote Device](#Capture-Data-from-Remote-Device)
    * [Watch/Monitor Data from Remote Device](#Watch-Data-from-Remote-Device)
    * [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
-   * [Capture Data from Remote Device](#Capture-Data-from-Remote-Device)
    * [Sending Data to Remote Device](#sending-data-to-remote-device)
 6. [GPIO Resources for Raspberry Pi](gpio-resources-for-raspberry-pi)   
    * [GPIO Input Monitoring and Output Control](#gpio-input-monitoring-and-output-control)
@@ -196,7 +196,56 @@ watch random data 115
 ## Channel Data Resources
 
 ### Watch Data from Remote Device
+
+
 ### Capture Data from Remote Device
+#### Device/Server API To Setup A Data Source
+```js
+const m2m = require('m2m');
+
+let device = new m2m.Device(100);
+
+device.connect(function(err, result){
+  if(err) return console.error('connect error:', err.message);
+
+  console.log('result:', result);
+
+  // Your channel name can be any name you want
+  // e.g. Set 'channel-data' as channel resource
+
+  device.setData('channel-data', function(err, data){
+    if(err) return console.error('setData channel-data error:', err.message);
+
+    // Implement the dataSource logic
+    // Your dataSource type can be a string, number or object
+
+    let channeData = dataSource();
+
+    data.send(channelData);
+  });
+});
+```
+#### Client API To Capture Data from Your Remote Device/Server
+```js
+$ npm install m2m
+```
+```js
+const m2m = require('m2m');
+
+let client = new m2m.Client();
+
+client.connect(function(err, result){
+  if(err) return console.error('connect error:', err.message);
+  console.log('result:', result);
+
+  let device = client.accessDevice(100);
+
+  device.watch('channel-data', function(err, data){
+    if(err) return console.error('channel-data error:', err.message);
+    console.log('channel-data', data);
+  });
+});
+```
 
 ### Using MCP 9808 Temperature Sensor
 
