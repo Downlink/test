@@ -194,7 +194,9 @@ watch random data 68
 watch random data 115
 ```
 ## Channel Data Resources
+
 ### Capture Data from Remote Device
+
 #### Device/Server API To Setup A Data Source
 ```js
 const { Device } = require('m2m');
@@ -219,10 +221,7 @@ device.connect(function(err, result){
 ```
 #### Client API To Capture Data from Your Remote Device/Server
 ```js
-$ npm install m2m
-```
-```js
-const {Client} = require('m2m');
+const { Client } = require('m2m');
 
 let client = new Client();
 
@@ -244,7 +243,7 @@ client.connect(function(err, result){
   // or
 
   /*
-   * Directly access the channel data from the client object
+   * Access channel data directly from the client object
    */
 
   // Access channel data by providing the device id of the device/server you want to access
@@ -255,6 +254,7 @@ client.connect(function(err, result){
 });
 ```
 ### Watch Data from Remote Device
+
 ### Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
