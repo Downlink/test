@@ -194,34 +194,26 @@ watch random data 68
 watch random data 115
 ```
 ## Channel Data Resources
-
-### Watch Data from Remote Device
-
-
 ### Capture Data from Remote Device
 #### Device/Server API To Setup A Data Source
 ```js
-const m2m = require('m2m');
+const { Device } = require('m2m');
 
-let device = new m2m.Device(100);
+let device = new Device(100);
 
 device.connect(function(err, result){
-  if(err) return console.error('connect error:', err.message);
+  ...
 
-  console.log('result:', result);
-
+  // Set a data source for your channel resource
   // Your channel name can be any name you want
-  // e.g. Set 'channel-data' as channel resource
+  device.setData('my-channel-data', function(err, data){
+    if(err) return console.error('setData my-channel-data error:', err.message);
 
-  device.setData('channel-data', function(err, data){
-    if(err) return console.error('setData channel-data error:', err.message);
+    // Implement myDataSource method
+    // Your data source can be of type string, number or object
 
-    // Implement the dataSource logic
-    // Your dataSource type can be a string, number or object
-
-    let channeData = dataSource();
-
-    data.send(channelData);
+    let myData = myDataSource();
+    data.send(myData);
   });
 });
 ```
@@ -230,23 +222,39 @@ device.connect(function(err, result){
 $ npm install m2m
 ```
 ```js
-const m2m = require('m2m');
+const {Client} = require('m2m');
 
-let client = new m2m.Client();
+let client = new Client();
 
 client.connect(function(err, result){
-  if(err) return console.error('connect error:', err.message);
-  console.log('result:', result);
+  ...
 
-  let device = client.accessDevice(100);
+  /*
+   * Access channel data using an alias
+   */
 
-  device.watch('channel-data', function(err, data){
+  // 'remoteDevice' is an alias of the remote device you want to access
+  let remoteDevice = client.accessDevice(100);
+
+  remoteDevice.getData('my-channel-data', function(err, data){
+    if(err) return console.error('channel-data error:', err.message);
+    console.log('channel-data', data);
+  });
+
+  // or
+
+  /*
+   * Directly access the channel data from the client object
+   */
+
+  // Access channel data by providing the device id of the device/server you want to access
+  client.getData(100, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log('channel-data', data);
   });
 });
 ```
-
+### Watch Data from Remote Device
 ### Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
