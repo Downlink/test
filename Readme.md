@@ -17,7 +17,7 @@ Your device servers will be accessible through its user assigned *device id* fro
 
 Access to clients and devices is restricted to authenticated and authorized users only.
 
-All communications between client and device servers are fully encrypted using TLS protocol.
+All communications between clients and devices are fully encrypted using TLS protocol.
 
 To use this module, users must create an account and register their devices with [node-m2m](https://www.node-m2m.com).
 
