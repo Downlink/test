@@ -49,7 +49,7 @@ To use this module, users must create an account and register their devices with
 9. [Query for Available Devices and Resources](#query-for-available-devices-and-resources)
    * [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices-per-user)
    * [Server query to get a specific device resource](#server-query-to-get-the-available-resources-from-a-specific-device)
-
+10.[Connecting To Other Server](#Connecting-To-Other-Server)
 
 ## Supported Platform
 
@@ -210,10 +210,8 @@ device.connect(function(err, result){
   // Your channel name can be any name you want
   device.setData('my-channel-data', function(err, data){
     if(err) return console.error('setData my-channel-data error:', err.message);
-
     // Implement myDataSource method
     // Your data source can be of type string, number or object
-
     let myData = myDataSource();
     data.send(myData);
   });
@@ -229,10 +227,8 @@ client.connect(function(err, result){
   ...
 
   /*
-   * Access channel data using an alias
+   * Capture/Get channel data using an alias
    */
-
-  // 'remoteDevice' is an alias of the remote device you want to access
   let remoteDevice = client.accessDevice(100);
 
   remoteDevice.getData('my-channel-data', function(err, data){
@@ -243,10 +239,8 @@ client.connect(function(err, result){
   // or
 
   /*
-   * Access channel data directly from the client object
+   * Capture/Get channel data directly from the client object
    */
-
-  // Access channel data by providing the device id of the device/server you want to access
   client.getData(100, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log('channel-data', data);
@@ -254,6 +248,69 @@ client.connect(function(err, result){
 });
 ```
 ### Watch Data from Remote Device
+#### Device/Server API To Setup A Data Source
+Same with Capturing Data from Remote Device.
+#### Client API To Watch/Monitor Data from Your Remote Device/Server
+```js
+const { Client } = require('m2m');
+
+let client = new Client();
+
+client.connect(function(err, result){
+  ...
+
+  /*
+   * Watch channel data using an alias
+   */
+  let remoteDevice = client.accessDevice(100);
+
+  remoteDevice.watch('my-channel-data', function(err, data){
+    if(err) return console.error('channel-data error:', err.message);
+    console.log('channel-data', data);
+  });
+
+  // watch using 1 minute poll interval
+  remoteDevice.watch('my-channel-data', 60000, function(err, data){
+    if(err) return console.error('channel-data error:', err.message);
+    console.log('channel-data', data);
+  });
+
+  // unwatch channel data at a later time
+  setTimeout(()=>{
+    remoteDevice.unwatch('my-channel-data');
+  }, 5*60000);
+  
+  // watch again at a later time
+  setTimeout(()=>{
+    remoteDevice.watch('my-channel-data', 60000);
+  }, 10*60000);
+
+  /*
+   * Watch channel data directly from the client object
+   */
+  client.watch(100, 'my-channel-data', function(err, data){
+    if(err) return console.error('channel-data error:', err.message);
+    console.log('channel-data', data);
+  });
+
+  // watch using 30000 ms or 30 secs poll interval
+  client.watch(100, 'my-channel-data', 30000, function(err, data){
+    if(err) return console.error('channel-data error:', err.message);
+    console.log('channel-data', data);
+  });
+
+  // unwatch channel data at a later time
+  setTimeout(()=>{
+    client.unwatch(100, 'my-channel-data');
+  }, 5*60000);
+  
+  // watch again at a later time
+  setTimeout(()=>{
+    client.watch(100, 'my-channel-data', 30000);
+  }, 10*60000);
+
+});
+```
 
 ### Using MCP 9808 Temperature Sensor
 
@@ -261,26 +318,16 @@ client.connect(function(err, result){
 [](example1.svg)
 #### Remote Device Setup in Tokyo
 
+Using a built-in MCP9808 i2c library from array-gpio
 ```js
 $ npm install m2m array-gpio
 ```
 ```js
 const m2m = require('m2m');
-
-// using a built-in MCP9808 i2c library using array-gpio
-// you can also create your own 9808 library using other npm modules
 const i2c = require('./node_modules/m2m/examples/i2c/9808.js');
 
 let device = new m2m.Device(110);
 
-// explicitly connecting to default node-m2m server
-device.connect('https://www.node-m2m.com', function(err, result){
-  // device application logic
-});
-
-// or
-
-// implicitly connecting to default node-m2m server
 device.connect(function(err, result){
   if(err) return console.error('connect error:', err.message);
   console.log('result:', result);
@@ -288,7 +335,46 @@ device.connect(function(err, result){
   device.setData('sensor-temperature', function(err, data){
     if(err) return console.error('set sensor-temperature error:', err.message);
 
+    // temperature data
     let td =  i2c.getTemp();
+    data.send(td);
+  });
+});
+```
+Using 9808 library from i2c-bus npm module
+```js
+$ npm install i2c-bus
+```
+```js
+const m2m = require('m2m');
+const i2c = require('i2c-bus');
+
+const MCP9808_ADDR = 0x18;
+const TEMP_REG = 0x05;
+
+const toCelsius = rawData => {
+  rawData = (rawData >> 8) + ((rawData & 0xff) << 8);
+  let celsius = (rawData & 0x0fff) / 16;
+  if (rawData & 0x1000) {
+    celsius -= 256;
+  }
+  return celsius;
+};
+
+const i2c1 = i2c.openSync(1);
+const rawData = i2c1.readWordSync(MCP9808_ADDR, TEMP_REG);
+
+let device = new m2m.Device(110);
+
+device.connect(function(err, result){
+  if(err) return console.error('connect error:', err.message);
+  console.log('result:', result);
+
+  device.setData('sensor-temperature', function(err, data){
+    if(err) return console.error('set sensor-temperature error:', err.message);
+
+    // temperature data
+    let td =  toCelsius(rawData);
     data.send(td);
   });
 });
@@ -988,5 +1074,33 @@ client.connect((err, result) => {
       channel: { name: [ 'voltage', 'gateway1', 'tcp' ] }
     }*/
   });  
+});
+```
+## Connecting To Other Server
+### You can connect to a different server by providing a url argument to connect method
+
+### Device
+```js
+const m2m = require('m2m');
+
+const device = new m2m.Device(110);
+
+// Explicitly connect to a specific server
+device.connect('https://www.my-m2m-server.com', function(err, result){
+
+  // device application logic
+
+});
+```
+### Client
+```js
+const m2m = require('m2m');
+
+const client = new m2m.Client();
+
+client.connect('https://www.my-m2m-server.com', function(err, result){
+
+  // client application logic
+
 });
 ```
