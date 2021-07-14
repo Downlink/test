@@ -38,7 +38,7 @@ To use this module, users must create an account and register their devices with
    * [Using Channel Data for GPIO Control](#Using-Channel-Data-for-Raspberry-Pi-GPIO-Control)
 7. [HTTP API Resources](#http-api)
     * [Server GET and POST method Setup](#Device-GET-and-POST-method-setup)
-    * [Client GET and POST request](#Client GET and POST request)
+    * [Client GET and POST request](#Client-GET-and-POST-request)
 8. [Device Orchestration](#device-orchestration)
     * [Remote Machine Monitoring](remote-machine-monitoring)
 9. [Using the Browser Interface](#Using-the-Browser-Interface)
