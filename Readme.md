@@ -197,27 +197,27 @@ watch random data 115
 
 ### Capture Data from Remote Device
 
-#### Device/Server API To Setup A Data Source
+#### Device/Server API - Data Source Setup
 ```js
 const { Device } = require('m2m');
 
-let device = new Device(100);
+const device = new Device(100);
 
 device.connect(function(err, result){
   ...
 
-  // Name your channel data which can be any name you want
+  // Create a data source by naming it which can be any name you want
   device.setData('my-channel-data', function(err, data){
     if(err) return console.error('setData my-channel-data error:', err.message);
 
-    // Implement myDataSource method. Your data source can be of type string, number or object
-    let myData = myDataSource();
-    data.send(myData);
+    // Implement DataSource method. Your data source can be of type string, number or object
+    let ds = DataSource();
+    data.send(ds);
 
   });
 });
 ```
-#### Client API To Capture Data from Your Remote Device/Server
+#### Client API - Capture Data from Your Remote Device/Server
 ```js
 const { Client } = require('m2m');
 
@@ -226,21 +226,30 @@ let client = new Client();
 client.connect(function(err, result){
   ...
 
-  /*
-   * Capture channel data using an alias
-   */
-  let remoteDevice = client.accessDevice(100);
+  /*********************************************
 
-  remoteDevice.getData('my-channel-data', function(err, data){
+     Capture channel data using a device alias
+
+   *********************************************/
+
+  // Create an alias (device object) of remote device 100
+  let device = client.accessDevice(100);
+
+  device.getData('my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log('channel-data', data);
   });
 
   // or
 
-  /*
-   * Capture channel data directly from the client object
-   */
+  /*********************************************************
+
+     Capture channel data directly from the client object
+
+   *********************************************************/
+
+  // NOTE: Provide the device id of the remote device you want to access
+  // as 1st argument of getData method
   client.getData(100, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log('channel-data', data);
@@ -248,9 +257,10 @@ client.connect(function(err, result){
 });
 ```
 ### Watch Data from Remote Device
-#### Device/server API is the same with data capturing
 
-#### Client API To Watch/Monitor Data from Your Remote Device/Server
+#### Setup your data source using the API from data capturing.
+
+#### Client API - Watch Data from Your Remote Device/Server
 ```js
 const { Client } = require('m2m');
 
@@ -259,35 +269,50 @@ let client = new Client();
 client.connect(function(err, result){
   ...
 
-  /*
-   * Watch channel data using an alias
-   */
-  let remoteDevice = client.accessDevice(100);
+ /************************************************
 
-  remoteDevice.watch('my-channel-data', function(err, data){
+    Watch channel data using a device alias
+
+  ************************************************/
+
+   // Create an alias rd of remote device 100
+  let rd = client.accessDevice(100);
+
+  // watch using a default poll interval of 5 secs
+  rd.watch('my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log('channel-data', data);
   });
 
-  // watch using 1 minute poll interval
-  remoteDevice.watch('my-channel-data', 60000, function(err, data){
+  // watch using a 1 minute poll interval
+  rd.watch('my-channel-data', 60000, function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log('channel-data', data);
   });
 
   // unwatch channel data at a later time
   setTimeout(()=>{
-    remoteDevice.unwatch('my-channel-data');
+    rd.unwatch('my-channel-data');
   }, 5*60000);
-  
-  // watch again at a later time
+
+  // watch again using the default poll interval
   setTimeout(()=>{
-    remoteDevice.watch('my-channel-data', 60000);
+    rd.watch('my-channel-data');
   }, 10*60000);
 
-  /*
-   * Watch channel data directly from the client object
-   */
+  // watch again using a 1 min poll interval
+  setTimeout(()=>{
+    rd.watch('my-channel-data', 60000);
+  }, 15*60000);
+
+  /******************************************************
+
+     Watch channel data directly from the client object
+
+   ******************************************************/
+  // NOTE: Provide the device id as 1st argument of watch method
+
+  // watch using a default poll interval of 5 secs
   client.watch(100, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log('channel-data', data);
@@ -303,11 +328,16 @@ client.connect(function(err, result){
   setTimeout(()=>{
     client.unwatch(100, 'my-channel-data');
   }, 5*60000);
-  
-  // watch again at a later time
+
+  // watch again at a later time using the default poll interval
+  setTimeout(()=>{
+    client.watch(100, 'my-channel-data');
+  }, 10*60000);
+
+  // watch again at a later time using 30 secs poll interval
   setTimeout(()=>{
     client.watch(100, 'my-channel-data', 30000);
-  }, 10*60000);
+  }, 15*60000);
 
 });
 ```
@@ -341,10 +371,14 @@ device.connect(function(err, result){
   });
 });
 ```
-Using 9808 library from i2c-bus npm module
+Using *i2c-bus* npm module to setup MCP 9808 temperature sensor
 ```js
 $ npm install i2c-bus
 ```
+[Configure I2C on the Raspberry Pi.](https://github.com/fivdi/i2c-bus/blob/HEAD/doc/raspberry-pi-i2c.md)
+\
+\
+After configuration, setup your device using the following code.
 ```js
 const m2m = require('m2m');
 const i2c = require('i2c-bus');
