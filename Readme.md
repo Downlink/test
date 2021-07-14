@@ -610,10 +610,17 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
-  // set GPIO input as resource
+  // Set GPIO input as resource using pin 11 and 13
+  device.setGpio({mode:'input', pin:[11, 13]});
+
+  // or
+
+  // Set GPIO input w/ a callback argument
   device.setGpio({mode:'input', pin:[11, 13]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
+    // the gpio object will return a pin and a state property
+    // you can use for any customized logic
     console.log('input pin', gpio.pin, 'state', gpio.state);
     // you can provide additional custom logic here
   });
@@ -632,10 +639,17 @@ device.connect(function(err, result){
 
   console.log('result:', result);
 
-  // set GPIO output as resource
+  // Set GPIO output as resource using pin 33 and 35
+  device.setGpio({mode:'output', pin:[33, 35]});
+
+  // or
+
+  // Set GPIO output w/ a callback argument
   device.setGpio({mode:'output', pin:[33, 35]}, function(err, gpio){
     if(err) return console.error('setGpio output error:', err.message);
 
+    // the gpio object will return a pin and a state property
+    // you can use for any customized logic
     console.log('output pin', gpio.pin, 'state', gpio.state);
     // you can provide additional custom logic here
   });
@@ -666,23 +680,36 @@ client.connect(function(err, result){
   // get current state of device1 input pin 11
   device1.gpio({mode:'in', pin:11}).getState(function(err, state){
     if(err) return console.error('get input pin 11 state error:', err.message);
-    console.log('get input pin 11 state', state);
+
+    // returns the state of pin 11
+    console.log(state);
   });
 
-  // watch device1 input pin 11 for state changes every 5 secs
+  // watch device1 input pin 11 using the default 5 secs poll interval
   device1.gpio({mode:'in', pin:11}).watch(function(err, state){
     if(err) return console.error('watch input pin 13 state error:', err.message);
-
-    console.log('watch input pin 11 state', state);
 
     if(state){
       // turn ON output pin 33
       device2.gpio({mode:'out', pin:33}).on();
     }
     else{
-      // turn OFF output pin 33
-      device2.gpio({mode:'out', pin:33}).off();
+      // turn OFF output pin 33 w/ a callback for state confirmation
+      device2.gpio({mode:'out', pin:33}).off(function(err, state){
+        if(err) return console.error('turn OFF output pin 33 error:', err.message);
+
+        console.log(state); // should return false
+        ...
+      });
     }
+  });
+
+  // watch device1 input pin 11 using a 25 secs poll interval
+  device1.gpio({mode:'in', pin:11}).watch(25000, function(err, state){
+    if(err) return console.error('watch input pin 13 state error:', err.message);
+
+    console.log(state);
+    ...
   });
 
   /************************************
@@ -694,23 +721,36 @@ client.connect(function(err, result){
   // get current state of device1 input pin 13
   device1.input(13).getState(function(err, state){
     if(err) return console.error('get input pin 13 state error:', err.message);
-    console.log('get input pin 13 state', state);
+
+    // returns the state of pin 13
+    console.log(state);
   });
 
-  // watch device1 input pin 13 for state changes every 5 secs
+  // watch device1 input pin 13 using the default 5 secs poll interval
   device1.input(13).watch(function(err, state){
     if(err) return console.error('watch pin 11 error:', err.message);
-
-    console.log('watch input pin 13 state', state);
 
     if(state){
       // turn OFF output pin 35
       device2.output(35).off();
     }
     else{
-      // turn ON output pin 35
-      device2.output(35).on();
+      // turn ON output pin 35 w/ a callback for state confirmation
+      device2.output(35).on(function(err, state){
+        if(err) return console.error('turn ON output pin 35 error:', err.message);
+
+        console.log(state); // should return true
+        ...
+      });  
     }
+  });
+
+  // watch device1 input pin 13 using a 25 secs poll interval
+  device1.input(13).watch(25000, function(err, state){
+    if(err) return console.error('watch pin 11 error:', err.message);
+
+    console.log(state);
+    ...
   });
 });
 ```
