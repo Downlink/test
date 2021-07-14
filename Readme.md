@@ -11,7 +11,7 @@ You can deploy multiple public device servers on the fly from anywhere without t
 
 *m2m* can run alongside with other applications from your remote devices or endpoints.
 
-You can set multiple *channel data* or *HTTP API* resources on your device servers. If your remote endpoint is a Raspberry Pi, you can set *GPIO objects* as device resources directly from the API.
+You can set multiple *channel data* or *HTTP API* resources on your device servers. If your remote endpoint is a Raspberry Pi, you can set *GPIO resources* directly from the API.
 
 Your device servers will be accessible through its user assigned *device id* from client applications.
 
