@@ -46,10 +46,9 @@ To use this module, users must create an account and register their devices with
    * [Application Process Auto Restart](#application-auto-restart)
    * [Configure your Application for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
    * [Naming your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
-9. [Query for Available Devices and Resources](#query-for-available-devices-and-resources)
-   * [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices-per-user)
-   * [Server query to get a specific device resource](#server-query-to-get-the-available-resources-from-a-specific-device)
-10.[Connecting To Other Server](#Connecting-To-Other-Server)
+9. [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices-per-user)
+10.[Client request to get the available resources from a specific device](#Client-request-to-get-the-available-resources-from-a-specific-device)
+11.[Connecting To Other Server](#Connecting-To-Other-Server)
 
 ## Supported Platform
 
@@ -206,11 +205,17 @@ const device = new Device(100);
 device.connect(function(err, result){
   ...
 
-  // Create a data source by naming it which can be any name you want
+  /*
+   * Set a name for your channel data. You can use any name you want.
+   * In the example below, we'll use the name 'my-channel-data'.
+   */
   device.setData('my-channel-data', function(err, data){
     if(err) return console.error('setData my-channel-data error:', err.message);
 
-    // Implement DataSource method. Your data source can be of type string, number or object
+    /*
+     * Implement/create your data source. Your data source can be of type string, number or object.
+     * Below is a hypothetical 'DataSource' method that will return the value of your data source.
+     */
     let ds = DataSource();
     data.send(ds);
 
@@ -237,7 +242,9 @@ client.connect(function(err, result){
 
   device.getData('my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
-    console.log('channel-data', data);
+
+    // data is the value of 'my-channel-data' data source
+    console.log(data);
   });
 
   // or
@@ -248,11 +255,12 @@ client.connect(function(err, result){
 
    *********************************************************/
 
-  // NOTE: Provide the device id of the remote device you want to access
-  // as 1st argument of getData method
+  // Provide the device id (100) of the remote device you want to access
   client.getData(100, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
-    console.log('channel-data', data);
+
+    // data is the value of 'my-channel-data' data source
+    console.log(data);
   });
 });
 ```
@@ -281,13 +289,15 @@ client.connect(function(err, result){
   // watch using a default poll interval of 5 secs
   rd.watch('my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
-    console.log('channel-data', data);
+
+    // data is the value of 'my-channel-data' data source
+    console.log(data);
   });
 
   // watch using a 1 minute poll interval
   rd.watch('my-channel-data', 60000, function(err, data){
     if(err) return console.error('channel-data error:', err.message);
-    console.log('channel-data', data);
+    console.log(data);
   });
 
   // unwatch channel data at a later time
@@ -312,18 +322,22 @@ client.connect(function(err, result){
      Watch channel data directly from the client object
 
    ******************************************************/
-  // NOTE: Provide the device id as 1st argument of watch method
+
+   // Provide the device id of the remote device you want to access
+   // as 1st argument of watch method
 
   // watch using a default poll interval of 5 secs
   client.watch(100, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
-    console.log('channel-data', data);
+
+    // data is the value of 'my-channel-data' data source
+    console.log('my-channel-data', data);
   });
 
   // watch using 30000 ms or 30 secs poll interval
   client.watch(100, 'my-channel-data', 30000, function(err, data){
     if(err) return console.error('channel-data error:', err.message);
-    console.log('channel-data', data);
+    console.log(data);
   });
 
   // unwatch channel data at a later time
@@ -432,7 +446,7 @@ client.connect(function(err, result){
 
   device.watch('sensor-temperature', function(err, data){
     if(err) return console.error('sensor-temperature error:', err.message);
-    console.log('temperature data', data); // 23.51, 23.49, 23.11
+    console.log('sensor temperature data', data); // 23.51, 23.49, 23.11
   });
 });
 ```
@@ -455,29 +469,24 @@ client.connect(function(err, result){
   // scan/poll the data every 15 secs instead of the default 5 secs
   device.watch('sensor-temperature', 15000, function(err, data){
     if(err) return console.error('sensor-temperature error:', err.message);
-    console.log('temperature data', data); // 23.51, 23.49, 23.11
+    console.log('sensor temperature data', data); // 23.51, 23.49, 23.11
   });
 
   // unwatch temperature data after 5 minutes
-  // client will stop receiving temperature data from the remote device
   setTimeout(function(){
     device.unwatch('sensor-temperature');
   }, 5*60000);
 
-  // watch temperature data again after 10 minutes
-  // since no scan/poll interval argument was provided, it will scan the data every 5 secs (default)
-  // client will start receiving again the temperature data from the remote device
+  // watch temperature data again using the default poll interval
   setTimeout(function(){
     device.watch('sensor-temperature');
   }, 10*60000);
-
 });
 ```
 ### Sending Data to Remote Device
-
-#### Device/Server Setup
-Instead of just capturing data from remote devices, we can send data to our remote devices for resource updates, data movement, as control signal, or for whatever purposes you may need it in your application.  
-
+\
+Instead of capturing data from remote devices, we can send data to our remote devices for resource updates, data movement, as control signal, or for whatever purposes you may need it in your application.  
+#### Device/Server API
 ```js
 const m2m = require('m2m');
 const fs = require('fs');
@@ -533,7 +542,7 @@ server.connect(function(err, result){
   });
 });
 ```
-#### Client API for sending data to a remote device
+#### Client API - Send data To Your Remote Device/Server
 ```js
 const fs = require('fs');
 const m2m = require('m2m');
@@ -577,16 +586,15 @@ client.connect(function(err, result){
   let num = 1.2456;
 
   server.sendData('number', num);
-
 });
 ```
 ## GPIO Resources for Raspberry Pi
 
-### GPIO Input Monitoring and Output Control
+### GPIO API for Input Monitoring and Output Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
-#### Configure GPIO input resource on device1
+#### Device/Server API - Configure GPIO input resource on device1
 Install array-gpio both on device1 and device2
 ```js
 $ npm install array-gpio
@@ -612,7 +620,7 @@ device.connect(function(err, result){
 });
 ```
 
-#### Configure GPIO output resource on device2
+#### Device/Server API - Configure GPIO output resource on device2
 
 ```js
 const m2m = require('m2m');
@@ -633,7 +641,7 @@ device.connect(function(err, result){
   });
 });
 ```
-#### Client application accessing GPIO input/output resources from device1 and device2
+#### Client API - Accessing GPIO input/output resources from device1 and device2
 
 There are two ways we can access the GPIO input/output objects from remote devices as shown below.
 Both methods will allow you to manipulate GPIO input/output resources directly from your client applications. Choose one whichever is convenient to you.    
@@ -649,9 +657,11 @@ client.connect(function(err, result){
   let device1 = client.accessDevice(120);
   let device2 = client.accessDevice(130);
 
-  /*
-   * using .gpio() method
-   */
+  /**************************
+
+      Using .gpio() method
+
+   **************************/
 
   // get current state of device1 input pin 11
   device1.gpio({mode:'in', pin:11}).getState(function(err, state){
@@ -675,9 +685,11 @@ client.connect(function(err, result){
     }
   });
 
-  /*
-   * using .input()/output() method
-   */
+  /************************************
+
+      Using .input()/output() method
+
+   ************************************/
 
   // get current state of device1 input pin 13
   device1.input(13).getState(function(err, state){
@@ -799,7 +811,7 @@ client.connect(function(err, result){
 ```
 ## HTTP API
 
-### Server GET and POST method
+### Device/Server API - GET and POST method setup
 ```js
 const m2m = require('m2m');
 
@@ -828,7 +840,7 @@ server.connect((err, result) => {
   });
 });
 ```
-### Client GET and POST request
+### Client API - GET and POST request
 ```js
 const m2m = require('m2m');
 
@@ -954,7 +966,7 @@ client.connect((err, result) => {
   });
 });
 ```
-## Using the Browser Interface To Access Clients and Devices
+## Using the Browser Interface
 
 ### Remote Application Code Editing
 
@@ -1049,8 +1061,6 @@ client.connect((err, result) => {
 });
 ```
 
-## Query for Available Devices and Resources    
-
 ### Server query to get all available remote devices per user
 ```js
 const m2m = require('m2m');
@@ -1074,8 +1084,8 @@ client.connect((err, result) => {
   });
 });
 ```
+### Client request to get the available resources from a specific device
 
-### Server query to get the available resources from a specific device
 ```js
 const m2m = require('m2m');
 
@@ -1111,9 +1121,9 @@ client.connect((err, result) => {
   });  
 });
 ```
+
 ## Connecting to other m2m server
 ### You can connect to a different server by providing the url of the server you want to use
-
 ```js
 ...
 // By default without a url argument, the connect method will use 'https://www.node-m2m.com' server
