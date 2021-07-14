@@ -33,15 +33,15 @@ To use this module, users must create an account and register their devices with
    * [Watch/Monitor Data from Remote Device](#Watch-Data-from-Remote-Device)
    * [Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
    * [Sending Data to Remote Device](#sending-data-to-remote-device)
-6. [GPIO Resources for Raspberry Pi](gpio-resources-for-raspberry-pi)   
-   * [GPIO Input Monitoring and Output Control](#gpio-input-monitoring-and-output-control)
+6. [GPIO Resources for Raspberry Pi](#gpio-resources-for-raspberry-pi)   
+   * [GPIO Input Monitoring and Output Control](#GPIO-Input-Monitoring-and-Output-Control)
    * [Using Channel Data for GPIO Control](#using-channel-data-for-gpio-control)
 7. [HTTP API Resources](#http-api)
     * [Server GET and POST method Setup](#server-get-and-post-method)
     * [Client GET and POST request](#client-get-and-post-request)
 8. [Device Orchestration](#device-orchestration)
     * [Remote Machine Monitoring](remote-machine-monitoring)
-9. [Using the Browser Interface to Access Clients and Devices](#using-the-browser-interface-to-access-clients-and-devices)
+9. [Using the Browser Interface](#Using-the-Browser-Interface)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
    * [Configure your Application for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
@@ -590,7 +590,7 @@ client.connect(function(err, result){
 ```
 ## GPIO Resources for Raspberry Pi
 
-### GPIO API for Input Monitoring and Output Control
+### GPIO Input Monitoring and Output Control
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example2.svg?sanitize=true)
 
