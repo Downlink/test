@@ -206,14 +206,14 @@ let device = new Device(100);
 device.connect(function(err, result){
   ...
 
-  // Set a data source for your channel resource
-  // Your channel name can be any name you want
+  // Name your channel data which can be any name you want
   device.setData('my-channel-data', function(err, data){
     if(err) return console.error('setData my-channel-data error:', err.message);
-    // Implement myDataSource method
-    // Your data source can be of type string, number or object
+
+    // Implement myDataSource method. Your data source can be of type string, number or object
     let myData = myDataSource();
     data.send(myData);
+
   });
 });
 ```
@@ -227,7 +227,7 @@ client.connect(function(err, result){
   ...
 
   /*
-   * Capture/Get channel data using an alias
+   * Capture channel data using an alias
    */
   let remoteDevice = client.accessDevice(100);
 
@@ -239,7 +239,7 @@ client.connect(function(err, result){
   // or
 
   /*
-   * Capture/Get channel data directly from the client object
+   * Capture channel data directly from the client object
    */
   client.getData(100, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
@@ -248,8 +248,8 @@ client.connect(function(err, result){
 });
 ```
 ### Watch Data from Remote Device
-#### Device/Server API To Setup A Data Source
-Same with Capturing Data from Remote Device.
+#### Device/server API is the same with data capturing
+
 #### Client API To Watch/Monitor Data from Your Remote Device/Server
 ```js
 const { Client } = require('m2m');
