@@ -35,10 +35,10 @@ To use this module, users must create an account and register their devices with
    * [Sending Data to Remote Device](#sending-data-to-remote-device)
 6. [GPIO Resources for Raspberry Pi](#gpio-resources-for-raspberry-pi)   
    * [GPIO Input Monitoring and Output Control](#GPIO-Input-Monitoring-and-Output-Control)
-   * [Using Channel Data for GPIO Control](#using-channel-data-for-gpio-control)
+   * [Using Channel Data for GPIO Control](#Using-Channel-Data-for-Raspberry-Pi-GPIO-Control)
 7. [HTTP API Resources](#http-api)
-    * [Server GET and POST method Setup](#server-get-and-post-method)
-    * [Client GET and POST request](#client-get-and-post-request)
+    * [Server GET and POST method Setup](#Device-API-GET-and-POST-method-setup)
+    * [Client GET and POST request](#Client-API-GET-and-POST-request)
 8. [Device Orchestration](#device-orchestration)
     * [Remote Machine Monitoring](remote-machine-monitoring)
 9. [Using the Browser Interface](#Using-the-Browser-Interface)
@@ -754,7 +754,7 @@ client.connect(function(err, result){
   });
 });
 ```
-### Using Channel Data API for Raspberry Pi GPIO Control
+### Using Channel Data for Raspberry Pi GPIO Control
 
 If the standard API for setting GPIO resources does not meet your requirements, you can use the channel data API to set GPIO input/output resources from your remote devices.
 
@@ -851,7 +851,7 @@ client.connect(function(err, result){
 ```
 ## HTTP API
 
-### Device/Server API - GET and POST method setup
+### Device API - GET and POST method setup
 ```js
 const m2m = require('m2m');
 
