@@ -305,6 +305,8 @@ client.connect(function(err, result){
     rd.watch('my-channel-data', 60000);
   }, 15*60000);
 
+  // or
+
   /******************************************************
 
      Watch channel data directly from the client object
@@ -341,7 +343,6 @@ client.connect(function(err, result){
 
 });
 ```
-
 ### Using MCP 9808 Temperature Sensor
 
 ![](https://raw.githubusercontent.com/EdoLabs/src2/master/example1.svg?sanitize=true)
@@ -350,7 +351,7 @@ client.connect(function(err, result){
 
 Using a built-in MCP9808 i2c library from array-gpio
 ```js
-$ npm install m2m array-gpio
+$ npm install array-gpio
 ```
 ```js
 const m2m = require('m2m');
@@ -1110,31 +1111,18 @@ client.connect((err, result) => {
   });  
 });
 ```
-## Connecting To Other Server
-### You can connect to a different server by providing a url argument to connect method
+## Connecting to other m2m server
+### You can connect to a different server by providing the url of the server you want to use
 
-### Device
 ```js
-const m2m = require('m2m');
-
-const device = new m2m.Device(110);
-
-// Explicitly connect to a specific server
-device.connect('https://www.my-m2m-server.com', function(err, result){
-
-  // device application logic
-
+...
+// By default without a url argument, the connect method will use 'https://www.node-m2m.com' server
+client.connect(function(err, result){
+  // application logic
 });
-```
-### Client
-```js
-const m2m = require('m2m');
 
-const client = new m2m.Client();
-
+// Connecting to 'https://www.my-m2m-server.com' server
 client.connect('https://www.my-m2m-server.com', function(err, result){
-
-  // client application logic
-
+  // application logic
 });
 ```
