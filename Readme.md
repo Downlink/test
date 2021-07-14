@@ -46,9 +46,9 @@ To use this module, users must create an account and register their devices with
    * [Application Process Auto Restart](#application-auto-restart)
    * [Configure your Application for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
    * [Naming your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
-10. [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices-per-user)
-11. [Client request to get the available resources from a specific device](#Client-request-to-get-the-available-resources-from-a-specific-device)
-12. [Connecting To Other Server](#Connecting-To-Other-Server)
+10. [Get all available remote devices](#server-query-to-get-all-available-remote-devices-per-user)
+11. [Get the available resources from a specific device](#Client-request-to-get-the-available-resources-from-a-specific-device)
+12. [Connecting to other server](#Connecting-to-other-m2m-server)
 
 ## Supported Platform
 
@@ -1121,7 +1121,6 @@ client.connect((err, result) => {
   });  
 });
 ```
-
 ## Connecting to other m2m server
 ### You can connect to a different server by providing the url of the server you want to use
 ```js
