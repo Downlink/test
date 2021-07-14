@@ -36,21 +36,21 @@ To use this module, users must create an account and register their devices with
 6. [GPIO Resources for Raspberry Pi](gpio-resources-for-raspberry-pi)   
    * [GPIO Input Monitoring and Output Control](#gpio-input-monitoring-and-output-control)
    * [Using Channel Data for GPIO Control](#using-channel-data-for-gpio-control)
-6. [HTTP API Resources](#http-api)
+7. [HTTP API Resources](#http-api)
     * [Server GET and POST method Setup](#server-get-and-post-method)
     * [Client GET and POST request](#client-get-and-post-request)
-7. [Device Orchestration](#device-orchestration)
+8. [Device Orchestration](#device-orchestration)
     * [Remote Machine Monitoring](remote-machine-monitoring)
-8. [Using the Browser Interface to Access Clients and Devices](#using-the-browser-interface-to-access-clients-and-devices)
+9. [Using the Browser Interface to Access Clients and Devices](#using-the-browser-interface-to-access-clients-and-devices)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
    * [Configure your Application for Remote Code Editing and Auto Restart](#code-edit-and-auto-restart-automatic-configuration)
    * [Naming your Client Application for Tracking Purposes](#naming-your-client-application-for-tracking-purposes)
-9. [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices-per-user)
+10. [Server query to get all available remote devices](#server-query-to-get-all-available-remote-devices-per-user)
 \
-10.[Client request to get the available resources from a specific device](#Client-request-to-get-the-available-resources-from-a-specific-device)
+11.[Client request to get the available resources from a specific device](#Client-request-to-get-the-available-resources-from-a-specific-device)
 \
-11.[Connecting To Other Server](#Connecting-To-Other-Server)
+12.[Connecting To Other Server](#Connecting-To-Other-Server)
 
 ## Supported Platform
 
