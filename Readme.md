@@ -37,8 +37,8 @@ To use this module, users must create an account and register their devices with
    * [GPIO Input Monitoring and Output Control](#GPIO-Input-Monitoring-and-Output-Control)
    * [Using Channel Data for GPIO Control](#Using-Channel-Data-for-Raspberry-Pi-GPIO-Control)
 7. [HTTP API Resources](#http-api)
-    * [Server GET and POST method Setup](#Device-API-GET-and-POST-method-setup)
-    * [Client GET and POST request](#Client-API-GET-and-POST-request)
+    * [Server GET and POST method Setup](#Device-GET-and-POST-method-setup)
+    * [Client GET and POST request](#Client GET and POST request)
 8. [Device Orchestration](#device-orchestration)
     * [Remote Machine Monitoring](remote-machine-monitoring)
 9. [Using the Browser Interface](#Using-the-Browser-Interface)
@@ -851,7 +851,7 @@ client.connect(function(err, result){
 ```
 ## HTTP API
 
-### Device API - GET and POST method setup
+### Device GET and POST method setup
 ```js
 const m2m = require('m2m');
 
@@ -880,7 +880,7 @@ server.connect((err, result) => {
   });
 });
 ```
-### Client API - GET and POST request
+### Client GET and POST request
 ```js
 const m2m = require('m2m');
 
