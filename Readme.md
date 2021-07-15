@@ -9,11 +9,11 @@ The module's API is a FaaS (Function as a Service) also called "serverless" maki
 
 You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server.
 
-*m2m* can run alongside with other applications from your remote devices or endpoints.
+Your device servers will be accessible through its user assigned *device id* from client applications.
+
+It can run alongside with other applications from your remote devices or endpoints.
 
 You can set multiple *channel data* or *HTTP API* resources on your device servers. If your remote endpoint is a Raspberry Pi, you can set *GPIO resources* directly from the API.
-
-Your device servers will be accessible through its user assigned *device id* from client applications.
 
 Access to clients and devices is restricted to authenticated and authorized users only.
 
@@ -44,7 +44,7 @@ To use this module, users must create an account and register their devices with
     * [Server GET and POST method Setup](#Device-GET-and-POST-method-setup)
     * [Client GET and POST request](#Client-GET-and-POST-request)
 8. [Device Orchestration](#device-orchestration)
-    * [Remote Machine Monitoring](remote-machine-monitoring)
+    * [Remote Machine Monitoring](#remote-machine-monitoring)
 9. [Using the Browser Interface](#Using-the-Browser-Interface)
    * [Remote Code Editing](#remote-application-code-editing)
    * [Application Process Auto Restart](#application-auto-restart)
@@ -204,7 +204,7 @@ watch random data 115
 ```js
 const { Device } = require('m2m');
 
-const device = new Device(deviceId);
+let device = new Device(deviceId);
 
 device.connect(function(err, result){
   ...
@@ -664,7 +664,7 @@ device.connect(function(err, result){
 ```
 ### Client API To Capture and Watch GPIO Input Resources
 
-There are two methods we can capture and watch GPIO input resources from remote devices.
+There are two ways we can capture and watch GPIO input resources from remote devices.
 Choose one whichever is convenient to you.    
 
 ```js
@@ -682,7 +682,6 @@ client.connect(function(err, result){
       Using .gpio() method
 
    **************************/
-  // Applies both for ON/OFF methods
 
   // get current state of input pin 11
   device.gpio({mode:'in', pin:11}).getState(function(err, state){
@@ -711,7 +710,6 @@ client.connect(function(err, result){
       Using .input()/output() method
 
    ************************************/
-   // Applies both for ON/OFF methods
 
   // get current state of input pin 13
   device.input(13).getState(function(err, state){
@@ -739,7 +737,7 @@ client.connect(function(err, result){
 
 ### Client API To Control GPIO Output Resources
 
-There are two ways we can set or control (on/off) the GPIO output state from remote devices.
+Similar with GPIO input access, there are two ways we can set or control (on/off) the GPIO output state from remote devices.
 
 ```js
 const { Client } = require('m2m');
@@ -1169,7 +1167,7 @@ From the example above, the filename of the application is *device.js*. Replace 
 
 
 ### Application Auto Restart
-Using the browser interface, you may need to restart your application after a module update, code edit/update, or by sending a remote restart command.
+Using the browser interface, you may need to restart your application after a module update, code edit/update, or a remote restart command.
 
 Node-m2m uses **nodemon** to restart your application.
 ```js
@@ -1218,16 +1216,16 @@ If the configuration is correct, you can now run your node process using *npm st
 ```js
 $ npm start
 ```
-Your node application should restart automatically after a remote code update, an npm module update, or  a remote restart command from the browser interface.
+Your application should restart automatically after a remote *code update*, an *npm module update*, a remote *restart command* from the browser interface.
 
 ### Naming your Client Application for Tracking Purposes
 
-Unlike *device/server* applications, users can create *client* applications without server registration.
+Unlike the *device/server* applications, users can create *client* applications without registering it with the server.
 
 Node-m2m tracks all client applications through a dynamic *client id* from the browser.
-If you have multiple clients, tracking all your clients by *client id* is not easy.
+If you have multiple clients, tracking all your clients by its *client id* is not easy.
 
-You can add a **name**, **location** and a **description** properties to your clients as shown below.
+You can add a *name*, *location* and a *description* properties to your clients as shown below.
 
 This will make it easy to track all your clients from the browser interface.
 ```js
@@ -1236,8 +1234,6 @@ const m2m = require('m2m');
 const client = new m2m.Client({name:'Main client', location:'Boston, MA', description:'Test client app'});
 
 client.connect((err, result) => {
-  if(err) return console.error('connect error:', err.message);
-  console.log('result:', result);
   ...
 });
 ```
@@ -1306,7 +1302,7 @@ client.connect((err, result) => {
 ### You can connect to a different server by providing the url of the server you want to use
 ```js
 ...
-// By default without a url argument, the connect method will use 'https://www.node-m2m.com' server
+// By default without a url argument, it will connect to 'https://www.node-m2m.com' server
 client.connect(function(err, result){
   // application logic
 });
