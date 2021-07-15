@@ -217,8 +217,8 @@ device.connect(function(err, result){
     if(err) return console.error('setData my-channel-data error:', err.message);
 
     /*
-     * Implement/create your data source. Your data source can be of type string, number or object.
-     * Below is a hypothetical 'DataSource' method that will return the value of your data source.
+     * Implement the source of your channel data. Your data source can be of type string, number or object.
+     * Below is a pseudocode DataSource() method that will return the value of your data source.
      */
     let ds = DataSource();
     data.send(ds);
@@ -235,11 +235,9 @@ let client = new Client();
 client.connect(function(err, result){
   ...
 
-  /*********************************************
-
-     Capture channel data using a device alias
-
-   *********************************************/
+  /**
+   *  Capture channel data using a device alias
+   */
 
   // Create an alias (device object) of the remote device you want to access
   let device = client.accessDevice(deviceId);
@@ -251,13 +249,10 @@ client.connect(function(err, result){
     console.log(data);
   });
 
-  // or
 
-  /*********************************************************
-
-     Capture channel data directly from the client object
-
-   *********************************************************/
+  /**
+   *  Capture channel data directly from the client object
+   */
 
   // Provide the deviceId of the remote device you want to access
   client.getData(deviceId, 'my-channel-data', function(err, data){
@@ -281,11 +276,9 @@ let client = new Client();
 client.connect(function(err, result){
   ...
 
- /************************************************
-
-    Watch channel data using a device alias
-
-  ************************************************/
+ /**
+  *  Watch channel data using a device alias
+  */
 
    // Create an alias rd of the remote device you want to access
   let rd = client.accessDevice(deviceId);
@@ -319,13 +312,10 @@ client.connect(function(err, result){
     rd.watch('my-channel-data', 60000);
   }, 15*60000);
 
-  // or
 
-  /******************************************************
-
-     Watch channel data directly from the client object
-
-   ******************************************************/
+  /**
+   *  Watch channel data directly from the client object
+   */
 
    // Provide the device id of the remote device you want to access
    // as 1st argument of watch method
@@ -677,11 +667,9 @@ client.connect(function(err, result){
 
   let device = client.accessDevice(deviceId);
 
-  /**************************
-
-      Using .gpio() method
-
-   **************************/
+  /**
+   *  Using .gpio() method
+   */
 
   // get current state of input pin 11
   device.gpio({mode:'in', pin:11}).getState(function(err, state){
@@ -705,11 +693,9 @@ client.connect(function(err, result){
     console.log(state);
   });
 
-  /************************************
-
-      Using .input()/output() method
-
-   ************************************/
+  /**
+   *  Using .input()/output() method
+   */
 
   // get current state of input pin 13
   device.input(13).getState(function(err, state){
@@ -749,11 +735,9 @@ client.connect(function(err, result){
 
   let device = client.accessDevice(deviceId);
 
-  /**************************
-
-      Using .gpio() method
-
-   **************************/
+  /**
+   *  Using .gpio() method
+   */
   // Applies both for ON/OFF methods
 
   // turn ON output pin 33
@@ -770,11 +754,9 @@ client.connect(function(err, result){
     ...
   });
 
-  /************************************
-
-      Using .input()/output() method
-
-   ************************************/
+  /**
+   *  Using .input()/output() method
+   */
   // Applies both for ON/OFF methods
 
   // turn OFF output pin 35
