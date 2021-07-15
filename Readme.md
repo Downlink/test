@@ -598,12 +598,16 @@ Install array-gpio on your remote device
 $ npm install array-gpio
 ```
 ### Device API To Setup GPIO Input Resources
+/
+As expected, GPIO input objects are read-only. Clients can read/capture and watch its current state in real-time.
+
 ```js
+const m2m = require('m2m');
+
+const device = new m2m.Device(deviceId);
 
 device.connect(function(err, result){
   ...
-
-  // NOTE: GPIO Inputs are read-only
 
   // Set a GPIO input resource using pin 11
   device.setGpio({mode:'input', pin:11});
@@ -612,12 +616,14 @@ device.connect(function(err, result){
   device.setGpio({mode:'input', pin:[11, 13, 15, 19]});
 
   // Set GPIO inputs w/ a callback argument
-  device.setGpio({mode:'input', pin:[11, 13, 15, 19]}, function(err, gpio){
+  device.setGpio({mode:'input', pin:[15, 19]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
     /*
-     * The callback returned gpio object includes a pin and a state property
-     * for additional data processing/filtering
+     * If there is no error, the callback will return a gpio object
+     * with a pin and a state property that you can use for additional
+     * data processing/filtering with a custom logic
+     *
      */
     console.log('pin', gpio.pin, 'state', gpio.state);
     // provide custom logic here
@@ -625,7 +631,12 @@ device.connect(function(err, result){
 });
 ```
 ### Device API To Setup GPIO Output Resources
+/
+GPIO output objects are both readable and writable. Clients can read/capture and control its current state in real-time. At present you cannot watch the GPIO output state.
 ```js
+const m2m = require('m2m');
+
+const device = new m2m.Device(deviceId);
 
 device.connect(function(err, result){
   ...
@@ -637,12 +648,14 @@ device.connect(function(err, result){
   device.setGpio({mode:'input', pin:[33, 35, 36, 37]});
 
   // Set GPIO outputs w/ a callback argument
-  device.setGpio({mode:'input', pin:[33, 35, 36, 37]}, function(err, gpio){
+  device.setGpio({mode:'input', pin:[36, 37]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
     /*
-     * The callback returned gpio object includes a pin and a state property
-     * for additional data processing/filtering
+     * If there is no error, the callback will return a gpio object
+     * with a pin and a state property that you can use for additional
+     * data processing/filtering with a custom logic
+     *
      */
     console.log('pin', gpio.pin, 'state', gpio.state);
     // provide custom logic here
