@@ -241,7 +241,7 @@ client.connect(function(err, result){
 
    *********************************************/
 
-  // Create an alias (device object) of remote device 100
+  // Create an alias (device object) of the remote device you want to access
   let device = client.accessDevice(deviceId);
 
   device.getData('my-channel-data', function(err, data){
@@ -259,8 +259,8 @@ client.connect(function(err, result){
 
    *********************************************************/
 
-  // Provide the device id (100) of the remote device you want to access
-  client.getData(100, 'my-channel-data', function(err, data){
+  // Provide the deviceId of the remote device you want to access
+  client.getData(deviceId, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
 
     // data is the value of 'my-channel-data' data source
@@ -287,7 +287,7 @@ client.connect(function(err, result){
 
   ************************************************/
 
-   // Create an alias rd of remote device 100
+   // Create an alias rd of the remote device you want to access
   let rd = client.accessDevice(deviceId);
 
   // watch using a default poll interval of 5 secs
@@ -331,7 +331,7 @@ client.connect(function(err, result){
    // as 1st argument of watch method
 
   // watch using a default poll interval of 5 secs
-  client.watch(100, 'my-channel-data', function(err, data){
+  client.watch(deviceId, 'my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
 
     // data is the value of 'my-channel-data' data source
@@ -339,24 +339,24 @@ client.connect(function(err, result){
   });
 
   // watch using 30000 ms or 30 secs poll interval
-  client.watch(100, 'my-channel-data', 30000, function(err, data){
+  client.watch(deviceId, 'my-channel-data', 30000, function(err, data){
     if(err) return console.error('channel-data error:', err.message);
     console.log(data);
   });
 
   // unwatch channel data at a later time
   setTimeout(()=>{
-    client.unwatch(100, 'my-channel-data');
+    client.unwatch(deviceId, 'my-channel-data');
   }, 5*60000);
 
   // watch again at a later time using the default poll interval
   setTimeout(()=>{
-    client.watch(100, 'my-channel-data');
+    client.watch(deviceId, 'my-channel-data');
   }, 10*60000);
 
   // watch again at a later time using 30 secs poll interval
   setTimeout(()=>{
-    client.watch(100, 'my-channel-data', 30000);
+    client.watch(deviceId, 'my-channel-data', 30000);
   }, 15*60000);
 
 });
@@ -487,7 +487,7 @@ client.connect(function(err, result){
 });
 ```
 ### Sending Data to Remote Device
-\
+
 Instead of capturing data from remote devices, we can send data to our remote devices for resource updates, data movement, as control signal, or for whatever purposes you may need it in your application.  
 
 #### Device/Server API
