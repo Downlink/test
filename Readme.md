@@ -598,8 +598,8 @@ Install array-gpio on your remote device
 $ npm install array-gpio
 ```
 ### Device API To Setup GPIO Input Resources
-/
-As expected, GPIO input objects are read-only. Clients can read/capture and watch its current state in real-time but they cannot set or change it.
+
+As expected, GPIO input objects are read-only. Clients can read/capture and watch its current state in real-time but they cannot set/change (on/off) it.
 
 ```js
 const m2m = require('m2m');
@@ -631,9 +631,8 @@ device.connect(function(err, result){
 });
 ```
 ### Device API To Setup GPIO Output Resources
-/
 
-GPIO output objects are both readable and writable. Clients can read/capture and control its current state in real-time. At present you cannot watch the GPIO output state.
+GPIO output objects are both readable and writable. Clients can read/capture and control (on/off) its current state in real-time. At present, you *cannot watch* the state of GPIO output objects.
 ```js
 const m2m = require('m2m');
 
