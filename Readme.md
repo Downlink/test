@@ -204,7 +204,7 @@ watch random data 115
 ```js
 const { Device } = require('m2m');
 
-const device = new Device(100);
+const device = new Device(deviceId);
 
 device.connect(function(err, result){
   ...
@@ -242,7 +242,7 @@ client.connect(function(err, result){
    *********************************************/
 
   // Create an alias (device object) of remote device 100
-  let device = client.accessDevice(100);
+  let device = client.accessDevice(deviceId);
 
   device.getData('my-channel-data', function(err, data){
     if(err) return console.error('channel-data error:', err.message);
@@ -288,7 +288,7 @@ client.connect(function(err, result){
   ************************************************/
 
    // Create an alias rd of remote device 100
-  let rd = client.accessDevice(100);
+  let rd = client.accessDevice(deviceId);
 
   // watch using a default poll interval of 5 secs
   rd.watch('my-channel-data', function(err, data){
@@ -495,7 +495,7 @@ Instead of capturing data from remote devices, we can send data to our remote de
 const m2m = require('m2m');
 const fs = require('fs');
 
-let server = new m2m.Device(500);
+let server = new m2m.Device(deviceId);
 
 server.connect(function(err, result){
   if(err) return console.error('connect error:', err.message);
@@ -557,7 +557,7 @@ client.connect(function(err, result){
   if(err) return console.error('connect error:', err.message);
   console.log('result:', result);
 
-  let server = client.accessDevice(500);
+  let server = client.accessDevice(deviceId);
 
   // sending a simple string payload data to 'echo-server' channel
   let payload = 'hello server';
@@ -663,30 +663,29 @@ device.connect(function(err, result){
 });
 ```
 ### Client API To Capture and Watch GPIO Input Resources
-\
-There are two ways we can capture/watch GPIO input resources from remote devices.
+
+There are two methods we can capture and watch GPIO input resources from remote devices.
 Choose one whichever is convenient to you.    
 
 ```js
-const m2m = require('m2m');
+const { Client } = require('m2m');
 
-let client = new m2m.Client();
+let client = new Client();
 
 client.connect(function(err, result){
-  if(err) return console.error('connect error:', err.message);
-  console.log('result:', result);
+  ...
 
-  let device1 = client.accessDevice(120);
-  let device2 = client.accessDevice(130);
+  let device = client.accessDevice(deviceId);
 
   /**************************
 
       Using .gpio() method
 
    **************************/
+  // Applies both for ON/OFF methods
 
   // get current state of input pin 11
-  device1.gpio({mode:'in', pin:11}).getState(function(err, state){
+  device.gpio({mode:'in', pin:11}).getState(function(err, state){
     if(err) return console.error('getState input pin 11 error:', err.message);
 
     // returns the state of pin 11
@@ -694,14 +693,14 @@ client.connect(function(err, result){
   });
 
   // watch input pin 13 using the default 5 secs poll interval
-  device1.gpio({mode:'in', pin:13}).watch(function(err, state){
+  device.gpio({mode:'in', pin:13}).watch(function(err, state){
     if(err) return console.error('watch input pin 13 error:', err.message);
 
     console.log(state);
   });
 
   // watch input pin 15 using a 25 secs poll interval
-  device1.gpio({mode:'in', pin:15}).watch(25000, function(err, state){
+  device.gpio({mode:'in', pin:15}).watch(25000, function(err, state){
     if(err) return console.error('watch input pin 15 error:', err.message);
 
     console.log(state);
@@ -712,9 +711,10 @@ client.connect(function(err, result){
       Using .input()/output() method
 
    ************************************/
+   // Applies both for ON/OFF methods
 
   // get current state of input pin 13
-  device1.input(13).getState(function(err, state){
+  device.input(13).getState(function(err, state){
     if(err) return console.error('getState input pin 13 error:', err.message);
 
     // returns the state of pin 13
@@ -722,14 +722,14 @@ client.connect(function(err, result){
   });
 
   // watch input pin 15 using the default 5 secs poll interval
-  device1.input(15).watch(function(err, state){
+  device.input(15).watch(function(err, state){
     if(err) return console.error('watch input pin 15 error:', err.message);
 
     console.log(state);
   });
 
   // watch input pin 19 using a 25 secs poll interval
-  device1.input(19).watch(25000, function(err, state){
+  device.input(19).watch(25000, function(err, state){
     if(err) return console.error('watch input pin 19 error:', err.message);
 
     console.log(state);
@@ -738,32 +738,37 @@ client.connect(function(err, result){
 ```
 
 ### Client API To Control GPIO Output Resources
-\
-There are two ways we can control (on/off) the output resources from remote devices.
 
+There are two ways we can set or control (on/off) the GPIO output state from remote devices.
 
 ```js
-const m2m = require('m2m');
+const { Client } = require('m2m');
 
-let client = new m2m.Client();
+let client = new Client();
 
 client.connect(function(err, result){
   ...
-  let device = client.accessDevice(100);
+
+  let device = client.accessDevice(deviceId);
 
 /**************************
 
     Using .gpio() method
 
  **************************/
+ // Applies both for ON/OFF methods
+
   // turn ON output pin 33
   device.gpio({mode:'out', pin:33}).on();
 
-  // turn OFF output pin 33 w/ a callback for state confirmation
+  // turn OFF output pin 33 w/ a callback for state confirmation and
+  // for additional data processing/filtering with a custom logic
   device.gpio({mode:'out', pin:33}).off(function(err, state){
     if(err) return console.error('turn OFF output pin 33 error:', err.message);
 
-    console.log(state); // should return false
+     // should return false
+    console.log(state);
+    // add custom logic here
     ...
   });
 
@@ -772,14 +777,19 @@ client.connect(function(err, result){
     Using .input()/output() method
 
  ************************************/
+  // Applies both for ON/OFF methods
+
   // turn OFF output pin 35
   device.output(35).off();
 
-  // turn ON output pin 35 w/ a callback for state confirmation
+  // turn ON output pin 35 w/ a callback for state confirmation and
+  // for additional data processing/filtering with a custom logic
   device.output(35).on(function(err, state){
     if(err) return console.error('turn ON output pin 35 error:', err.message);
 
-    console.log(state); // should return true
+    // should return true
+    console.log(state);
+    // add custom logic here
     ...
   });  
 });
