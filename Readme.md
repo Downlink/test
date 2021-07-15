@@ -751,12 +751,12 @@ client.connect(function(err, result){
 
   let device = client.accessDevice(deviceId);
 
-/**************************
+  /**************************
 
-    Using .gpio() method
+      Using .gpio() method
 
- **************************/
- // Applies both for ON/OFF methods
+   **************************/
+  // Applies both for ON/OFF methods
 
   // turn ON output pin 33
   device.gpio({mode:'out', pin:33}).on();
@@ -772,11 +772,11 @@ client.connect(function(err, result){
     ...
   });
 
-/************************************
+  /************************************
 
-    Using .input()/output() method
+      Using .input()/output() method
 
- ************************************/
+   ************************************/
   // Applies both for ON/OFF methods
 
   // turn OFF output pin 35
