@@ -280,7 +280,7 @@ client.connect(function(err, result){
   *  Watch channel data using a device alias
   */
 
-   // Create an alias rd of the remote device you want to access
+  // Create an alias rd of the remote device you want to access
   let rd = client.accessDevice(deviceId);
 
   // watch using a default poll interval of 5 secs
@@ -317,8 +317,8 @@ client.connect(function(err, result){
    *  Watch channel data directly from the client object
    */
 
-   // Provide the device id of the remote device you want to access
-   // as 1st argument of watch method
+  // Provide the device id of the remote device you want to access
+  // as 1st argument of watch method
 
   // watch using a default poll interval of 5 secs
   client.watch(deviceId, 'my-channel-data', function(err, data){
@@ -594,7 +594,7 @@ As expected, GPIO input objects are *read-only*. Clients can read/capture and wa
 ```js
 const { Device }  = require('m2m');
 
-const device = new Device(deviceId);
+let device = new Device(deviceId);
 
 device.connect(function(err, result){
   ...
@@ -613,9 +613,9 @@ device.connect(function(err, result){
      * If there is no error, the callback will return a gpio object
      * with a pin and a state property that you can use for additional
      * data processing/filtering with a custom logic
-     *
      */
     console.log('pin', gpio.pin, 'state', gpio.state);
+
     // provide custom logic here
   });
 });
@@ -626,7 +626,7 @@ GPIO output objects are both *readable* and *writable*. Clients can read/capture
 ```js
 const { Device }  = require('m2m');
 
-const device = new Device(deviceId);
+let device = new Device(deviceId);
 
 device.connect(function(err, result){
   ...
@@ -635,19 +635,19 @@ device.connect(function(err, result){
   device.setGpio({mode:'output', pin:33});
 
   // Set GPIO output resources using pin 33, 35, 36 and 37
-  device.setGpio({mode:'input', pin:[33, 35, 36, 37]});
+  device.setGpio({mode:'output', pin:[33, 35, 36, 37]});
 
   // Set GPIO outputs w/ a callback argument
-  device.setGpio({mode:'input', pin:[36, 37]}, function(err, gpio){
+  device.setGpio({mode:'output', pin:[36, 37]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
     /*
      * If there is no error, the callback will return a gpio object
      * with a pin and a state property that you can use for additional
      * data processing/filtering with a custom logic
-     *
      */
     console.log('pin', gpio.pin, 'state', gpio.state);
+
     // provide custom logic here
   });
 });
@@ -738,7 +738,8 @@ client.connect(function(err, result){
   /**
    *  Using .gpio() method
    */
-  // Applies both for ON/OFF methods
+
+  // Applies both for on/off methods
 
   // turn ON output pin 33
   device.gpio({mode:'out', pin:33}).on();
@@ -748,16 +749,16 @@ client.connect(function(err, result){
   device.gpio({mode:'out', pin:33}).off(function(err, state){
     if(err) return console.error('turn OFF output pin 33 error:', err.message);
 
-     // should return false
     console.log(state);
+
     // add custom logic here
-    ...
   });
 
   /**
    *  Using .input()/output() method
    */
-  // Applies both for ON/OFF methods
+
+  // Applies both for on/off methods
 
   // turn OFF output pin 35
   device.output(35).off();
@@ -767,10 +768,9 @@ client.connect(function(err, result){
   device.output(35).on(function(err, state){
     if(err) return console.error('turn ON output pin 35 error:', err.message);
 
-    // should return true
     console.log(state);
+
     // add custom logic here
-    ...
   });  
 });
 ```
