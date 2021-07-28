@@ -23,7 +23,7 @@ To use this module, users must create an account and register their devices with
 3. [Installation](#installation)
 4. [Quick Tour](#quick-tour)
 5. [Channel Data Resources](#channel-data-resources)
-   * [Set Channel Data on your Device](#Set-Channel-Data-on-your-Device)
+   * [Set Channel Data Resources on your Device](#Set-Channel-Data-Resources-on-your-Device)
    * [Capture Channel Data from Client Device](#Capture-Channel-Data-from-Client)
    * [Watch/Monitor Channel Data from Client Device](#Watch-Channel-Data-from-Client)
    * [Sending Data to Remote Device](#Sending-Data-to-Remote-Device)
@@ -58,7 +58,7 @@ To use this module, users must create an account and register their devices with
 
 ## Node.js version requirement
 
-* Node.js versions: 10.x, 11.x, 12.x, 14.x
+* Node.js versions: 10.x, 11.x, 12.x, 14.x. Ideally the latest 14.x LTS version.
 
 ## Installation
 ```js
@@ -188,7 +188,7 @@ watch random data 115
 ```
 ## Channel Data Resources
 
-### Set Channel Data on your Device
+### Set Channel Data Resources on your Device
 
 ```js
 const { Device } = require('m2m');
@@ -343,7 +343,7 @@ client.connect(function(err, result){
 ```
 ### Sending Data to Remote Device
 
-Instead of capturing or receiving channel data from remote devices, we can send data to device channel resources for updates, data migration, as control signal, or for whatever purposes you may need it in your application.  
+Instead of capturing or receiving data from remote devices, we can send data to device channel resources for updates and data migration, as control signal, or for whatever purposes you may need it in your application.  
 
 #### Set Channel Data on your Device
 ```js
