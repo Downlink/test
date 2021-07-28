@@ -7,9 +7,9 @@ m2m is a client module for machine-to-machine communication framework  [node-m2m
 
 The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
 
-You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Your device servers will be accessible through its non-ip user-assigned *device id* from client applications.
+You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Your device servers will be accessible through its user-assigned *device id* from client applications.
 
-You can set multiple *channel data* or *HTTP API* resources on your device as well as *GPIO resources* for Raspberry Pi directly from the API.
+You can set multiple *Channel Data* or *HTTP API* resources on your device as well as *GPIO resources* for Raspberry Pi directly from the API.
 
 Clients and devices are accessible only to authenticated and authorized users. All communications between clients and devices are fully encrypted using TLS.
 
@@ -36,7 +36,7 @@ To use this module, users must create an account and register their devices with
    * [Using Channel Data API for GPIO Input/Output Resources](#Using-Channel-Data-API-for-GPIO-Resources)
    * [Example - GPIO Input Monitoring and Output Control](#GPIO-Input-Monitoring-and-Output-Control)
 7. [HTTP API Resources](#http-api)
-    * [Set HTTP GET and POST method Resources on your Device](#Device-GET-and-POST-method-setup)
+    * [Set HTTP GET and POST Resources on your Device](#Device-GET-and-POST-method-setup)
     * [HTTP GET and POST Request from Client](#Client-GET-and-POST-request)
 8. [Device Orchestration](#device-orchestration)
     * [Remote Machine Monitoring](#remote-machine-monitoring)
@@ -110,9 +110,9 @@ device.connect(function(err, result){
   // set 'random-number' as channel data resource  
   device.setData('random-number', function(err, data){
     if(err) return console.error('setData random-number error:', err.message);
-
-    let rd = Math.floor(Math.random() * 100);
-    data.send(rd);
+    
+    let rn = Math.floor(Math.random() * 100);
+    data.send(rn);
   });
 });
 ```
@@ -270,11 +270,11 @@ client.connect(function(err, result){
   *  Watch channel data using a device alias
   */
 
-  // Create an alias rd of the remote device you want to access
-  let rd = client.accessDevice(deviceId);
+  // Create an alias object for the remote device you want to access
+  let device = client.accessDevice(deviceId);
 
   // watch using a default poll interval of 5 secs
-  rd.watch('my-channel', function(err, data){
+  device.watch('my-channel', function(err, data){
     if(err) return console.error('my-channel error:', err.message);
 
     // data is the value of 'my-channel' data source
@@ -282,24 +282,24 @@ client.connect(function(err, result){
   });
 
   // watch using a 1 minute poll interval
-  rd.watch('my-channel', 60000, function(err, data){
+  device.watch('my-channel', 60000, function(err, data){
     if(err) return console.error('my-channel error:', err.message);
     console.log(data);
   });
 
   // unwatch channel data at a later time
   setTimeout(()=>{
-    rd.unwatch('my-channel');
+    device.unwatch('my-channel');
   }, 5*60000);
 
   // watch again using the default poll interval
   setTimeout(()=>{
-    rd.watch('my-channel');
+    device.watch('my-channel');
   }, 10*60000);
 
   // watch again using a 1 min poll interval
   setTimeout(()=>{
-    rd.watch('my-channel', 60000);
+    device.watch('my-channel', 60000);
   }, 15*60000);
 
 
@@ -597,7 +597,7 @@ device.connect(function(err, result){
   // Set GPIO input resources using pin 11, 13, 15 and 19
   device.setGpio({mode:'input', pin:[11, 13, 15, 19]});
 
-  // Set GPIO inputs w/ a callback argument
+  // Set GPIO input resources w/ a callback argument
   device.setGpio({mode:'input', pin:[15, 19]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
@@ -608,7 +608,7 @@ device.connect(function(err, result){
      */
     console.log('pin', gpio.pin, 'state', gpio.state);
 
-    // provide custom logic here
+    // add custom logic here
   });
 });
 ```
@@ -629,7 +629,7 @@ device.connect(function(err, result){
   // Set GPIO output resources using pin 33, 35, 36 and 37
   device.setGpio({mode:'output', pin:[33, 35, 36, 37]});
 
-  // Set GPIO outputs w/ a callback argument
+  // Set GPIO output resources w/ a callback argument
   device.setGpio({mode:'output', pin:[36, 37]}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
@@ -640,7 +640,7 @@ device.connect(function(err, result){
      */
     console.log('pin', gpio.pin, 'state', gpio.state);
 
-    // provide custom logic here
+    // add custom logic here
   });
 });
 ```
@@ -1263,13 +1263,14 @@ client.connect((err, result) => {
 ### You can connect to a different server by providing the url of the server you want to use
 ```js
 ...
-// By default without a url argument, it will connect to 'https://www.node-m2m.com' server
-client.connect(function(err, result){
+// By default without a url argument, the connect method will use the 'https://www.node-m2m.com' server
+.connect(function(err, result){
   // application logic
 });
 
-// Connecting to 'https://www.my-m2m-server.com' server
-client.connect('https://www.my-m2m-server.com', function(err, result){
+// To connect to a different server, provide a url argument to the connect method
+// e.g. connecting to 'https://www.my-m2m-server.com' server
+.connect('https://www.my-m2m-server.com', function(err, result){
   // application logic
 });
 ```
