@@ -3,17 +3,17 @@
 [![Version npm](https://img.shields.io/npm/v/m2m.svg?logo=npm)](https://www.npmjs.com/package/m2m)
 ![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fwww.node-m2m.com%2Fm2m%2Fbuild-badge%2F2021)
 
-m2m is a client module for machine-to-machine communication framework  [node-m2m](https://www.node-m2m.com).
+m2m is a lightweight communication library for developing client-server applications using the machine-to-machine framework [node-m2m](https://www.node-m2m.com).
 
-The module's API is a FaaS (Function as a Service) also called "serverless" making it easy for everyone to develop applications in telematics, data acquisition, process automation, network gateways, workflow orchestration and many others.
+It uses a FaaS (Function as a Service) API also called *serverless* which enables anyone to easily create, prototype and test applications in IoT, telematics, data acquisition, process automation and a whole lot more.
 
 You can deploy multiple public device servers on the fly from anywhere without the usual heavy infrastructure involved in provisioning a public server. Your device servers will be accessible through its user-assigned *device id* from client applications.
 
-You can set multiple *Channel Data* or *HTTP API* resources on your device as well as *GPIO resources* for Raspberry Pi directly from the API.
+You can set multiple *Channel Data* or *HTTP API* resources on your remote device as well as *GPIO* resources for Raspberry Pi.
 
-Clients and devices are accessible only to authenticated and authorized users. All communications between clients and devices are fully encrypted using TLS.
+Access to clients and devices is restricted to authenticated and authorized users only. All communications between clients and devices are fully encrypted using TLS.
 
-To use this module, users must create an account and register their devices with [node-m2m](https://www.node-m2m.com).
+To use this library, users must <a href="https://www.node-m2m.com/m2m/account/create" target="_blank">create an account</a> and register their devices with node-m2m .
 
 [](https://raw.githubusercontent.com/EdoLabs/src/master/m2mSystem2.svg?sanitize=true)
 
@@ -858,9 +858,9 @@ client.connect(function(err, result){
 
 If the standard API for setting GPIO resources does not meet your requirements, you can use the channel data API to set GPIO input/output resources.
 
-In this example, we will use *array-gpio* module as low level GPIO peripheral access library to watch an input object and control (on/off) an output object.  
+In this example, we will use the API of the *array-gpio* module to watch an input object and control (on/off) an output object. If you are familar with other *npm* GPIO library, you can use it instead.     
 
-#### Device/Server setup
+#### Device setup
 ```js
 const m2m = require('m2m');
 const { setInput, setOutput } = require('array-gpio');
@@ -1016,7 +1016,7 @@ client.connect((err, result) => {
 
 ### Remote Machine Monitoring
 
-Install array-gpio to each remote machine.
+Install array-gpio for each remote machine.
 ```js
 $ npm install array-gpio
 ```
