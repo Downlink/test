@@ -575,13 +575,15 @@ client.connect(function(err, result){
 ```
 
 ## GPIO Resources for Raspberry Pi
-Install array-gpio on your remote device
+
+### Set GPIO Input Resources on Your Raspberry Pi Device
+
+Install array-gpio on your Raspberry Pi device
 ```js
 $ npm install array-gpio
 ```
-### Set GPIO Input Resources on Your Device
 
-GPIO input objects are *read-only*. Clients can read/capture and watch its current state in real-time but they *cannot set/change* its state.
+GPIO input object resources are *read-only*. Clients can read/capture and watch its current state in real-time but they *cannot set/change* its state.
 
 ```js
 const { Device }  = require('m2m');
@@ -613,7 +615,7 @@ device.connect(function(err, result){
 });
 ```
 
-### Set Simulated GPIO Input Resources on Non-Raspberry Device
+#### Set Simulated GPIO Input Resources on Non-Raspberry Device
 
 You can set GPIO input objects in simulation on Windows or Linux computers for trial. It behaves similarly as if you are using a Raspberry Pi but only in simulation. Set the GPIO input object  resources as usual with a callback and add a property `type` with a value of *sim* or *simulation*.  
 
@@ -625,7 +627,8 @@ let device = new Device(deviceId);
 device.connect(function(err, result){
   ...
 
-  // Set GPIO input resources w/ a callback argument as usual and add a property type with a value of 'sim' or 'simulation'. 
+  // Set GPIO input resources w/ a callback argument as usual
+  // and add a property type with a value of 'sim' or 'simulation'. 
   device.setGpio({mode:'input', pin:[15, 19], type:'sim'}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
@@ -635,9 +638,14 @@ device.connect(function(err, result){
 });
 
 
-### Set GPIO Output Resources on Your Device
+### Set GPIO Output Resources on Your Raspberry Pi Device
 
-GPIO output objects are both *readable* and *writable*. Clients can read/capture and control (on/off) its current state in real-time. At present, you *cannot watch* the state of GPIO output objects.
+Install array-gpio on your Raspberry Pi device
+```js
+$ npm install array-gpio
+```
+
+GPIO output object resources are both *readable* and *writable*. Clients can read/capture and control (on/off) its current state in real-time. At present, you *cannot watch* the state of GPIO output objects.
 ```js
 const { Device }  = require('m2m');
 
@@ -667,7 +675,7 @@ device.connect(function(err, result){
   });
 });
 ```
-### Set Simulated GPIO Output Resources on Non-Raspberry Device
+#### Set Simulated GPIO Output Resources on Non-Raspberry Device
 
 Similar with input objects, you can set GPIO output objects in simulation for Windows or Linux computers for trial. Set the GPIO output objects as usual with a callback and add a property `type` with a value of *sim* or *simulation*.  
 
@@ -679,7 +687,8 @@ let device = new Device(deviceId);
 device.connect(function(err, result){
   ...
 
-  // Set GPIO output resources w/ a callback argument as usual and add a property type with a value of 'sim' or 'simulation'. 
+  // Set GPIO output resources w/ a callback argument as usual
+  // and add a property type with a value of 'sim' or 'simulation'. 
   device.setGpio({mode:'output', pin:[33, 35], type:'sim'}, function(err, gpio){
     if(err) return console.error('setGpio output error:', err.message);
 
