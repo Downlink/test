@@ -617,7 +617,7 @@ device.connect(function(err, result){
 
 #### Set Simulated GPIO Input Resources on Non-Raspberry Device
 
-You can set GPIO input objects in simulation on Windows or Linux computers for trial. It behaves similarly as if you are using a Raspberry Pi but only in simulation. Set the GPIO input object  resources as usual with a callback and add a property `type` with a value of *sim* or *simulation*.  
+You can set GPIO input objects in simulation on Windows or Linux computers for trial. It behaves similarly as if you are using a Raspberry Pi but only in simulation. Set the GPIO input object  resources as usual with a callback and add a `type` property with a value of *sim* or *simulation* from the object argument.  
 
 ```js
 const { Device }  = require('m2m');
@@ -627,8 +627,6 @@ let device = new Device(deviceId);
 device.connect(function(err, result){
   ...
 
-  // Set GPIO input resources w/ a callback argument as usual
-  // and add a property type with a value of 'sim' or 'simulation'. 
   device.setGpio({mode:'input', pin:[15, 19], type:'sim'}, function(err, gpio){
     if(err) return console.error('setGpio input error:', err.message);
 
@@ -677,7 +675,7 @@ device.connect(function(err, result){
 ```
 #### Set Simulated GPIO Output Resources on Non-Raspberry Device
 
-Similar with input objects, you can set GPIO output objects in simulation for Windows or Linux computers for trial. Set the GPIO output objects as usual with a callback and add a property `type` with a value of *sim* or *simulation*.  
+Similar with input objects, you can set GPIO output objects in simulation for Windows or Linux computers for trial. Set the GPIO output objects as usual with a callback and add a `type` property with a value of *sim* or *simulation* from the object argument.   
 
 ```js
 const { Device }  = require('m2m');
@@ -687,8 +685,6 @@ let device = new Device(deviceId);
 device.connect(function(err, result){
   ...
 
-  // Set GPIO output resources w/ a callback argument as usual
-  // and add a property type with a value of 'sim' or 'simulation'. 
   device.setGpio({mode:'output', pin:[33, 35], type:'sim'}, function(err, gpio){
     if(err) return console.error('setGpio output error:', err.message);
 
@@ -750,7 +746,6 @@ client.connect(function(err, result){
 
     console.log(state);
   });
-
 });
 ```
 
