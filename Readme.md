@@ -29,8 +29,8 @@ To use this library, users must <a href="https://www.node-m2m.com/m2m/account/cr
    * [Sending Data to Remote Device](#Sending-Data-to-Remote-Device)
    * [Example - Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
 6. [GPIO Resources for Raspberry Pi](#gpio-resources-for-raspberry-pi)  
-   * [Set GPIO Input Resources on Your Device](#Set-GPIO-Input-Resources-on-your-Device)
-   * [Set GPIO Output Resources on Your Device](#Set-GPIO-Output-Resources-on-your-Device)
+   * [Set GPIO Input Resources on Your Device](#Set-GPIO-Input-Resources-on-Your-Raspberry-Pi-Device)
+   * [Set GPIO Output Resources on Your Device](#Set-GPIO-Output-Resources-on-Your-Raspberry-Pi-Device)
    * [Capture/Watch GPIO Input Resources from Client](#Capture-and-Watch-GPIO-Input-Resources-from-Client)
    * [Control (On/Off) GPIO Output Resources from Client](#Control-GPIO-Output-Resources-from-Client)
    * [Using Channel Data API for GPIO Input/Output Resources](#Using-Channel-Data-API-for-GPIO-Resources)
@@ -636,7 +636,7 @@ device.connect(function(err, result){
 
   });
 });
-
+```
 
 ### Set GPIO Output Resources on Your Raspberry Pi Device
 
@@ -696,7 +696,7 @@ device.connect(function(err, result){
 
   });
 });
-
+```
 
 ### Capture and Watch GPIO Input Resources from Client
 
