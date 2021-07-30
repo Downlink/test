@@ -26,7 +26,7 @@ To use this library, users must <a href="https://www.node-m2m.com/m2m/account/cr
    * [Set Channel Data Resources on Your Device](#set-channel-data-resources-on-your-device)
    * [Capture Channel Data from Client Device](#capture-channel-data-from-client)
    * [Watch/Monitor Channel Data from Client Device](#watch-channel-data-from-client)
-   * [Sending Data to Remote Device](#sending-sata-to-remote-device)
+   * [Sending Data to Remote Device](#sending-data-to-remote-device)
    * [Example - Using MCP 9808 Temperature Sensor](#using-mcp-9808-temperature-sensor)
 6. [GPIO Resources for Raspberry Pi](#gpio-resources-for-raspberry-pi)  
    * [Set GPIO Input Resources on Your Device](#set-gpio-input-resources-on-your-raspberry-pi-device)
