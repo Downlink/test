@@ -617,7 +617,7 @@ device.connect(function(err, result){
 
 #### Set Simulated GPIO Input Resources on Non-Raspberry Device
 
-You can set GPIO input objects in simulation on Windows or Linux computers for trial. It behaves similarly as if you are using a Raspberry Pi but only in simulation. Set the GPIO input object  resources as usual with a callback and add a `type` property with a value of *sim* or *simulation* from the object argument.  
+You can set GPIO input objects in simulation on Windows or Linux computers for trial. It behaves similarly as if you are using a Raspberry Pi but only in simulation. Set the GPIO input object  resources as usual with a callback and add a *type* property with a value of `sim` or `simulation` from the object argument.  
 
 ```js
 const { Device }  = require('m2m');
@@ -675,7 +675,7 @@ device.connect(function(err, result){
 ```
 #### Set Simulated GPIO Output Resources on Non-Raspberry Device
 
-Similar with input objects, you can set GPIO output objects in simulation for Windows or Linux computers for trial. Set the GPIO output objects as usual with a callback and add a `type` property with a value of *sim* or *simulation* from the object argument.   
+Similar with input objects, you can set GPIO output objects in simulation for Windows or Linux computers for trial. Set the GPIO output objects as usual with a callback and add a *type* property with a value of `sim` or `simulation` from the object argument.    
 
 ```js
 const { Device }  = require('m2m');
